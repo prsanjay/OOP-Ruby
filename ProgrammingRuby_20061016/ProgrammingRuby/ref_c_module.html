@@ -1,0 +1,544 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Module</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_c_module',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="class" id="Module">class <strong>Module</strong> &lt; Object</h1>
+
+<p><strong>Subclasses:</strong> Class</p>
+
+<p>A <code>Module</code> is a collection of methods and constants. The methods in a module may be instance methods or module methods. Instance methods appear as methods in a class when the module is included, module methods do not. Conversely, module methods may be called without creating an encapsulating object, while instance methods may not. See <code class="class_instance_method"><a href="ref_c_module.html#Module.module_function"><span class="class">Module</span>#<span class="method">module_function</span></a></code>.</p>
+
+<p>In the descriptions that follow, the parameter <i class="obj">aSymbol</i> refers to a symbol, which is either a quoted string or a <code class="class">Symbol</code> (such as <code>:name</code>).</p>
+
+<div><code class="block">module Mod
+  include Math
+  CONST = 1
+  def meth
+    #  ...
+  end
+end
+Mod.type <span class="output"><span class="outputmark">&rarr;</span> Module</span>
+Mod.constants <span class="output"><span class="outputmark">&rarr;</span> ["CONST", "E", "PI"]</span>
+Mod.instance_methods <span class="output"><span class="outputmark">&rarr;</span> ["meth"]</span></code></div>
+
+
+<h2 class="refsubsection" id="classmethods">class methods</h2>
+<dl class="methodlist">
+	<dt id="Module.constants">constants</dt>
+		<dd class="callseq">Module.constants  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns an array of the names of all constants defined in the system. This list includes the names of all modules and classes.
+
+<div><code class="block">p Module.constants.sort[1..5]</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">["ARGV", "ArgumentError", "Array", "Bignum", "Binding"]</code></div>
+
+		</dd>
+
+	<dt id="Module.nesting">nesting</dt>
+		<dd class="callseq">Module.nesting  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns the list of <code>Modules</code> nested at the point of call.
+
+<div><code class="block">module M1
+  module M2
+    $a = Module.nesting
+  end
+end
+$a <span class="output"><span class="outputmark">&rarr;</span> [M1::M2, M1]</span>
+$a[0].name <span class="output"><span class="outputmark">&rarr;</span> "M1::M2"</span></code></div>
+
+		</dd>
+
+	<dt id="Module.new">new</dt>
+		<dd class="callseq">Module.new  &rarr; <i class="obj">aModule</i></dd>
+		<dd class="desc">Creates a new anonymous module.</dd>
+</dl>
+
+<h2 class="refsubsection" id="instancemethods">instance methods</h2>
+<dl class="methodlist">
+	<dt id="Module._lt_cm_lt_eq_cm_lt_cm_lt_eq">&lt;, &lt;=, &gt;, &gt;=</dt>
+		<dd class="callseq"><i class="obj">mod</i> <code><em>relop</em></code> <i class="obj">aModule</i> &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Hierarchy Query&mdash;One module is considered <em>greater than</em> another if it is included in (or is a parent class of) the other module. The other operators are defined accordingly. If there is no relationship between the modules, returns false for all operators.
+
+<div><code class="block">module Mixin
+end
+
+module Parent
+  include Mixin
+end
+
+module Unrelated
+end
+
+Parent &gt; Mixin <span class="output"><span class="outputmark">&rarr;</span> false</span>
+Parent &lt; Mixin <span class="output"><span class="outputmark">&rarr;</span> true</span>
+Parent &lt;= Parent <span class="output"><span class="outputmark">&rarr;</span> true</span>
+Parent &lt; Unrelated <span class="output"><span class="outputmark">&rarr;</span> false</span>
+Parent &gt; Unrelated <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+		</dd>
+
+	<dt id="Module._lt_eq_lt">&lt;=&gt;</dt>
+		<dd class="callseq"><i class="obj">mod</i> &lt;=&gt; <i class="obj">aModule</i>  &rarr; -1, 0, +1</dd>
+		<dd class="desc">Comparison&mdash;Returns -1 if <i class="obj">mod</i> includes <i class="obj">aModule</i>, 0 if <i class="obj">mod</i> is the same as <i class="obj">aModule</i>, and +1 if <i class="obj">mod</i> is included by <i class="obj">aModule</i> or if <i class="obj">mod</i> has no relationship with <i class="obj">aModule</i>. </dd>
+
+	<dt id="Module._eq_eq_eq">===</dt>
+		<dd class="callseq"><i class="obj">mod</i> === <i class="obj">anObject</i>  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Case Equality&mdash;Returns <code class="const">true</code> if <i class="obj">anObject</i> is an instance of <i class="obj">mod</i>
+      or one of <i class="obj">mod</i>'s descendents. Of limited use for modules, but
+      can be used in <code class="keyword">case</code> statements to classify objects by class.
+
+		</dd>
+
+	<dt id="Module.ancestors">ancestors</dt>
+		<dd class="callseq"><i class="obj">mod</i>.ancestors  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns a list of modules included in <i class="obj">mod</i> (including <i class="obj">mod</i> itself).
+
+<div><code class="block">module Mod
+  include Math
+  include Comparable
+end
+
+Mod.ancestors <span class="output"><span class="outputmark">&rarr;</span> [Mod, Comparable, Math]</span>
+Math.ancestors <span class="output"><span class="outputmark">&rarr;</span> [Math]</span></code></div>
+
+		</dd>
+
+	<dt id="Module.class_eval">class_eval</dt>
+		<dd class="callseq"><i class="obj">mod</i>.class_eval( <i class="obj">aString</i> )  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="callseq"><i class="obj">mod</i>.class_eval {|  | block }  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Synonym for <code>Module.module_eval</code>.
+
+		</dd>
+
+	<dt id="Module.class_variables">class_variables</dt>
+		<dd class="callseq"><i class="obj">mod</i>.class_variables  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns an array of the names of class variables in <i class="obj">mod</i> and the ancestors of <i class="obj">mod</i>.
+
+<div><code class="block">class One
+  @@var1 = 1
+end
+class Two &lt; One
+  @@var2 = 2
+end
+One.class_variables <span class="output"><span class="outputmark">&rarr;</span> ["@@var1"]</span>
+Two.class_variables <span class="output"><span class="outputmark">&rarr;</span> ["@@var2", "@@var1"]</span></code></div>
+
+		</dd>
+
+	<dt id="Module.clone">clone</dt>
+		<dd class="callseq"><i class="obj">mod</i>.clone  &rarr; <i class="obj">aModule</i></dd>
+		<dd class="desc">Creates a new copy of a module.
+
+<div><code class="block">m = Math.clone <span class="output"><span class="outputmark">&rarr;</span> Math</span>
+m.constants <span class="output"><span class="outputmark">&rarr;</span> ["E", "PI"]</span>
+m == Math <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+		</dd>
+
+	<dt id="Module.const_defined_qm">const_defined?</dt>
+		<dd class="callseq"><i class="obj">mod</i>.const_defined?( <i class="obj">aSymbol</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if a constant with the given name is defined by <i class="obj">mod</i>.
+
+<div><code class="block">Math.const_defined? "PI" <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="Module.const_get">const_get</dt>
+		<dd class="callseq"><i class="obj">mod</i>.const_get( <i class="obj">aSymbol</i> )  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Returns the value of the named constant in <i class="obj">mod</i>.
+
+<div><code class="block">Math.const_get :PI <span class="output"><span class="outputmark">&rarr;</span> 3.141592654</span></code></div>
+
+		</dd>
+
+	<dt id="Module.const_set">const_set</dt>
+		<dd class="callseq"><i class="obj">mod</i>.const_set( <i class="obj">aSymbol</i>, <i class="obj">anObject</i> )  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Sets the named constant to the given object, returning that object. Creates a new constant if no constant with the given name previously existed.
+
+<div><code class="block">Math.const_set("HIGH_SCHOOL_PI", 22.0/7.0) <span class="output"><span class="outputmark">&rarr;</span> 3.142857143</span>
+Math::HIGH_SCHOOL_PI - Math::PI <span class="output"><span class="outputmark">&rarr;</span> 0.001264489267</span></code></div>
+
+		</dd>
+
+	<dt id="Module.constants">constants</dt>
+		<dd class="callseq"><i class="obj">mod</i>.constants  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns an array of the names of the constants accessible
+      in <i class="obj">mod</i>. This includes the names of constants in any
+      included modules (example at start of section).
+
+		</dd>
+
+	<dt id="Module.included_modules">included_modules</dt>
+		<dd class="callseq"><i class="obj">mod</i>.included_modules  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns the list of modules included in <i class="obj">mod</i>.
+
+<div><code class="block">module Mixin
+end
+
+module Outer
+  include Mixin
+end
+
+Mixin.included_modules <span class="output"><span class="outputmark">&rarr;</span> []</span>
+Outer.included_modules <span class="output"><span class="outputmark">&rarr;</span> [Mixin]</span></code></div>
+
+		</dd>
+
+	<dt id="Module.instance_methods">instance_methods</dt>
+		<dd class="callseq"><i class="obj">mod</i>.instance_methods( <i class="obj">includeSuper</i>=<code class="const">false</code> )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns an array containing the names of public instance methods in the receiver. For a module, these are the public methods; for a class, they are the instance (not singleton) methods. With no argument, or with an argument that is <code class="const">false</code>, the instance methods in <i class="obj">mod</i> are returned, otherwise the methods in <i class="obj">mod</i> and <i class="obj">mod</i>'s superclasses are returned.
+
+<div><code class="block">module A
+  def method1()  end
+end
+class B
+  def method2()  end
+end
+class C &lt; B
+  def method3()  end
+end</code></div>
+
+<div><code class="block">A.instance_methods <span class="output"><span class="outputmark">&rarr;</span> ["method1"]</span>
+B.instance_methods <span class="output"><span class="outputmark">&rarr;</span> ["method2"]</span>
+C.instance_methods <span class="output"><span class="outputmark">&rarr;</span> ["method3"]</span>
+C.instance_methods(true).length <span class="output"><span class="outputmark">&rarr;</span> 39</span></code></div>
+
+		</dd>
+
+	<dt id="Module.method_defined_qm">method_defined?</dt>
+		<dd class="callseq"><i class="obj">mod</i>.method_defined?( <i class="obj">aSymbol</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the named method is defined by <i class="obj">mod</i> (or its included modules and, if <i class="obj">mod</i> is a class, its ancestors).
+
+<div><code class="block">module A
+  def method1()  end
+end
+class B
+  def method2()  end
+end
+class C &lt; B
+  include A
+  def method3()  end
+end
+
+A.method_defined? :method1 <span class="output"><span class="outputmark">&rarr;</span> true</span>
+C.method_defined? "method1" <span class="output"><span class="outputmark">&rarr;</span> true</span>
+C.method_defined? "method2" <span class="output"><span class="outputmark">&rarr;</span> true</span>
+C.method_defined? "method3" <span class="output"><span class="outputmark">&rarr;</span> true</span>
+C.method_defined? "method4" <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+		</dd>
+
+	<dt id="Module.module_eval">module_eval</dt>
+		<dd class="callseq"><i class="obj">mod</i>.module_eval( <i class="obj">aString</i> )  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="callseq"><i class="obj">mod</i>.module_eval {|  | block }  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Evaluates the string or block in the context of <i class="obj">mod</i>. This can be used to add methods to a class. <code class="method">module_eval</code> returns the result of evaluating its argument.
+
+<div><code class="block">class Thing
+end
+a = %q{def hello() "Hello there!" end}
+Thing.module_eval(a) <span class="output"><span class="outputmark">&rarr;</span> nil</span>
+Thing.new.hello() <span class="output"><span class="outputmark">&rarr;</span> "Hello there!"</span></code></div>
+
+		</dd>
+
+	<dt id="Module.name">name</dt>
+		<dd class="callseq"><i class="obj">mod</i>.name  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns the name of the module <i class="obj">mod</i>.
+
+		</dd>
+
+	<dt id="Module.private_class_method">private_class_method</dt>
+		<dd class="callseq"><i class="obj">mod</i>.private_class_method( <i>[</i><i class="obj">aSymbol</i><i>]+</i> )  &rarr; <code>nil</code></dd>
+		<dd class="desc">Makes existing class methods private. Often used to hide the default constructor <code>new</code>.
+
+<div><code class="block">class SimpleSingleton  # Not thread safe
+  private_class_method :new
+  def SimpleSingleton.create(*args, &amp;block)
+    @me = new(*args, &amp;block) if ! @me
+    @me
+  end
+end</code></div>
+
+		</dd>
+
+	<dt id="Module.private_instance_methods">private_instance_methods</dt>
+		<dd class="callseq"><i class="obj">mod</i>.private_instance_methods( <i class="obj">includeSuper</i>=<code class="const">false</code> ) &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns a list of the private instance methods defined in <i class="obj">mod</i>. If the optional parameter is not <code class="const">false</code>, the methods of any ancestors are included.
+
+<div><code class="block">module Mod
+  def method1()  end
+  private :method1
+  def method2()  end
+end
+Mod.instance_methods <span class="output"><span class="outputmark">&rarr;</span> ["method2"]</span>
+Mod.private_instance_methods <span class="output"><span class="outputmark">&rarr;</span> ["method1"]</span></code></div>
+
+		</dd>
+
+	<dt id="Module.protected_instance_methods">protected_instance_methods</dt>
+		<dd class="callseq"><i class="obj">mod</i>.protected_instance_methods( <i class="obj">includeSuper</i>=<code class="const">false</code> ) &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns a list of the protected instance methods defined in <i class="obj">mod</i>. If the optional parameter is not <code class="const">false</code>, the methods of any ancestors are included. </dd>
+
+	<dt id="Module.public_class_method">public_class_method</dt>
+		<dd class="callseq"><i class="obj">mod</i>.public_class_method( <i>[</i><i class="obj">aSymbol</i><i>]+</i> )  &rarr; <code>nil</code></dd>
+		<dd class="desc">Makes a list of existing class methods public.
+
+		</dd>
+
+	<dt id="Module.public_instance_methods">public_instance_methods</dt>
+		<dd class="callseq"><i class="obj">mod</i>.public_instance_methods( <i class="obj">includeSuper</i>=<code class="const">false</code> ) &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns a list of the public instance methods defined in <i class="obj">mod</i>. If the optional parameter is not <code>false</code>, the methods of any ancestors are included.</dd>
+</dl>
+ 
+<h2 id="privatemethods">private methods</h2>
+<p>The following methods are used mainly during the definition of classes and modules.</p>
+
+<dl class="methodlist">
+	<dt id="Module.alias_method">alias_method</dt>
+		<dd class="callseq">alias_method( <i class="obj">newID, oldID</i> )  &rarr; <i class="obj">mod</i></dd>
+		<dd class="desc">Makes <i class="obj">newID</i> a new copy of the method <i class="obj">oldID</i>. This can be used to retain access to methods that are overridden.
+
+<div><code class="block">module Mod
+  alias_method :origExit, :exit
+  def exit(code=0)
+    print "Exiting with code #{code}\n"
+    origExit(code)
+  end
+end
+include Mod
+exit(99)</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Exiting with code 99</code></div>
+
+		</dd>
+
+	<dt id="Module.append_features">append_features</dt>
+		<dd class="callseq">append_features( <i class="obj">aModule</i> )  &rarr; <i class="obj">mod</i></dd>
+		<dd class="desc">When this module is included in another, Ruby calls <code class="method">append_features</code> in this module, passing it the receiving module in <i class="obj">aModule</i>. Ruby's default implementation is to add the constants, methods, and module variables of this module to <i class="obj">aModule</i> if this module has not already been added to <i class="obj">aModule</i> or one of its ancestors. See also <code class="class_instance_method"><a href="ref_c_module.html#Module.include"><span class="class">Module</span>#<span class="method">include</span></a></code>. </dd>
+
+	<dt id="Module.attr">attr</dt>
+		<dd class="callseq">attr( <i class="obj">aSymbol</i>, <i class="obj">writable</i>=<code class="const">false</code> )  &rarr; <code>nil</code></dd>
+		<dd class="desc">Defines a named attribute for this module, where the name is <i class="obj">aSymbol.</i><code>id2name</code>, creating an instance variable (<var>@name</var>) and a corresponding access method to read it. If the optional <i class="obj">writable</i> argument is <code class="const">true</code>, also creates a method called <code>name=</code> to set the attribute.
+
+<div><code class="block">module Mod
+  attr  :size, true
+end</code></div>
+      <em>is equivalent to:</em>
+
+<div><code class="block">module Mod
+  def size
+    @size
+  end
+  def size=(val)
+    @size = val
+  end
+end</code></div>
+
+		</dd>
+
+	<dt id="Module.attr_accessor">attr_accessor</dt>
+		<dd class="callseq">attr_accessor( <i>[</i><i class="obj">aSymbol</i><i>]+</i> )  &rarr; <code>nil</code></dd>
+		<dd class="desc">Equivalent to calling &ldquo;<code>attr </code><i class="obj">aSymbol</i><code>, true</code>&rdquo; on each <i class="obj">aSymbol</i> in turn.
+
+<div><code class="block">module Mod
+  attr_accessor(:one, :two)
+end
+Mod.instance_methods.sort <span class="output"><span class="outputmark">&rarr;</span> ["one", "one=", "two", "two="]</span></code></div>
+
+		</dd>
+
+	<dt id="Module.attr_reader">attr_reader</dt>
+		<dd class="callseq">attr_reader( <i>[</i><i class="obj">aSymbol</i><i>]+</i> )  &rarr; <code>nil</code></dd>
+		<dd class="desc">Creates instance variables and corresponding methods that return the value of each instance variable. Equivalent to calling &ldquo;<code>attr </code><i class="obj">:name</i>&rdquo; on each name in turn. </dd>
+
+	<dt id="Module.attr_writer">attr_writer</dt>
+		<dd class="callseq">attr_writer( <i>[</i><i class="obj">aSymbol</i><i>]+</i> )  &rarr; <code>nil</code></dd>
+		<dd class="desc">Creates an accessor method to allow assignment to the attribute
+      <i class="obj">aSymbol</i><code>.id2name</code>.
+
+		</dd>
+
+	<dt id="Module.extend_object">extend_object</dt>
+		<dd class="callseq">extend_object( <i class="obj">anObject</i> )  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Extends the specified object by adding this module's constants and methods (which are added as singleton methods). This is the callback method used by <code class="class_instance_method"><a href="ref_c_object.html#Object.extend"><span class="class">Object</span>#<span class="method">extend</span></a></code>.
+
+<div><code class="block">module Picky
+  def Picky.extend_object(o)
+    if String === o
+      print "Can't add Picky to a String\n"
+    else
+      print "Picky added to ", o.type, "\n"
+      super
+    end
+  end
+end
+(s = Array.new).extend Picky  # Call Object.extend
+(s = "quick brown fox").extend Picky</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Picky added to Array
+Can't add Picky to a String</code></div>
+
+		</dd>
+
+	<dt id="Module.include">include</dt>
+		<dd class="callseq">include( <i>[</i><i class="obj">aModule</i><i>]+</i> )  &rarr; <i class="obj">mod</i></dd>
+		<dd class="desc">Invokes <code class="module_private_method"><a href="ref_c_module.html#Module.append_features"><span class="module">Module</span>.<span class="method">append_features</span></a></code> on each parameter in turn. </dd>
+
+	<dt id="Module.method_added">method_added</dt>
+		<dd class="callseq">method_added( <i class="obj">aSymbol</i> )</dd>
+		<dd class="desc">Invoked as a callback whenever a method is added to the receiver.
+
+<div><code class="block">module Chatty
+  def Chatty.method_added(id)
+    print "Adding ", id.id2name, "\n"
+  end
+  def one()   end
+end
+module Chatty
+  def two()   end
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Adding one
+Adding two</code></div>
+
+		</dd>
+
+	<dt id="Module.module_function">module_function</dt>
+		<dd class="callseq">module_function( <i>[</i><i class="obj">aSymbol</i><i>]*</i> )   &rarr; <i class="obj">mod</i></dd>
+		<dd class="desc">Creates module functions for the named methods. These functions may be called with the module as a receiver, and also become available as instance methods to classes that mix in the module. Module functions are copies of the original, and so may be changed independently. The instance-method versions are made private. If used with no arguments, subsequently defined methods become module functions.
+
+<div><code class="block">module Mod
+  def one
+    "This is one"
+  end
+  module_function :one
+end
+class Cls
+  include Mod
+  def callOne
+    one
+  end
+end
+Mod.one <span class="output"><span class="outputmark">&rarr;</span> "This is one"</span>
+c = Cls.new
+c.callOne <span class="output"><span class="outputmark">&rarr;</span> "This is one"</span>
+module Mod
+  def one
+    "This is the new one"
+  end
+end
+Mod.one <span class="output"><span class="outputmark">&rarr;</span> "This is one"</span>
+c.callOne <span class="output"><span class="outputmark">&rarr;</span> "This is the new one"</span></code></div>
+
+		</dd>
+
+	<dt id="Module.private">private</dt>
+		<dd class="callseq">private( <i>[</i><i class="obj">aSymbol</i><i>]*</i> )  &rarr; <i class="obj">mod</i></dd>
+		<dd class="desc">With no arguments, sets the default visibility for subsequently defined methods to private. With arguments, sets the named methods to have private visibility. See &ldquo;<a href="language.html#accesscontrol">Access Control</a>.&rdquo;
+
+<div><code class="block">module Mod
+  def a()  end
+  def b()  end
+  private
+  def c()  end
+  private :a
+end
+Mod.private_instance_methods <span class="output"><span class="outputmark">&rarr;</span> ["a", "c"]</span></code></div>
+
+		</dd>
+
+	<dt id="Module.protected">protected</dt>
+		<dd class="callseq">protected( <i>[</i><i class="obj">aSymbol</i><i>]*</i> )  &rarr; <i class="obj">mod</i></dd>
+		<dd class="desc">With no arguments, sets the default visibility for subsequently defined methods to protected. With arguments, sets the named methods to have protected visibility. See &ldquo;<a href="language.html#accesscontrol">Access Control</a>.&rdquo;</dd>
+
+	<dt id="Module.public">public</dt>
+		<dd class="callseq">public( <i>[</i><i class="obj">aSymbol</i><i>]*</i> )  &rarr; <i class="obj">mod</i></dd>
+		<dd class="desc">With no arguments, sets the default visibility for subsequently defined methods to public. With arguments, sets the named methods to have public visibility. See &ldquo;<a href="language.html#accesscontrol">Access Control</a>.&rdquo;</dd>
+
+	<dt id="Module.remove_const">remove_const</dt>
+		<dd class="callseq">remove_const( <i class="obj">aSymbol</i> )  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Removes the definition of the given constant, returning that constant's value. Predefined classes and singleton objects (such as <i class="obj">true</i>) cannot be removed. </dd>
+
+	<dt id="Module.remove_method">remove_method</dt>
+		<dd class="callseq">remove_method( <i class="obj">aSymbol</i> )  &rarr; <i class="obj">mod</i></dd>
+		<dd class="desc">Removes the method identified by
+      <i class="obj">aSymbol</i>
+      from the current class.
+      For an example, see <code>Module.undef_method</code>.
+
+		</dd>
+
+	<dt id="Module.undef_method">undef_method</dt>
+		<dd class="callseq">undef_method( <i class="obj">aSymbol</i> )  &rarr; <i class="obj">mod</i></dd>
+		<dd class="desc">Prevents the current class from responding to calls to the named method. Contrast this with <code class="method">remove_method</code>, which deletes the method from the particular class; Ruby will still search superclasses and mixed-in modules for a possible receiver.
+
+<div><code class="block">class Parent
+  def hello
+    print "In parent\n"
+  end
+end
+class Child &lt; Parent
+  def hello
+    print "In child\n"
+  end
+end
+
+c = Child.new
+c.hello
+
+class Child
+  remove_method :hello  # remove from child, still in parent
+end
+c.hello
+
+class Child
+  undef_method :hello   # prevent any calls to 'hello'
+end
+c.hello</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">In child
+In parent
+prog.rb:23: undefined method `hello' for #&lt;Child:0x401b5928&gt; (NameError)</code></div></dd>
+</dl>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_c_module.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

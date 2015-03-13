@@ -1,0 +1,244 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>More About Methods</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	<a href="tut_stdtypes.html" class="prev">&lt; Previous</a><a href="tut_expressions.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'tut_methods',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+<h1 id="moreaboutmethods">More About Methods</h1>
+<p>Other languages have functions, procedures, methods, or routines, but in Ruby there is only the <em>method</em>&mdash;a chunk of expressions that return a value.</p>
+<p>So far in this book, we've been defining and using methods without much thought. Now it's time to get into the details.</p>
+
+<h2 id="definingamethod">Defining a Method</h2>
+<p>As we've seen throughout this book, a method is defined using the keyword <code class="keyword">def</code>. Method names should begin with a lowercase letter. <span class="footnote">(You won't get an immediate error if you use an  uppercase letter, but when Ruby sees you calling the method, it  will first guess that it is a constant, not a method invocation, and as a result it may parse the call incorrectly.)</span>  Methods that act as queries are often named with a trailing &ldquo;<code>?</code>&rdquo;, such as <code>instance_of?</code>.  Methods that are &ldquo;dangerous,&rdquo; or modify the receiver, might be named with a trailing &ldquo;<code>!</code>&rdquo;.  For instance, <code>String</code> provides both a <code>chop</code> and a <code>chop!</code>.  The first one returns a modified string; the second modifies the receiver in place. &ldquo;<code>?</code>&rdquo; and &ldquo;<code>!</code>&rdquo; are the only weird characters allowed as method name suffixes.</p>
+<p>Now that we've specified a name for our new method, we may need to declare some parameters. These are simply a list of local variable names in parentheses.  Some sample method declarations are</p>
+
+<div><code class="block">def myNewMethod(arg1, arg2, arg3)     # 3 arguments
+  # Code for the method would go here
+end
+
+def myOtherNewMethod                  # No arguments
+  # Code for the method would go here
+end</code></div>
+<p>Ruby lets you specify default values for a method's arguments&mdash;values that will be used if the caller doesn't pass them explicitly. This is done using the assignment operator.</p>
+
+<div><code class="block">def coolDude(arg1="Miles", arg2="Coltrane", arg3="Roach")
+  "#{arg1}, #{arg2}, #{arg3}."
+end
+
+coolDude <span class="output"><span class="outputmark">&rarr;</span> "Miles, Coltrane, Roach."</span>
+coolDude("Bart") <span class="output"><span class="outputmark">&rarr;</span> "Bart, Coltrane, Roach."</span>
+coolDude("Bart", "Elwood") <span class="output"><span class="outputmark">&rarr;</span> "Bart, Elwood, Roach."</span>
+coolDude("Bart", "Elwood", "Linus") <span class="output"><span class="outputmark">&rarr;</span> "Bart, Elwood, Linus."</span></code></div>
+
+
+<p>The body of a method contains normal Ruby expressions, except that you may not define an instance method, class, or module within a method.  The return value of a method is the value of the last expression executed, or the result of an explicit <code class="keyword">return</code> expression.</p>
+
+<h3 id="variablelengthargumentlists">Variable-Length Argument Lists</h3>
+<p>But what if you want to pass in a variable number of arguments, or want to capture multiple arguments into a single parameter? Placing an asterisk before the name of the parameter after the &ldquo;normal&rdquo; parameters does just that.</p>
+
+<div><code class="block">def varargs(arg1, *rest)
+  "Got #{arg1} and #{rest.join(', ')}"
+end
+
+varargs("one") <span class="output"><span class="outputmark">&rarr;</span> "Got one and "</span>
+varargs("one", "two") <span class="output"><span class="outputmark">&rarr;</span> "Got one and two"</span>
+varargs "one", "two", "three" <span class="output"><span class="outputmark">&rarr;</span> "Got one and two, three"</span></code></div>
+
+
+<p>In this example, the first argument is assigned to the first method parameter as usual. However, the next parameter is prefixed with an asterisk, so all the remaining arguments are bundled into a new <code class="class">Array</code>, which is then assigned to that parameter.</p>
+
+<h3 id="methodsandblocks">Methods and Blocks</h3>
+
+<p>As we discussed in &ldquo;<a href="tut_containers.html#blocksanditerators">Blocks and Iterators</a>,&rdquo; when a method is called, it may be associated with a block. Normally, you simply call the block from within the method using <code class="keyword">yield</code>.</p>
+
+<div><code class="block">def takeBlock(p1)
+  if block_given?
+    yield(p1)
+  else
+    p1
+  end
+end</code></div>
+
+<div><code class="block">takeBlock("no block") <span class="output" style="width:15em"><span class="outputmark">&rarr;</span> "no block"</span>
+takeBlock("no block") { |s| s.sub(/no /, &rdquo;) } <span class="output" style="width:15em"><span class="outputmark">&rarr;</span> "block"</span></code></div>
+
+
+<p>However, if the last parameter in a method definition is prefixed with an ampersand, any associated block is converted to a <code class="class">Proc</code> object, and that object is assigned to the parameter.</p>
+
+<div><code class="block">class TaxCalculator
+  def initialize(name, &amp;block)
+    @name, @block = name, block
+  end
+  def getTax(amount)
+    "#@name on #{amount} = #{ @block.call(amount) }"
+  end
+end
+
+tc = TaxCalculator.new("Sales tax") { |amt| amt * 0.075 }
+
+tc.getTax(100) <span class="output"><span class="outputmark">&rarr;</span> "Sales tax on 100 = 7.5"</span>
+tc.getTax(250) <span class="output"><span class="outputmark">&rarr;</span> "Sales tax on 250 = 18.75"</span></code></div>
+
+
+
+<h2 id="callingamethod">Calling a Method</h2>
+<p>You call a method by specifying a receiver, the name of the method, and optionally some parameters and an associated block.</p>
+
+<div><code class="block">connection.downloadMP3("jitterbug") { |p| showProgress(p) }</code></div>
+<p>In this example, the object <code>connection</code> is the receiver, <code class="method">downloadMP3</code> is the name of the method, <code>"jitterbug"</code> is the parameter, and the stuff between the braces is the associated block.</p>
+<p>For class and module methods, the receiver will be the class or module name.</p>
+
+<div><code class="block">File.size("testfile")
+Math.sin(Math::PI/4)</code></div>
+<p>If you omit the receiver, it defaults to <var>self</var>, the current object.</p>
+
+<div><code class="block">self.id <span class="output"><span class="outputmark">&rarr;</span> 537794160</span>
+id <span class="output"><span class="outputmark">&rarr;</span> 537794160</span>
+self.type <span class="output"><span class="outputmark">&rarr;</span> Object</span>
+type <span class="output"><span class="outputmark">&rarr;</span> Object</span></code></div>
+
+
+<p>This defaulting mechanism is how Ruby implements private methods. Private methods may <em>not</em> be called with a receiver, so they must be methods available in the current object.</p>
+<p>The optional parameters follow the method name.  If there is no ambiguity you can omit the parentheses around the argument list when calling a method. <span class="footnote">(Other Ruby documentation sometimes calls   these method calls without parentheses &ldquo;commands.&rdquo;)</span>  However, except in the simplest cases we don't recommend this&mdash;there are some subtle problems that can trip you up. <span class="footnote">(In particular, you <b>must</b> use parentheses on a method call that is itself a   parameter to another method call (unless it is the last parameter).</span> Our rule is simple: if there's any doubt, use parentheses.</p>
+
+<div><code class="block">  a = obj.hash    # Same as
+  a = obj.hash()  # this.
+
+  obj.someMethod "Arg1", arg2, arg3   # Same thing as
+  obj.someMethod("Arg1", arg2, arg3)  # with parentheses.</code></div>
+
+<h4 id="expandingarraysinmethodcalls">Expanding Arrays in Method Calls</h4>
+<p>Earlier we saw that if you put an asterisk in front of a formal parameter in a method definition, multiple arguments in the call to the method will be bundled up into an array. Well, the same thing works in reverse.</p>
+<p>When you call a method, you can explode an array, so that each of its members is taken as a separate parameter. Do this by prefixing the array argument (which must follow all the regular arguments) with an asterisk.</p>
+
+<div><code class="block">def five(a, b, c, d, e)
+  "I was passed #{a} #{b} #{c} #{d} #{e}"
+end
+
+five(1, 2, 3, 4, 5 ) <span class="output"><span class="outputmark">&rarr;</span> "I was passed 1 2 3 4 5"</span>
+five(1, 2, 3, *['a', 'b']) <span class="output"><span class="outputmark">&rarr;</span> "I was passed 1 2 3 a b"</span>
+five(*(10..14).to_a) <span class="output"><span class="outputmark">&rarr;</span> "I was passed 10 11 12 13 14"</span></code></div>
+
+
+
+<h4 id="makingblocksmoredynamic">Making Blocks More Dynamic</h4>
+<p>We've already seen how you can associate a block with a method call.</p>
+
+<div><code class="block">listBones("aardvark") do |aBone|
+  # ...
+end</code></div>
+<p>Normally, this is perfectly good enough&mdash;you associate a fixed block of code with a method, in the same way you'd have a chunk of code after an <code class="keyword">if</code> or <code class="keyword">while</code> statement.</p>
+<p>Sometimes, however, you'd like to be more flexible.  For example, we may be teaching math skills. <span class="footnote">(Of course, Andy and Dave would have to <em>learn</em> math skills first. Conrad Schneiker reminded us that there are three kinds of people: those who can count and those who can't.)</span> The student could ask for an <em>n</em>-plus table or an <em>n</em>-times table.  If the student asked for a 2-times table, we'd output 2, 4, 6, 8, and so on. (This code does not check its inputs for errors.)</p>
+
+<div><code class="block">print "(t)imes or (p)lus: "
+times = gets
+print "number: "
+number = gets.to_i
+
+if times =~ /^t/
+  puts((1..10).collect { |n| n*number }.join(", "))
+else
+  puts((1..10).collect { |n| n+number }.join(", "))
+end</code></div>
+
+<p class="produces"><em>produces:</em></p>
+
+<div><code class="block">(t)imes or (p)lus: t
+number: 2
+2, 4, 6, 8, 10, 12, 14, 16, 18, 20</code></div>
+<p>This works, but it's ugly, with virtually identical code on each branch of the <code class="keyword">if</code> statement. If would be nice if we could factor out the block that does the calculation.</p>
+
+<div><code class="block">print "(t)imes or (p)lus: "
+times = gets
+print "number: "
+number = gets.to_i
+
+if times =~ /^t/
+  calc = proc { |n| n*number }
+else
+  calc = proc { |n| n+number }
+end
+puts((1..10).collect(&amp;calc).join(", "))</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">(t)imes or (p)lus: t
+number: 2
+2, 4, 6, 8, 10, 12, 14, 16, 18, 20</code></div>
+<p>If the last argument to a method is preceded by an ampersand, Ruby assumes that it is a <code class="class">Proc</code> object. It removes it from the parameter list, converts the <code class="class">Proc</code> object into a block, and associates it with the method.</p>
+<p>This technique can also be used to add some syntactic sugar to block usage. For example, you sometimes want to take an iterator and store each value it yields into an array. We'll reuse our <a href="tut_containers.html#fibonacci">Fibonacci number generator</a>.</p>
+
+<div><code class="block">a = []
+fibUpTo(20) { |val| a &lt;&lt; val } <span class="output"><span class="outputmark">&rarr;</span> nil</span>
+a.inspect <span class="output"><span class="outputmark">&rarr;</span> "[1, 1, 2, 3, 5, 8, 13]"</span></code></div>
+
+
+<p>This works, but our intention isn't quite as transparent as we may like. Instead, we'll define a method called <code class="method">into</code>, which returns the block that fills the array. (Notice at the same time that the block returned really is a closure&mdash;it references the parameter <code class="obj">anArray</code> even after method <code class="method">into</code> has returned.)</p>
+
+<div><code class="block">def into(anArray)
+  return proc { |val| anArray &lt;&lt; val }
+end
+
+fibUpTo 20, &amp;into(a = [])
+a.inspect <span class="output"><span class="outputmark">&rarr;</span> "[1, 1, 2, 3, 5, 8, 13]"</span></code></div>
+
+
+
+<h4 id="collectinghasharguments">Collecting Hash Arguments</h4>
+<p>Some languages feature &ldquo;keyword arguments&rdquo;&mdash;that is, instead of passing arguments in a given order and quantity, you pass the name of the argument with its value, in any order.  Ruby 1.6 does not have keyword arguments (although they are scheduled to be implemented in Ruby 1.8).</p>
+<p>In the meantime, people are using hashes as a way of achieving the same effect. For example, we might consider adding a more powerful named-search facility to our <code class="class">SongList</code>.</p>
+
+<div><code class="block">class SongList
+  def createSearch(name, params)
+    # ...
+  end
+end
+aList.createSearch("short jazz songs", {
+                   'genre'            =&gt; "jazz",
+                   'durationLessThan' =&gt; 270
+                   } )</code></div>
+<p>The first parameter is the search name, and the second is a hash literal containing search parameters. The use of a hash means that we can simulate keywords: look for songs with a genre of &ldquo;jazz&rdquo; and a duration less than  4 1/2  minutes. However, this approach is slightly clunky, and that set of braces could easily be mistaken for a block associated with the method. So, Ruby has a short cut. You can place <code class="obj">key</code> <code>=&gt;</code> <code class="obj">value</code> pairs in an argument list, as long as they follow any normal arguments and precede any array and block arguments. All these pairs will be collected into a single hash and passed as one argument to the method. No braces are needed.</p>
+
+<div><code class="block">aList.createSearch("short jazz songs",
+                   'genre'            =&gt; "jazz",
+                   'durationLessThan' =&gt; 270
+                   )</code></div>
+
+
+<div id="menubot" class="menu">
+	<a href="tut_stdtypes.html" class="prev">&lt; Previous</a><a href="tut_expressions.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="tut_methods.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

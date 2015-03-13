@@ -1,0 +1,225 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Microsoft Windows Support</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	<a href="lib_network.html" class="prev">&lt; Previous</a><a href="rdtool.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'lib_windows',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+
+<h1 id="microsoftwindowssupport">Microsoft Windows Support</h1>
+
+<p>The three libraries documented in this chapter turn Ruby into a powerful and convenient Windows scripting language. Now you have the power to control your applications, but in a controlled, object-oriented environment.</p>
+
+<h1 id="WIN32OLE" class="class">class <strong>WIN32OLE</strong> &lt; Object</h1>
+
+<div><code class="block">require 'win32ole'
+ie = WIN32OLE.new('InternetExplorer.Application')
+ie.visible = true
+ie.gohome</code></div>
+
+
+<p><code class="class">WIN32OLE</code> provides a client interface to Windows 32 OLE Automation servers.  See the tutorial description &ldquo;<a href="win32.html#windowsautomation">Windows Automation</a>&rdquo; for more information.</p>
+
+<h2 class="refsubsection" id="WIN32OLE.constants">WIN32OLE constants</h2>
+
+<table class="constants">
+<tr class="firstRow">
+	<td><code class="constant">WIN32OLE::VERSION</code></td>
+	<td><em>Current version number</em></td>
+</tr></table>
+
+
+<h2 class="refsubsection" id="WIN32OLE.classmethods">WIN32OLE class methods</h2>
+<dl class="methodlist">
+	<dt id="WIN32OLE.connect">connect</dt>
+		<dd class="callseq">WIN32OLE.connect( <i class="obj">aString</i> )  &rarr; <i class="obj">wapi</i></dd>
+		<dd class="desc">Returns a new OLE automation client connected to an existing instance of the named automation server.</dd>
+
+	<dt id="WIN32OLE.const_load">const_load</dt>
+		<dd class="callseq">WIN32OLE.const_load( <i class="obj">wapi</i>, <i>[</i><i class="obj">aClass=WIN32OLE</i><i>]</i> )  &rarr; <code>nil</code></dd>
+		<dd class="desc">Defines the constants from the specified automation server as class constants in <i class="obj">aClass</i>.</dd>
+
+	<dt id="WIN32OLE.new">new</dt>
+		<dd class="callseq">WIN32OLE.new( <i class="obj">aString</i> )  &rarr; <i class="obj">wapi</i></dd>
+		<dd class="desc">Returns a new OLE automation client connected to a new instance of the automation server named by <i class="obj">aString</i>.</dd>
+</dl>
+
+<h2 class="refsubsection" id="WIN32OLE.instancemethods">WIN32OLE instance methods</h2>
+<dl class="methodlist">
+	<dt id="WIN32OLE._ob_cb">[ ]</dt>
+		<dd class="callseq"><i class="obj">wapi</i>[ <i class="obj">aString</i> ]  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Returns the named property from the OLE automation object.</dd>
+
+	<dt id="WIN32OLE._ob_cb_eq">[ ]=</dt>
+		<dd class="callseq"><i class="obj">wapi</i>[ <i class="obj">aString</i> ] = <i class="obj">aValue</i>  &rarr; <code>nil</code></dd>
+		<dd class="desc">Sets the named property in the OLE automation object.</dd>
+
+	<dt id="WIN32OLE.each">each</dt>
+		<dd class="callseq"><i class="obj">wapi</i>.each {| anObj | block }  &rarr; <code>nil</code></dd>
+		<dd class="desc">Iterates over each item of this OLE server that supports the <code>IEnumVARIANT</code> interface.</dd>
+
+	<dt id="WIN32OLE.invoke">invoke</dt>
+		<dd class="callseq"><i class="obj">wapi</i>.invoke ( <i class="obj">aCmdString</i>, <i>[</i><i class="obj">args</i><i>]*</i> )  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Invokes the command given in <i class="obj">aCmdString</i> with the given <i class="obj">args</i>.  <i class="obj">args</i> may be a <code class="class">Hash</code> of named parameters and values.  You don't need to call <code>invoke</code> explicitly; this class uses <code>method_missing</code> to forward calls through <code>invoke</code>, so you can simply use the OLE methods as methods of this class.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="WIN32OLE_EVENT" class="class">class <strong>WIN32OLE_EVENT</strong> &lt; Object</h1>
+
+<p>This (slightly modified) example from the Win32OLE 0.1.1 distribution shows the use of an event sink.</p>
+
+<div><code class="block">require 'win32ole'
+
+$urls = []
+
+def navigate(url)
+  $urls &lt;&lt; url
+end
+
+def stop_msg_loop
+  puts "IE has exited..."
+  throw :done
+end
+
+def default_handler(event, *args)
+  case event
+  when "BeforeNavigate"
+    puts "Now Navigating to #{args[0]}..."
+  end
+end
+
+ie = WIN32OLE.new('InternetExplorer.Application')
+ie.visible = TRUE
+ie.gohome
+ev = WIN32OLE_EVENT.new(ie, 'DWebBrowserEvents')
+
+ev.on_event {|*args| default_handler(*args)}
+ev.on_event("NavigateComplete") {|url| navigate(url)}
+ev.on_event("Quit") {|*args| stop_msg_loop}
+
+catch(:done) {
+  loop {
+    WIN32OLE_EVENT.message_loop
+  }
+}
+
+puts "You Navigated to the following URLs: "
+$urls.each_with_index do |url, i|
+  puts "(#{i+1}) #{url}"
+end</code></div>
+
+
+<p><code class="class">WIN32OLE_EVENT</code> is used in conjunction with the <code class="class">WIN32OLE</code> class to add callbacks for Windows 32 events.</p>
+
+
+<h2 class="refsubsection" id="WIN32OLE_EVENT.classmethods">WIN32OLE_EVENT class methods</h2>
+<dl class="methodlist">
+	<dt id="WIN32OLE_EVENT.message_loop">message_loop</dt>
+		<dd class="callseq">WIN32OLE_EVENT.message_loop  &rarr; <code>nil</code></dd>
+		<dd class="desc">Executes the Windows event loop, translating and dispatching events.</dd>
+
+	<dt id="WIN32OLE_EVENT.new">new</dt>
+		<dd class="callseq">WIN32OLE_EVENT.new ( <i class="obj">anOle</i>, <i class="obj">aName</i> )  &rarr; <i class="obj">wapi</i></dd>
+		<dd class="desc">Returns a new <code>WIN32OLE_EVENT</code> (an event sink) for the given <code>WIN32OLE</code> object and named event source.  If <i class="obj">aName</i> is <code>nil</code>, it will attempt to use the default source and will raise a <code class="exception">RuntimeError</code> if it cannot find one.</dd>
+</dl>
+
+<h2 class="refsubsection" id="WIN32OLE_EVENT.instancemethods">WIN32OLE_EVENT instance methods</h2>
+<dl class="methodlist">
+	<dt id="WIN32OLE_EVENT.on_event">on_event</dt>
+		<dd class="callseq"><i class="obj">wapi</i>.on_event ( <i>[</i><i class="obj">anEvent</i><i>]</i> ) {| args | block }  &rarr; <code>nil</code></dd>
+		<dd class="desc">Defines a callback for the named <i class="obj">anEvent</i>.  If <i class="obj">anEvent</i> is <code>nil</code>, then this callback is associated with all events. The block will be given any arguments appropriate for this event.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="Win32API" class="class">class <strong>Win32API</strong> &lt; Object</h1>
+
+<p>This example is from the Ruby distribution, in <code>ext/Win32API</code>:</p>
+
+<div><code class="block">require 'Win32API'
+
+getCursorPos = Win32API.new("user32", "GetCursorPos", ['P'], 'V')
+
+lpPoint = " " * 8 # store two LONGs
+getCursorPos.Call(lpPoint)
+x, y = lpPoint.unpack("LL") # get the actual values
+
+print "x: ", x, "\n"
+print "y: ", y, "\n"
+
+ods = Win32API.new("kernel32", "OutputDebugString", ['P'], 'V')
+ods.Call("Hello, World\n")
+
+GetDesktopWindow = Win32API.new("user32", "GetDesktopWindow", [], 'L')
+GetActiveWindow = Win32API.new("user32", "GetActiveWindow", [], 'L')
+SendMessage = Win32API.new("user32", "SendMessage", ['L'] * 4, 'L')
+SendMessage.Call(GetDesktopWindow.Call, 274, 0xf140, 0)</code></div>
+
+
+<p>The <code>Win32API</code> module allows access to any arbitrary Windows 32 function. Many of these functions take or return a <code>Pointer</code> datatype&mdash;a region of memory corresponding to a C string or structure type.</p>
+
+<p>In Ruby, these pointers are represented using class <code class="class">String</code>, which contains a sequence of 8-bit bytes.  It is up to you to pack and unpack the bits in the <code class="class">String</code>. See the reference sections for <code class="class_instance_method"><a href="ref_c_string.html#String.unpack"><span class="class">String</span>#<span class="method">unpack</span></a></code> and <code class="class_instance_method"><a href="ref_c_array.html#Array.pack"><span class="class">Array</span>#<span class="method">pack</span></a></code> for details.</p>
+
+<h2 class="refsubsection" id="Win32API.classmethods">Win32API class methods</h2>
+<dl class="methodlist">
+	<dt id="Win32API.new">new</dt>
+		<dd class="callseq">Win32API.new( <i class="obj">dllname</i>, <i class="obj">procname</i>, <i class="obj">importArray</i>, <i class="obj">export</i> )  &rarr; <i class="obj">wapi</i></dd>
+		<dd class="desc"><p>Returns a new object representing a Windows 32 API function. <i class="obj">dllname</i> is the name of the DLL containing the function, such as &ldquo;user32&rdquo; or &ldquo;kernel32.&rdquo; <i class="obj">procname</i> is the name of the desired function. <i class="obj">importArray</i> is an array of strings representing the types of arguments to the function.</p>
+	<p><i class="obj">export</i> is a string  representing the return type of the function. Strings &ldquo;n&rdquo; and &ldquo;l&rdquo; represent numbers, &ldquo;i&rdquo;  represent integers, &ldquo;p&rdquo; represents pointers to data stored in a string, and &ldquo;v&rdquo; represents a void type (used for export parameters only). These strings are case-insensitive.</p></dd>
+</dl>
+
+<h2 class="refsubsection" id="Win32API.instancemethods">Win32API instance methods</h2>
+<dl class="methodlist">
+	<dt id="Win32API.call">call</dt>
+		<dd class="callseq"><i class="obj">wapi</i>.call( <i>[</i><i class="obj">args</i><i>]*</i> )  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Calls this API function with the given arguments, which must match the signature specified to <code>new</code>.</dd>
+
+	<dt id="Win32API.Call">Call</dt>
+		<dd class="callseq"><i class="obj">wapi</i>.Call( <i>[</i><i class="obj">args</i><i>]*</i> )  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><span class="class">Win32API</span>#<span class="method">call</span></code>.</dd>
+</dl>
+
+
+<div id="menubot" class="menu">
+	<a href="lib_network.html" class="prev">&lt; Previous</a><a href="rdtool.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="lib_windows.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

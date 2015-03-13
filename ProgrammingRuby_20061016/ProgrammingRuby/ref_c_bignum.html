@@ -1,0 +1,193 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Bignum</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_c_bignum',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="class" id="Bignum">class <strong>Bignum</strong> &lt; Integer</h1>
+
+<p><code>Bignum</code> objects hold integers outside the range of <code>Fixnum</code>. <code>Bignum</code> objects are created automatically when integer calculations would otherwise overflow a <code>Fixnum</code>. When a calculation involving <code>Bignum</code> objects returns a result that will  fit in a <code>Fixnum</code>, the result is automatically converted.</p>
+
+<p>For the purposes of the bitwise operations and <code>[]</code>, a <code>Bignum</code> is treated as if it were an infinite-length bitstring with 2's complement representation.</p>
+
+<p>While <code>Fixnum</code> values are immediate, <code>Bignum</code> objects are not&mdash;assignment and parameter passing work with references to objects, not the objects themselves.</p>
+
+<h2 class="refsubsection" id="instancemethods">instance methods</h2>
+<dl class="methodlist">
+	<dt id="Bignum.Arithmeticoperations" class="noncode">Arithmetic operations</dt>
+		<dd class="callseq noncode">Performs various arithmetic operations on <i class="obj">big</i>.</dd>
+		<dd class="desc"><table>
+			<tr class="firstRow">
+				<td><i class="obj">big</i></td>
+				<td><code>+</code></td>
+				<td><i class="obj">aNumeric</i></td>
+				<td>Addition</td>
+			</tr>
+			<tr>
+				<td><i class="obj">big</i></td>
+				<td><code>-</code></td>
+				<td><i class="obj">aNumeric</i></td>
+				<td>Subtraction</td>
+			</tr>
+			<tr>
+				<td><i class="obj">big</i></td>
+				<td><code>*</code></td>
+				<td><i class="obj">aNumeric</i></td>
+				<td>Multiplication</td>
+			</tr>
+			<tr>
+				<td><i class="obj">big</i></td>
+				<td><code>/</code></td>
+				<td><i class="obj">aNumeric</i></td>
+				<td>Division</td>
+			</tr>
+			<tr>
+				<td><i class="obj">big</i></td>
+				<td><code>%</code></td>
+				<td><i class="obj">aNumeric</i></td>
+				<td>Modulo</td>
+			</tr>
+			<tr>
+				<td><i class="obj">big</i></td>
+				<td><code>**</code></td>
+				<td><i class="obj">aNumeric</i></td>
+				<td>Exponentiation</td>
+			</tr>
+		</table>
+
+		</dd>
+
+	<dt id="Bignum.Bitoperations" class="noncode">Bit operations</dt>
+		<dd class="callseq noncode">Performs various operations on the binary representations of the <code>Bignum</code>.</dd>
+		<dd class="desc"><table>
+		<tr class="firstRow">
+			<td><code>~</code> <i class="obj">big</i></td>
+			<td></td><td></td>
+			<td>Invert bits</td>
+		</tr>
+		<tr>
+			<td><i class="obj">big</i></td>
+			<td><code>|</code></td>
+			<td><i class="obj">aNumeric</i></td>
+			<td>Bitwise <span class="smallcaps">OR</span></td>
+		</tr>
+		<tr>
+			<td><i class="obj">big</i></td>
+			<td><code>&amp;</code></td>
+			<td><i class="obj">aNumeric</i></td>
+			<td>Bitwise <span class="smallcaps">AND</span></td>
+		</tr>
+		<tr>
+			<td><i class="obj">big</i></td>
+			<td><code>^</code></td>
+			<td><i class="obj">aNumeric</i></td>
+			<td>Bitwise <span class="smallcaps">EXCLUSIVE</span> <span class="smallcaps">OR</span></td>
+		</tr>
+		<tr>
+			<td><i class="obj">big</i></td>
+			<td><code>&lt;&lt;</code></td>
+			<td><i class="obj">aNumeric</i></td>
+			<td>Left-shift <em>aNumeric</em> bits</td>
+		</tr>
+		<tr>
+			<td><i class="obj">big</i></td>
+			<td><code>&gt;&gt;</code></td>
+			<td><i class="obj">aNumeric</i></td>
+			<td>Right-shift <em>aNumeric</em> bits (with sign extension)</td>
+		</tr>
+	</table>
+
+		</dd>
+
+	<dt id="Bignum._lt_eq_lt">&lt;=&gt;</dt>
+		<dd class="callseq"><i class="obj">big</i> &lt;=&gt; <i class="obj">aNumeric</i>  &rarr; -1, 0, +1</dd>
+		<dd class="desc">Comparison&mdash;Returns -1, 0, or +1 depending on
+      whether <i class="obj">big</i> is less
+      than, equal to, or greater than <i class="obj">aNumeric</i>. This is the
+      basis for the tests in <code>Comparable</code>.
+
+		</dd>
+
+	<dt id="Bignum._ob_cb">[ ]</dt>
+		<dd class="callseq"><i class="obj">big</i>[ <i class="obj">n</i> ]  &rarr; 0, 1</dd>
+		<dd class="desc">Bit Reference&mdash;Returns the <em>n</em>th bit in
+      the (assumed) binary representation of <i class="obj">big</i>,
+      where <i class="obj">big</i>[0] is the least significant bit.
+
+<div><code class="block">a = 9**15
+50.downto(0) do |n|
+  print a[n]
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">000101110110100000111000011110010100111100010111001</code></div>
+
+		</dd>
+
+	<dt id="Bignum.size">size</dt>
+		<dd class="callseq"><i class="obj">big</i>.size  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Returns the number of bytes in the machine representation
+      of <i class="obj">big</i>.
+
+<div><code class="block">(256**10 - 1).size <span class="output"><span class="outputmark">&rarr;</span> 12</span>
+(256**20 - 1).size <span class="output"><span class="outputmark">&rarr;</span> 20</span>
+(256**40 - 1).size <span class="output"><span class="outputmark">&rarr;</span> 40</span></code></div>
+
+		</dd>
+
+	<dt id="Bignum.to_f">to_f</dt>
+		<dd class="callseq"><i class="obj">big</i>.to_f  &rarr; <i class="obj">aFloat</i></dd>
+		<dd class="desc">Converts <i class="obj">big</i> to a <code>Float</code>.  If <i class="obj">big</i> doesn't fit in a
+      <code>Float</code>, the result is infinity.
+
+		</dd>
+
+	<dt id="Bignum.to_i">to_i</dt>
+		<dd class="callseq"><i class="obj">big</i>.to_i  &rarr; <i class="obj"><i class="obj">big</i></i></dd>
+		<dd class="desc">Returns <i class="obj">big</i>.
+
+		</dd>
+
+	<dt id="Bignum.to_s">to_s</dt>
+		<dd class="callseq"><i class="obj">big</i>.to_s  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns a string containing the decimal representation of <i class="obj">big</i>.</dd>
+</dl>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_c_bignum.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

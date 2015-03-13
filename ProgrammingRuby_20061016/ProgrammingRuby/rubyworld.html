@@ -1,0 +1,237 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Ruby and Its World</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	<a href="trouble.html" class="prev">&lt; Previous</a><a href="web.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'rubyworld',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+<h1 id="rubyanditsworld">Ruby and Its World</h1>
+<p>It's an unfortunate fact of life that our applications have to deal with the big, bad world. In this chapter, we'll look at how Ruby interacts with its environment.  Microsoft Windows users will probably also want to look at platform-specific information in &ldquo;<a href="win32.html#rubyandmicrosoftwindows">Ruby and Microsoft Windows</a>.&rdquo;</p>
+
+<h2 id="commandlinearguments">Command-Line Arguments</h2>
+<p>&ldquo;In the Beginning was the Command Line.&rdquo; <span class="footnote">(Title of a marvelous essay by Neal Stephenson   (available online at   <a href="http://www.spack.org/essays/commandline.html" class="external">http://www.spack.org/essays/commandline.asp</a>).)</span> Regardless of the system in which Ruby is deployed, whether it be a super high-end scientific graphics workstation or an embedded PDA device, you've got to start the Ruby interpreter somehow, and that gives us the opportunity to pass in command-line arguments.</p>
+<p>A Ruby command line consists of three parts: options to the Ruby interpreter, optionally the name of a program to run, and optionally a set of arguments for that program.</p>
+<div class="syntax"><code class="block">ruby <i class="opt">[</i><i class="opt">options</i><i class="opt">]</i> <i class="opt">[</i>--<i class="opt">]</i> <i class="opt">[</i><i class="opt">programfile</i><i class="opt">]</i> <i class="opt">[</i><i class="opt">arguments</i><i class="opt">]</i></code></div>
+<p>The Ruby options are terminated by the first word on the command line that doesn't start with a hyphen, or by the special flag &ldquo;<code>--</code>&rdquo; (two hyphens).</p>
+<p>If no filename is present on the command line, or if the filename is a single hyphen (<code>-</code>), Ruby reads the program source from standard input.</p>
+
+<p>Arguments for the program itself follow the program name. For example:</p>
+<div><code class="block">% ruby -w - "Hello World"</code></div>
+<p>will enable warnings, read a program from standard input, and pass it the quoted string <code>"Hello World"</code> as an argument.</p>
+
+<h3 id="commandlineoptions">Command-Line Options</h3>
+
+<dl>
+	<dt><code class="cmdopt">-0[<em>octal</em>}</code></dt>
+	<dd>The number &ldquo;0&rdquo; flag specifies the record separator character (\0, if no digit follows).  <code>-00</code> indicates paragraph mode: records are separated by two successive default record separator characters. <code>-0777</code> reads the entire file at once (as it is an illegal character). Sets <var>$/</var>.</dd>
+	
+	<dt><code class="cmdopt">-a</code></dt>
+	<dd>Auto split mode when used with <code>-n</code> or <code>-p</code>; equivalent to executing <code></code>{$F at the top of each loop iteration.</dd>
+	
+	<dt><code class="cmdopt">-C <em>directory</em></code></dt>
+	<dd>Changes working directory to <em>directory</em> before executing.</dd>
+	
+	<dt><code class="cmdopt">-c</code></dt>
+	<dd>Checks syntax only; does not execute the program.</dd>
+	
+	<dt><code class="cmdopt"><code class="cmdopt">--copyright</code></code></dt>
+	<dd>Prints the copyright notice and exits.</dd>
+	
+	<dt><code class="cmdopt">-d, --debug</code></dt>
+	<dd>Sets <var>$DEBUG</var> to true. This can be used by your programs to enable additional tracing.</dd>
+	
+	<dt><code class="cmdopt">-e '<em>command</em>'</code></dt>
+	<dd>Executes <em>command</em> as one line of Ruby source. Several <code>-e</code>'s are allowed, and the commands are treated as multiple lines in the same program. If <em>programfile</em> is omitted when <code>-e</code> is present, execution stops after the <code>-e</code> commands have been run.</dd>
+	
+	<dt><code class="cmdopt">-F <em>pattern</em></code></dt>
+	<dd>Specifies the input field separator (<var>$;</var>) used as the default for <code>split()</code> (affects <code>-a</code>).</dd>
+	
+	<dt><code class="cmdopt">-h, --help</code></dt>
+	<dd>Displays a short help screen.</dd>
+	
+	<dt><code class="cmdopt">-I <em>directories</em></code></dt>
+	<dd>Specifies directories to be prepended to <var>$LOAD_PATH</var> (<var>$:</var>). Multiple <code>-I</code> options may be present, and multiple directories may appear following each <code>-I</code>. Directories are separated by a &ldquo;:&rdquo; on Unix-like systems and by a &ldquo;;&rdquo; on DOS/Windows systems.</dd>
+	
+	<dt><code class="cmdopt">-i [<em>extension</em>}</code></dt>
+	<dd>Edits <code>ARGV</code> files in place. For each file named in <var>ARGV</var>, anything you write to standard output will be saved back as the contents of that file. A backup copy of the file will be made if <em>extension</em> is supplied.
+		<div><code class="block">% ruby -pi.bak -e "gsub(/Perl/, 'Ruby')" *.txt</code></div>
+	</dd>
+	
+	<dt><code class="cmdopt">-K <em>kcode</em></code></dt>
+	<dd>Specifies the code set to be used. This option is useful mainly when Ruby is used for Japanese-language processing. <em>kcode</em> may be one of: e, E for EUC; s, S for SJIS; u, U for UTF-8; or a, A, n, N for ASCII.</dd>
+	
+	<dt><code class="cmdopt">-l</code></dt>
+	<dd>Enables automatic line-ending processing; sets <var>$\</var> to the value of <var>$/</var> and chops every input line automatically.</dd>
+	
+	<dt><code class="cmdopt">-n</code></dt>
+	<dd>Assumes &ldquo;<code>while gets; ...; end</code>&rdquo; loop around your program. For example, a simple <code>grep</code> command might be implemented as: <code>% ruby -n -e "print if /wombat/"  *.txt</code></dd>
+	
+	<dt><code class="cmdopt">-p</code></dt>
+	<dd>Places your program code within the loop &ldquo;<code>while gets; ...; print; end</code>.&rdquo; <div><code class="block">% ruby -p -e "$_.downcase!" *.txt</code></div></dd>
+	
+	<dt><code class="cmdopt">-r <em>library</em></code></dt>
+	<dd><code>require</code>s the named library before executing.</dd>
+	
+	<dt><code class="cmdopt">-S</code></dt>
+	<dd>Looks for the program file using <code>RUBYPATH</code> or <code>PATH</code> environment variable.</dd>
+	
+	<dt><code class="cmdopt">-s</code></dt>
+	<dd>Any command line switches found after the program filename, but before any filename arguments or before a <code>--</code>, are removed from <var>ARGV</var> and set to a global variable named for the switch. In the following example, the effect of this would be to set the variable <var>$opt</var> to &ldquo;<code>electric</code>&rdquo;.
+		<div><code class="block">% ruby -s prog -opt=electric ./mydata</code></div>
+	</dd>
+	
+	<dt><code class="cmdopt">-T[<em>level</em>}</code></dt>
+	<dd>Sets the safe level, which among other things enables tainting checks (see &ldquo;<a href="taint.html#lockingrubyinthesafe">Locking Ruby in the Safe</a>&rdquo;). Sets <var>$SAFE</var>.</dd>
+	
+	<dt><code class="cmdopt">-v, --verbose</code></dt>
+	<dd>Enables verbose mode and print the version number. In verbose mode, compilation warnings are printed. If no program filename appears on the command line, Ruby exits.</dd>
+	
+	<dt><code class="cmdopt">--version</code></dt>
+	<dd>Displays the Ruby version number and exits.</dd>
+	
+	<dt><code class="cmdopt">-w</code></dt>
+	<dd>Enables verbose mode. Unlike <code class="cmdopt">-v</code>, reads program from standard input if no program files are present on the command line. We recommend running your Ruby programs with <code>-w</code>.</dd>
+	
+	<dt><code class="cmdopt">-X <em>directory</em></code></dt>
+	<dd>Changes working directory to <em>directory</em> before executing. Same as <code>-C</code> <em>directory</em>.</dd>
+	
+	<dt><code class="cmdopt">-x [<em>directory</em>}</code></dt>
+	<dd>Strips off text before <code>#!ruby</code> line and changes working directory to <em>directory</em> if given.</dd>
+	
+	<dt><code class="cmdopt">-y, --yydebug</code></dt>
+	<dd>Enables yacc debugging in the parser <em>(waaay too much information)</em>.</dd>
+</dl>
+
+<h3 id="argv">ARGV</h3>
+<p>Any command-line arguments after the program filename are available to your Ruby program in the global array <var>ARGV</var>. For instance, invoking Ruby as</p>
+
+<div><code class="block">% ruby -w ptest "Hello World" a1 1.6180</code></div>
+
+<p>yields an <var>ARGV</var> array containing <code>["Hello World", a1, 1.6180]</code>.  There's a gotcha here for all you C programmers&mdash;<code>ARGV[0]</code> is the first argument to the program, not the program name. The name of the current program is available in the global variable <var>$0</var>.</p>
+
+<h2 id="programtermination">Program Termination</h2>
+<p>The method <code class="module_instance_method"><a href="ref_m_kernel.html#Kernel.exit"><span class="class">Kernel</span>#<span class="method">exit</span></a></code> terminates your program, returning a status value to the operating system. However, unlike some languages, <code class="method">exit</code> doesn't just terminate the program immediately. <code class="module_instance_method"><a href="ref_m_kernel.html#Kernel.exit"><span class="class">Kernel</span>#<span class="method">exit</span></a></code> first raises a <code class="exception">SystemExit</code> exception, which you may catch, and then performs a number of cleanup actions, including running any registered <code>at_exit</code> methods and object finalizers.  See the reference for <code class="module_instance_method"><a href="ref_m_kernel.html#Kernel.exit"><span class="class">Kernel</span>#<span class="method">exit</span></a></code> for details.</p>
+
+<h2 id="environmentvariables">Environment Variables</h2>
+<p>You can access operating system environment variables using the predefined variable <var>ENV</var>.  It responds to the same methods as <code class="class">Hash</code>. <span class="footnote">(<code class="const">ENV</code> is not actually a hash, but if you need to, you can convert it into a <code class="class">Hash</code> using   <code>ENV#to_hash</code>.)</span></p>
+<p>The values of some environment variables are read by Ruby when it first starts. These variables modify the behavior of the interpreter, as shown in <a href="rubyworld.html#table_13.1">Table 13.1</a>.</p>
+
+<table class="figure" id="table_13.1">
+<caption>Table 13.1 : Environment variables used by Ruby</caption>
+<thead><tr>
+	<th>Variable Name</th>
+	<th>Description</th>
+</tr></thead><tbody><tr class="firstRow">
+	<td><code>RUBYOPT</code></td>
+	<td>Additional command-line options to Ruby; examined after real command-line options are parsed (<code>$SAFE</code> must be 0).</td>
+</tr>
+<tr>
+  <td><code>RUBYLIB</code></td>
+  <td>Additional search path for Ruby programs (<code>$SAFE</code> must be 0).</td>
+</tr>
+<tr>
+  <td><code>RUBYPATH</code></td>
+  <td>With <code>-S</code> option, search path for Ruby programs (defaults to <code>PATH</code>).</td>
+</tr>
+<tr>
+  <td><code>RUBYSHELL</code></td>
+  <td>Shell to use when spawning a process; if not set, will also check <code>SHELL</code> or <code>COMSPEC</code>.</td>
+</tr>
+<tr>
+  <td><code>DLN_LIBRARY_PATH</code></td>
+  <td>Search path for dynamically loaded modules.</td>
+</tr>
+<tr>
+  <td><code>RUBYLIB_PREFIX</code></td>
+  <td>(Windows only) Mangle the RUBYLIB search path by adding this prefix to each component.</td>
+</tr>
+</tbody></table>
+
+
+<h3 id="writingtoenvironmentvariables">Writing to Environment Variables</h3>
+<p>A Ruby program may write to the <code class="const">ENV</code> object, which on most systems changes the values of the corresponding environment variables. However, this change is local to the process that makes it and to any subsequently spawned child processes. This inheritance of environment variables is illustrated in the code that follows. A subprocess changes an environment variable and this change is seen in a process that it then starts. However, the change is not visible to the original parent. (This just goes to prove that parents never really know what their children are doing.)</p>
+
+<div><code class="block">puts "In parent, term = #{ENV['TERM']}"
+fork do
+  puts "Start of child 1, term = #{ENV['TERM']}"
+  ENV['TERM'] = "ansi"
+  fork do
+    puts "Start of child 2, term = #{ENV['TERM']}"
+  end
+  Process.wait
+  puts "End of child 1, term = #{ENV['TERM']}"
+end
+Process.wait
+puts "Back in parent, term = #{ENV['TERM']}"</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">In parent, term = xterm
+Start of child 1, term = xterm
+Start of child 2, term = ansi
+End of child 1, term = ansi
+Back in parent, term = xterm</code></div>
+
+<h2 id="whererubyfindsitsmodules">Where Ruby Finds Its Modules</h2>
+<p>You use <code>require</code> or <code>load</code> to bring a library module into your Ruby program. Some of these modules are supplied with Ruby, some you installed off the Ruby Application Archive, and some you wrote yourself. How does Ruby find them?</p>
+<p>When Ruby is built for your particular machine, it predefines a set of standard directories to hold library stuff. Where these are depends on the machine in question. You can determine this from the command line with something like:</p>
+
+<div><code class="block">% ruby -e 'puts $:'</code></div>
+<p>On a typical Linux box, you'll probably find something such as:</p>
+
+<div><code class="block">/usr/local/lib/ruby/site_ruby/1.6/i686-linux
+/usr/local/lib/ruby/site_ruby/1.6
+/usr/local/lib/ruby/site_ruby
+/usr/local/lib/ruby/1.6/i686-linux
+/usr/local/lib/ruby/1.6
+.</code></div>
+<p>The <code>site_ruby</code> directories are intended to hold modules and extensions that you've added. The architecture-dependent directories (<code>i686-linux</code> in this case) hold executables and other things specific to this particular machine. All these directories are automatically included in Ruby's search for modules.</p>
+<p>Sometimes this isn't enough. Perhaps you're working on a large project written in Ruby, and you and your colleagues have built a substantial library of Ruby code. You want everyone on the team to have access to all of this code.  You have a couple of options to accomplish this. If your program runs at a safe level of zero (see &ldquo;<a href="taint.html#lockingrubyinthesafe">Locking Ruby in the Safe</a>&rdquo;), you can set the environment variable <code>RUBYLIB</code> to a list of one or more directories to be searched. <span class="footnote">(The separator between entries depends on your platform. For Windows, it's a semicolon; for Unix, a colon.)</span> If your program is not <em>setuid</em>, you can use the command-line parameter <code class="cmdopt">-I</code> to do the same thing.</p>
+<p>Finally, the Ruby variable <var>$:</var> is an array of places to search for loaded files. This variable is initialized to the list of standard directories, plus any additional ones you specified using <code>RUBYLIB</code> and <code>-I</code>. You can always add additional directories to this array from within your running program.</p>
+
+<h2 id="buildenvironment">Build Environment</h2>
+<p>When Ruby is compiled for a particular architecture, all of the relevant settings used to build it (including the architecture of the machine on which it was compiled, compiler options, source code directory, and so on) are written to the module <code class="module">Config</code> within the library file &ldquo;<code>rbconfig.rb</code>&rdquo;. After installation, any Ruby program can use this module to get details on how Ruby was compiled.</p>
+
+<div><code class="block">require "rbconfig.rb"
+include Config
+CONFIG["host"] <span class="output"><span class="outputmark">&rarr;</span> "i686-pc-linux"</span>
+CONFIG["LDFLAGS"] <span class="output"><span class="outputmark">&rarr;</span> "-rdynamic"</span></code></div>
+
+<p>Extension libraries use this configuration file in order to compile and link properly on any given architecture.  See &ldquo;<a href="ext_ruby.html#extendingruby">Extending Ruby</a>&rdquo;, and the reference for <code class="module"><a href="lib_standard.html#mkmf">mkmf</a></code> for details.</p>
+
+
+<div id="menubot" class="menu">
+	<a href="trouble.html" class="prev">&lt; Previous</a><a href="web.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="rubyworld.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

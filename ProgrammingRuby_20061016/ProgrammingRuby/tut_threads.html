@@ -1,0 +1,356 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Threads and Processes</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	<a href="tut_io.html" class="prev">&lt; Previous</a><a href="trouble.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'tut_threads',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+<h1 id="threadsandprocesses">Threads and Processes</h1>
+<p>Ruby gives you two basic ways to organize your program so that you can run different parts of it &ldquo;at the same time.&rdquo;  You can split up cooperating tasks <em>within</em> the program, using multiple threads, or you can split up tasks between different programs, using multiple processes.  Let's look at each in turn.</p>
+
+<h2 id="multithreading">Multithreading</h2>
+<p>Often the simplest way to do two things at once is by using <em>Ruby   threads</em>. These are totally in-process, implemented within the Ruby interpreter.  That makes the Ruby threads completely portable&mdash;there is no reliance on the operating system&mdash;but you don't get certain benefits from having native threads.  You may experience thread starvation (that's where a low-priority thread doesn't get a chance to run).  If you manage to get your threads deadlocked, the whole process may grind to a halt. And if some thread happens to make a call to the operating system that takes a long time to complete, all threads will hang until the interpreter gets control back. However, don't let these potential problems put you off&mdash;Ruby threads are a lightweight and efficient way to achieve parallelism in your code.</p>
+
+<h3 id="creatingrubythreads">Creating Ruby Threads</h3>
+<p>Creating a new thread is pretty straightforward. Here's a simple code fragment that downloads a set of Web pages in parallel. For each request it's given, the code creates a separate thread that handles the HTTP transaction.</p>
+
+<div><code class="block">require 'net/http'
+
+pages = %w( www.rubycentral.com
+            www.awl.com
+            www.pragmaticprogrammer.com
+           )
+
+threads = []
+
+for page in pages
+  threads &lt;&lt; Thread.new(page) { |myPage|
+
+    h = Net::HTTP.new(myPage, 80)
+    puts "Fetching: #{myPage}"
+    resp, data = h.get('/', nil )
+    puts "Got #{myPage}:  #{resp.message}"
+  }
+end
+
+threads.each { |aThread|  aThread.join }</code></div>
+
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Fetching: www.rubycentral.com
+Fetching: www.awl.com
+Fetching: www.pragmaticprogrammer.com
+Got www.rubycentral.com:  OK
+Got www.pragmaticprogrammer.com:  OK
+Got www.awl.com:  OK</code></div>
+<p>Let's look at this code in more detail, as there are a few subtle things going on.</p>
+<p>New threads are created with the <code class="class_class_method"><a href="ref_c_thread.html#Thread.new"><span class="class">Thread</span>.<span class="method">new</span></a></code> call. It is given a block that contains the code to be run in a new thread. In our case, the block uses the <code>net/http</code> library to fetch the top page from each of our nominated sites. Our tracing clearly shows that these fetches are going on in parallel.</p>
+<p>When we create the thread, we pass the required HTML page in as a parameter. This parameter is passed on to the block as <var>myPage</var>. Why do we do this, rather than simply using the value of the variable <var>page</var> within the block?</p>
+<p>A thread shares all global, instance, and local variables that are in existence at the time the thread starts. As anyone with a kid brother can tell you, sharing isn't always a good thing.  In this case, all three threads would share the variable <var>page</var>. The first thread gets started, and <var>page</var> is set to <a href="http://www.rubycentral.com" class="external">http://www.rubycentral.com</a>. In the meantime, the loop creating the threads is still running. The second time around, <var>page</var> gets set to <a href="http://www.awl.com" class="external">http://www.awl.com</a>. If the first thread has not yet finished using the <var>page</var> variable, it will suddenly start using its new value. These bugs are difficult to track down.</p>
+<p>However, local variables created within a thread's block are truly local to that thread&mdash;each thread will have its own copy of these variables. In our case, the variable <var>myPage</var> will be set at the time the thread is created, and each thread will have its own copy of the page address.</p>
+
+<h4 id="manipulatingthreads">Manipulating Threads</h4>
+<p>Another subtlety occurs on the last line in the program. Why do we call <code class="method">join</code> on each of the threads we created?</p>
+<p>When a Ruby program terminates, all running threads are killed, regardless of their states.  However, you can wait for a particular thread to finish by calling that thread's <code class="class_instance_method"><a href="ref_c_thread.html#Thread.join"><span class="class">Thread</span>#<span class="method">join</span></a></code> method. The calling thread will block until the given thread is finished.  By calling <code class="method">join</code> on each of the requestor threads, you can make sure that all three requests have completed before you terminate the main program.</p>
+<p>In addition to <code class="method">join</code>, there are a few other handy routines that are used to manipulate threads.  First of all, the current thread is always accessible using <code class="class_class_method"><a href="ref_c_thread.html#Thread.current"><span class="class">Thread</span>.<span class="method">current</span></a></code>.  You can obtain a list of all threads using <code class="class_class_method"><a href="ref_c_thread.html#Thread.list"><span class="class">Thread</span>.<span class="method">list</span></a></code>, which returns a list of all <code class="class">Thread</code> objects that are runnable or stopped.  To determine the status of a particular thread, you can use <code class="class_instance_method"><a href="ref_c_thread.html#Thread.status"><span class="class">Thread</span>#<span class="method">status</span></a></code> and <code class="class_instance_method"><a href="ref_c_thread.html#Thread.alive_qm"><span class="class">Thread</span>#<span class="method">alive?</span></a></code>.</p>
+<p>Also, you can adjust the priority of a thread using <code class="class_instance_method"><a href="ref_c_thread.html#Thread.priority_eq"><span class="class">Thread</span>#<span class="method">priority=</span></a></code>. Higher-priority threads will run before lower-priority threads.  We'll talk more about thread scheduling, and stopping and starting threads, in just a bit.</p>
+
+<h4 id="threadvariables">Thread Variables</h4>
+<p>As we described in the previous section, a thread can normally access any variables that are in scope when the thread is created.  Variables local to the block of a thread are local to the thread, and are not shared.</p>
+<p>But what if you need per-thread variables that can be accessed by other threads&mdash;including the main thread?  <code class="class">Thread</code> features a special facility that allows thread-local variables to be created and accessed by name. You simply treat the thread object as if it were a <code class="class">Hash</code>, writing to elements using <code class="method">[]=</code> and reading them back using <code class="method">[]</code>. In this example, each thread records the current value of the variable <var>count</var> in a thread-local variable with the key <code>mycount</code>. (There's a race condition in this code, but we haven't talked about synchronization yet, so we'll just quietly ignore it for now.)</p>
+
+<div><code class="block">count = 0
+arr = []
+10.times do |i|
+  arr[i] = Thread.new {
+    sleep(rand(0)/10.0)
+    Thread.current["mycount"] = count
+    count += 1
+  }
+end
+arr.each {|t| t.join; print t["mycount"], ", " }
+puts "count = #{count}"</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">8, 0, 3, 7, 2, 1, 6, 5, 4, 9, count = 10</code></div>
+<p>The main thread waits for the subthreads to finish and then prints out the value of <var>count</var> captured by each. Just to make it more interesting, we have each thread wait a random time before recording the value.</p>
+
+<h3 id="threadsandexceptions">Threads and Exceptions</h3> <p>What happens if a thread raises an unhandled exception? It depends on the setting of the <a href="http://abort_on_exception" class="external">http://abort_on_exception</a> flag, documented on pages 384 and 387.</p>
+<p>If <code class="method">abort_on_exception</code> is <code class="const">false</code>, the default condition, an unhandled exception simply kills the current thread&mdash;all the rest continue to run. In the following example, thread number 3 blows up and fails to produce any output. However, you can still see the trace from the other threads.</p>
+
+<div><code class="block">threads = []
+6.times { |i|
+  threads &lt;&lt; Thread.new(i) {
+    raise "Boom!" if i == 3
+    puts i
+  }
+}
+threads.each {|t| t.join }</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">0
+1
+2
+
+45prog.rb:4: Boom! (RuntimeError)
+	from prog.rb:8:in `join'
+	from prog.rb:8
+	from prog.rb:8:in `each'
+	from prog.rb:8</code></div>
+<p>However, set <var>abort_on_exception</var> to <code class="const">true</code>, and an unhandled exception kills all running threads. Once thread 3 dies, no more output is produced.</p>
+
+<div><code class="block">Thread.abort_on_exception = true
+threads = []
+6.times { |i|
+  threads &lt;&lt; Thread.new(i) {
+    raise "Boom!" if i == 3
+    puts i
+  }
+}
+threads.each {|t| t.join }</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">01
+2
+prog.rb:5: Boom! (RuntimeError)
+	from prog.rb:7:in `initialize'
+	from prog.rb:7:in `new'
+	from prog.rb:7
+	from prog.rb:3:in `times'
+	from prog.rb:3</code></div>
+
+<h2 id="controllingthethreadscheduler">Controlling the Thread Scheduler</h2>
+<p>In a well-designed application, you'll normally just let threads do their thing; building timing dependencies into a multithreaded application is generally considered to be bad form.</p>
+<p>However, there are times when you need to control threads. Perhaps the jukebox has a thread that displays a light show. We might need to stop it temporarily when the music stops. You might have two threads in a classic producer-consumer relationship, where the consumer has to pause if the producer gets backlogged.</p>
+<p>Class <code class="class">Thread</code> provides a number of methods to control the thread scheduler. Invoking <code class="class_class_method"><a href="ref_c_thread.html#Thread.stop"><span class="class">Thread</span>.<span class="method">stop</span></a></code> stops the current thread, while <code class="class_instance_method"><a href="ref_c_thread.html#Thread.run"><span class="class">Thread</span>#<span class="method">run</span></a></code> arranges for a particular thread to be run. <code class="class_class_method"><a href="ref_c_thread.html#Thread.pass"><span class="class">Thread</span>.<span class="method">pass</span></a></code> deschedules the current thread, allowing others to run, and <code class="class_instance_method"><a href="ref_c_thread.html#Thread.join"><span class="class">Thread</span>#<span class="method">join</span></a></code> and <code class="class_instance_method"><a href="ref_c_thread.html#Thread.value"><span class="class">Thread</span>#<span class="method">value</span></a></code> suspend the calling thread until a given thread finishes.</p>
+<p>We can demonstrate these features in the following, totally pointless program.</p>
+
+<div><code class="block">t = Thread.new { sleep .1; Thread.pass; Thread.stop; }
+t.status <span class="output"><span class="outputmark">&rarr;</span> "sleep"</span>
+t.run
+t.status <span class="output"><span class="outputmark">&rarr;</span> "run"</span>
+t.run
+t.status <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+
+<p>However, using these primitives to achieve any kind of real synchronization is, at best, hit or miss; there will always be race conditions waiting to bite you. And when you're working with shared data, race conditions pretty much guarantee long and frustrating debugging sessions.  Fortunately, threads have one additional facility&mdash;the idea of a critical section. Using this, we can build a number of secure synchronization schemes.</p>
+
+<h2 id="mutualexclusion">Mutual Exclusion</h2>
+<p>The lowest-level method of blocking other threads from running uses a global &ldquo;thread critical&rdquo; condition. When the condition is set to <code>true</code> (using the <code class="class_class_method"><a href="ref_c_thread.html#Thread.critical_eq"><span class="class">Thread</span>.<span class="method">critical=</span></a></code> method), the scheduler will not schedule any existing thread to run. However, this does not block new threads from being created and run. Certain thread operations (such as stopping or killing a thread, sleeping in the current thread, or raising an exception) may cause a thread to be scheduled even when in a critical section.</p>
+<p>Using <code class="class_class_method"><a href="ref_c_thread.html#Thread.critical_eq"><span class="class">Thread</span>.<span class="method">critical=</span></a></code> directly is certainly possible, but it isn't terribly convenient. Fortunately, Ruby comes packaged with several alternatives. Of these, two of the best, class <code class="class">Mutex</code> and class <code class="class">ConditionVariable</code>, are available in the <code class="class"><a href="ref_c_thread.html">Thread</a></code> library module.</p>
+
+<h4 id="themutexclass">The Mutex Class</h4> <p><code class="class">Mutex</code> is a class that implements a simple semaphore lock for mutually exclusive access to some shared resource. That is, only one thread may hold the lock at a given time.  Other threads may choose to wait in line for the lock to become available, or may simply choose to get an immediate error indicating that the lock is not available.</p>
+<p>A mutex is often used when updates to shared data need to be atomic. Say we need to update two variables as part of a transaction. We can simulate this in a trivial program by incrementing some counters. The updates are supposed to be atomic&mdash;the outside world should never see the counters with different values. Without any kind of mutex control, this just doesn't work.</p>
+
+<div><code class="block">count1 = count2 = 0
+difference = 0
+counter = Thread.new do
+  loop do
+    count1 += 1
+    count2 += 1
+  end
+end
+spy = Thread.new do
+  loop do
+    difference += (count1 - count2).abs
+  end
+end
+sleep 1
+Thread.critical = 1
+count1 <span class="output"><span class="outputmark">&rarr;</span> 184846</span>
+count2 <span class="output"><span class="outputmark">&rarr;</span> 184846</span>
+difference <span class="output"><span class="outputmark">&rarr;</span> 58126</span></code></div>
+
+
+<p>This example shows that the &ldquo;spy&rdquo; thread woke up a large number of times and found the values of <var>count1</var> and <var>count2</var> inconsistent.</p>
+<p>Fortunately we can fix this using a mutex.</p>
+
+<div><code class="block">require 'thread'
+mutex = Mutex.new
+
+count1 = count2 = 0
+difference = 0
+counter = Thread.new do
+  loop do
+    mutex.synchronize do
+      count1 += 1
+      count2 += 1
+    end
+  end
+end
+spy = Thread.new do
+  loop do
+    mutex.synchronize do
+      difference += (count1 - count2).abs
+    end
+  end
+end</code></div>
+
+<div><code class="block">sleep 1
+mutex.lock
+count1 <span class="output"><span class="outputmark">&rarr;</span> 21192</span>
+count2 <span class="output"><span class="outputmark">&rarr;</span> 21192</span>
+difference <span class="output"><span class="outputmark">&rarr;</span> 0</span></code></div>
+
+
+<p>By placing all accesses to the shared data under control of a mutex, we ensure consistency. Unfortunately, as you can see from the numbers, we also suffer quite a performance penalty.</p>
+
+<h4 id="conditionvariables">Condition Variables</h4>
+<p>Using a mutex to protect critical data is sometimes not enough. Suppose you are in a critical section, but you need to wait for some particular resource.  If your thread goes to sleep waiting for this resource, it is possible that no other thread will be able to release the resource because it cannot enter the critical section&mdash;the original process still has it locked. You need to be able to give up temporarily your exclusive use of the critical region and simultaneously tell people that you're waiting for a resource. When the resource becomes available, you need to be able to grab it <em>and</em> reobtain the lock on the critical region, all in one step.</p>
+<p>This is where condition variables come in. A condition variable is simply a semaphore that is associated with a resource and is used within the protection of a particular mutex. When you need a resource that's unavailable, you wait on a condition variable. That action releases the lock on the corresponding mutex. When some other thread signals that the resource is available, the original thread comes off the wait and simultaneously regains the lock on the critical region.</p>
+
+<div><code class="block">require 'thread'
+mutex = Mutex.new
+cv = ConditionVariable.new
+a = Thread.new {
+  mutex.synchronize {
+    puts "A: I have critical section, but will wait for cv"
+    cv.wait(mutex)
+    puts "A: I have critical section again! I rule!"
+  }
+}
+
+puts "(Later, back at the ranch...)"
+
+b = Thread.new {
+  mutex.synchronize {
+    puts "B: Now I am critical, but am done with cv"
+    cv.signal
+    puts "B: I am still critical, finishing up"
+  }
+}
+a.join
+b.join</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">A: I have critical section, but will wait for cv
+(Later, back at the ranch...)
+
+B: Now I am critical, but am done with cv
+B: I am still critical, finishing up
+A: I have critical section again! I rule!</code></div>
+<p>For alternative implementations of synchronization mechanisms, see <code>monitor.rb</code> and <code>sync.rb</code> in the <code>lib</code> subdirectory of the distribution.</p>
+
+<h2 id="runningmultipleprocesses">Running Multiple Processes</h2>
+<p>Sometimes you may want to split a task into several process-sized chunks&mdash;or perhaps you need to run a separate process that was not written in Ruby.  Not a problem: Ruby has a number of methods by which you may spawn and manage separate processes.</p>
+
+<h3 id="spawningnewprocesses">Spawning New Processes</h3>
+<p>There are several ways to spawn a separate process; the easiest is to run some command and wait for it to complete.  You might find yourself doing this to run some separate command or retrieve data from the host system. Ruby does this for you with the <code class="method">system</code> and backquote methods.</p>
+
+<div><code class="block">system("tar xzf test.tgz")
+<span class="output" style="width:35em"><span class="outputmark">&rarr;</span> tar: test.tgz: Cannot open:<br> No such file or directory<br>tar: Error is not recoverable: exiting now<br>tar: Child returned status 2<br>tar: Error exit delayed from previous errors<br>false</span>
+
+
+
+
+
+
+result = `date`
+result <span class="output"><span class="outputmark">&rarr;</span> "Sun Jun  9 00:08:50 CDT 2002\n"</span></code></div>
+
+
+<p>The method <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.system"><span class="class">Kernel</span>::<span class="method">system</span></a></code> executes the given command in a subprocess; it returns <code class="const">true</code> if the command was found and executed properly, <code class="const">false</code> otherwise. In case of failure, you'll find the subprocess's exit code in the global variable <var>$?</var>.</p>
+<p>One problem with <code class="method">system</code> is that the command's output will simply go to the same destination as your program's output, which may not be what you want.  To capture the standard output of a subprocess, you can use the backquotes, as with <code>`date`</code> in the previous example.  Remember that you may need to use <code class="class_instance_method"><a href="ref_c_string.html#String.chomp"><span class="class">String</span>#<span class="method">chomp</span></a></code> to remove the line-ending characters from the result.</p>
+<p>Okay, this is fine for simple cases&mdash;we can run some other process and get the return status.  But many times we need a bit more control than that. We'd like to carry on a conversation with the subprocess, possibly sending it data and possibly getting some back. The method <code class="class_class_method"><a href="ref_c_io.html#IO.popen"><span class="class">IO</span>.<span class="method">popen</span></a></code> does just this. The <code class="method">popen</code> method runs a command as a subprocess and connects that subprocess's standard input and standard output to a Ruby <code class="class">IO</code> object. Write to the <code class="class">IO</code> object, and the subprocess can read it on standard input. Whatever the subprocess writes is available in the Ruby program by reading from the <code class="class">IO</code> object.</p>
+<p>For example, on our systems one of the more useful utilities is <code>pig</code>, a program that reads words from standard input and prints them in pig Latin (or igpay atinlay). We can use this when our Ruby programs need to send us output that our 5-year-olds shouldn't be able to understand.</p>
+
+<div><code class="block">pig = IO.popen("pig", "w+")
+pig.puts "ice cream after they go to bed"
+pig.close_write
+puts pig.gets</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">iceway eamcray afterway eythay ogay otay edbay</code></div>
+<p>This example illustrates both the apparent simplicity and the real-world complexities involved in driving subprocesses through pipes. The code certainly looks simple enough: open the pipe, write a phrase, and read back the response. But it turns out that the <code>pig</code> program doesn't flush the output it writes. Our original attempt at this example, which had a <code>pig.puts</code> followed by a <code>pig.gets</code>, hung forever. The <code>pig</code> program processed our input, but its response was never written to the pipe. We had to insert the <code>pig.close_write</code> line. This sends an end-of-file to <code>pig</code>'s standard input, and the output we're looking for gets flushed as <code>pig</code> terminates.</p>
+<p>There's one more twist to <code class="method">popen</code>. If the command you pass it is a single minus sign (&ldquo;--&rdquo;), <code class="method">popen</code> will fork a new Ruby interpreter. Both this and the original interpreter will continue running by returning from the <code class="method">popen</code>. The original process will receive an <code class="class">IO</code> object back, while the child will receive <code>nil</code>.</p>
+
+<div><code class="block">pipe = IO.popen("-","w+")
+if pipe
+  pipe.puts "Get a job!"
+  $stderr.puts "Child says '#{pipe.gets.chomp}'"
+else
+  $stderr.puts "Dad says '#{gets.chomp}'"
+  puts "OK"
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Dad says 'Get a job!'
+Child says 'OK'</code></div>
+<p>In addition to <code>popen</code>, the traditional Unix calls <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.fork"><span class="class">Kernel</span>::<span class="method">fork</span></a></code>, <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.exec"><span class="class">Kernel</span>::<span class="method">exec</span></a></code>, and <code class="class_class_method"><a href="ref_c_io.html#IO.pipe"><span class="class">IO</span>.<span class="method">pipe</span></a></code> are available on platforms that support them.  The file-naming convention of many <code class="class">IO</code> methods and <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.open"><span class="class">Kernel</span>::<span class="method">open</span></a></code> will also spawn subprocesses if you put a &ldquo;<code>|</code>&rdquo; as the first character of the filename (see the introduction to class <code class="class"><a href="ref_c_io.html">IO</a></code> for details). Note that you <em>cannot</em> create pipes using <code class="class_class_method"><a href="ref_c_file.html#File.new"><span class="class">File</span>.<span class="method">new</span></a></code>; it's just for files.</p>
+
+<h3 id="independentchildren">Independent Children</h3>
+<p>Sometimes we don't need to be quite so hands-on: we'd like to give the subprocess its assignment and then go on about our business. Some time later, we'll check in with it to see if it has finished. For instance, we might want to kick off a long-running external sort.</p>
+
+<div><code class="block">exec("sort testfile &gt; output.txt") if fork == nil
+# The sort is now running in a child process
+# carry on processing in the main program
+
+# then wait for the sort to finish
+Process.wait</code></div>
+<p>The call to <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.fork"><span class="class">Kernel</span>::<span class="method">fork</span></a></code> returns a process id in the parent, and <code>nil</code> in the child, so the child process will perform the <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.exec"><span class="class">Kernel</span>::<span class="method">exec</span></a></code> call and run sort. Sometime later, we issue a <code class="module_module_method"><a href="ref_m_process.html#Process.wait"><span class="class">Process</span>::<span class="method">wait</span></a></code> call, which waits for the sort to complete (and returns its process id).</p>
+<p>If you'd rather be notified when a child exits (instead of just waiting around), you can set up a signal handler using <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.trap"><span class="class">Kernel</span>::<span class="method">trap</span></a></code>. Here we set up a trap on <code>SIGCLD</code>, which is the signal sent on &ldquo;death of child process.&rdquo;</p>
+
+<div><code class="block">trap("CLD") {
+  pid = Process.wait
+  puts "Child pid #{pid}: terminated"
+  exit
+}
+
+exec("sort testfile &gt; output.txt") if fork == nil
+
+# do other stuff...</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Child pid 31842: terminated</code></div>
+
+<h3 id="blocksandsubprocesses">Blocks and Subprocesses</h3>
+
+<p><code class="class_class_method"><a href="ref_c_io.html#IO.popen"><span class="class">IO</span>.<span class="method">popen</span></a></code> works with a block in pretty much the same way as <code class="class_class_method"><a href="ref_c_file.html#File.open"><span class="class">File</span>.<span class="method">open</span></a></code> does. Pass <code class="method">popen</code> a command, such as <code>date</code>, and the block will be passed an <code class="class">IO</code> object as a parameter.</p>
+
+<div><code class="block">IO.popen ("date") { |f| puts "Date is #{f.gets}" }</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Date is Sun Jun  9 00:08:50 CDT 2002</code></div>
+<p>The <code class="class">IO</code> object will be closed automatically when the code block exits, just as it is with <code class="class_class_method"><a href="ref_c_file.html#File.open"><span class="class">File</span>.<span class="method">open</span></a></code>.</p>
+<p>If you associate a block with <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.fork"><span class="class">Kernel</span>::<span class="method">fork</span></a></code>, the code in the block will be run in a Ruby subprocess, and the parent will continue after the block.</p>
+
+<div><code class="block">fork do
+  puts "In child, pid = #$$"
+  exit 99
+end
+pid = Process.wait
+puts "Child terminated, pid = #{pid}, exit code = #{$? &gt;&gt; 8}"</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">In child, pid = 31849
+Child terminated, pid = 31849, exit code = 99</code></div>
+<p>One last thing. Why do we shift the exit code in <var>$?</var> 8 bits to the right before displaying it? This is a &ldquo;feature&rdquo; of Posix systems: the bottom 8 bits of an exit code contain the reason the program terminated, while the higher-order 8 bits hold the actual exit code.</p>
+
+
+<div id="menubot" class="menu">
+	<a href="tut_io.html" class="prev">&lt; Previous</a><a href="trouble.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="tut_threads.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

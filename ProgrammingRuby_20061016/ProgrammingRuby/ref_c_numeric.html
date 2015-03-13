@@ -1,0 +1,223 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Numeric</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_c_numeric',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="class" id="Numeric">class <strong>Numeric</strong> &lt; Object</h1>
+
+<p><strong>Subclasses:</strong> Float, Integer</p>
+
+<p>Numeric is the fundamental base type for the concrete number classes  <code class="class">Float</code>, <code class="class">Fixnum</code>, and <code class="class">Bignum</code>.</p>
+
+
+<h2>mixins</h2>
+<dl>
+	<dt><code class="module"><a href="ref_m_comparable.html#Comparable">Comparable</a></code></dt>
+	<dd><code class="module_instance_method"><a href="ref_m_comparable.html#Comparable._lt">&lt;</a></code>, <code class="module_instance_method"><a href="ref_m_comparable.html#Comparable._lt_eq">&lt;=</a></code>, <code class="module_instance_method"><a href="ref_m_comparable.html#Comparable.eqeq">==</a></code>, <code class="module_instance_method"><a href="ref_m_comparable.html#Comparable._gt_eq">&gt;=</a></code>, <code class="module_instance_method"><a href="ref_m_comparable.html#Comparable._gt">&gt;</a></code>, <code class="module_instance_method"><a href="ref_m_comparable.html#Comparable.between">between?</a></code></dd>
+</dl>
+
+<h2 class="refsubsection" id="instancemethods">instance methods</h2>
+<dl class="methodlist">
+	<dt id="Numeric._pl_at">+@</dt>
+		<dd class="callseq">+<i class="obj">num</i>  &rarr; <i class="obj">num</i></dd>
+		<dd class="desc">Unary Plus&mdash;Returns the receiver's value.
+
+		</dd>
+
+	<dt id="Numeric._mi_mi_at">-@</dt>
+		<dd class="callseq">--<i class="obj">num</i>  &rarr; <i class="obj">aNumeric</i></dd>
+		<dd class="desc">Unary Minus&mdash;Returns the receiver's value, negated.
+
+		</dd>
+
+	<dt id="Numeric.abs">abs</dt>
+		<dd class="callseq"><i class="obj">num</i>.abs  &rarr; <i class="obj">aNumeric</i></dd>
+		<dd class="desc">Returns the absolute value of <i class="obj">num</i>.
+
+<div><code class="block">12.abs <span class="output"><span class="outputmark">&rarr;</span> 12</span>
+(-34.56).abs <span class="output"><span class="outputmark">&rarr;</span> 34.56</span>
+-34.56.abs <span class="output"><span class="outputmark">&rarr;</span> 34.56</span></code></div>
+
+		</dd>
+
+	<dt id="Numeric.coerce">coerce</dt>
+		<dd class="callseq"><i class="obj">num</i>.coerce( <i class="obj">aNumeric</i> )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">If <i class="obj">aNumeric</i> is the same type as <i class="obj">num</i>, returns an array containing <i class="obj">aNumeric</i> and <i class="obj">num</i>. Otherwise, returns an array with both <i class="obj">aNumeric</i> and <i class="obj">num</i> represented as <code class="class">Float</code> objects.
+
+<div><code class="block">1.coerce(2.5) <span class="output"><span class="outputmark">&rarr;</span> [2.5, 1.0]</span>
+1.2.coerce(3) <span class="output"><span class="outputmark">&rarr;</span> [3.0, 1.2]</span>
+1.coerce(2) <span class="output"><span class="outputmark">&rarr;</span> [2, 1]</span></code></div>
+
+		</dd>
+
+	<dt id="Numeric.divmod">divmod</dt>
+		<dd class="callseq"><i class="obj">num</i>.divmod( <i class="obj">aNumeric</i> )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc"><p>Returns an array containing the quotient and modulus obtained by dividing <i class="obj">num</i> by <i class="obj">aNumeric</i>.</p>
+<p>If <code>q, r = x.divmod(y)</code>,<em><br>
+&nbsp; &nbsp; &nbsp; q = floor(float(x) / float(y))<br>
+&nbsp; &nbsp; &nbsp; x = q * y + r</em></p>
+
+      <p>The quotient is rounded toward -infinity. See <a href="ref_c_numeric.html#table_22.6">/Table 22.6</a>.</p>
+
+<div><code class="block">11.divmod(3) <span class="output"><span class="outputmark">&rarr;</span> [3, 2]</span>
+11.divmod(-3) <span class="output"><span class="outputmark">&rarr;</span> [-4, -1]</span>
+11.divmod(3.5) <span class="output"><span class="outputmark">&rarr;</span> [3.0, 0.5]</span>
+(-11).divmod(3.5) <span class="output"><span class="outputmark">&rarr;</span> [-4.0, 3.0]</span>
+(11.5).divmod(3.5) <span class="output"><span class="outputmark">&rarr;</span> [3.0, 1.0]</span></code></div>
+
+	<table id="table_22.6">
+		<caption>Table 22.6 : Difference between modulo and remainder. The modulo operator (&ldquo;<code>%</code>&rdquo;) always has the sign of the divisor, whereas <code class="method">remainder</code> has the sign of the dividend.</caption>
+		<thead><tr>
+	<th>a</th>
+	<th>b</th>
+<th>a.divmod(b)</th>
+			<th>a / b</th>
+			<th>a.modulo(b)</th>
+			<th>a.remainder(b)</th>
+			</tr></thead>
+		<tr class="firstRow">
+			<td>13</td>
+			<td>4</td>
+			<td>3, 1</td>
+			<td>3</td>
+			<td>1</td>
+			<td>1</td>
+		</tr>
+		<tr>
+			<td>13</td>
+			<td>-4</td>
+			<td>-4, -3</td>
+			<td>-4</td>
+			<td>-3</td>
+			<td>1</td>
+		</tr>
+		<tr>
+			<td>-13</td>
+			<td>4</td>
+			<td>-4, 3</td>
+			<td>-4</td>
+			<td>3</td>
+			<td>-1</td>
+		</tr>
+		<tr>
+			<td>-13</td>
+			<td>-4</td>
+			<td>3, -1</td>
+			<td>3</td>
+			<td>-1</td>
+			<td>-1</td>
+		</tr>
+		<tr>
+			<td>11.5</td>
+			<td>4</td>
+			<td>2.0, 3.5</td>
+			<td>2.875</td>
+			<td>3.5</td>
+			<td>3.5</td>
+		</tr>
+		<tr>
+			<td>11.5</td>
+			<td>-4</td>
+			<td>-3.0, -0.5</td>
+			<td>-2.875</td>
+			<td>-0.5</td>
+			<td>3.5</td>
+		</tr>
+		<tr>
+			<td>-11.5</td>
+			<td>4</td>
+			<td>-3.0, 0.5</td>
+			<td>-2.875</td>
+			<td>0.5</td>
+			<td>-3.5</td>
+		</tr>
+		<tr>
+			<td>-11.5</td>
+			<td>-4</td>
+			<td>2.0, -3.5</td>
+			<td>2.875</td>
+			<td>-3.5</td>
+			<td>-3.5</td>
+		</tr>
+	</table>
+
+
+		</dd>
+
+	<dt id="Numeric.eql_qm">eql?</dt>
+		<dd class="callseq"><i class="obj">num</i>.eql?( <i class="obj">aNumeric</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">num</i> and <i class="obj">aNumeric</i> are the same type and have equal values.
+
+<div><code class="block">1 == 1.0 <span class="output"><span class="outputmark">&rarr;</span> true</span>
+1.eql?(1.0) <span class="output"><span class="outputmark">&rarr;</span> false</span>
+(1.0).eql?(1.0) <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="Numeric.integer_qm">integer?</dt>
+		<dd class="callseq"><i class="obj">num</i>.integer?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">num</i> is an <code class="class">Integer</code> (including <code class="class">Fixnum</code> and <code class="class">Bignum</code>). </dd>
+
+	<dt id="Numeric.modulo">modulo</dt>
+		<dd class="callseq"><i class="obj">num</i>.modulo( <i class="obj">aNumeric</i> )  &rarr; <i class="obj">aNumeric</i></dd>
+		<dd class="desc">Equivalent to <i class="obj">num</i>.<code>divmod(</code><i class="obj">aNumeric</i><code>)[1]</code>. </dd>
+
+	<dt id="Numeric.nonzero_qm">nonzero?</dt>
+		<dd class="callseq"><i class="obj">num</i>.nonzero?  &rarr; <i class="obj">num</i> or <code>nil</code></dd>
+		<dd class="desc">Returns <i class="obj">num</i> if <i class="obj">num</i> is not zero, <code>nil</code> otherwise. This behavior is useful when chaining comparisons:
+
+<div><code class="block">a = %w( z Bb bB bb BB a aA Aa AA A )
+b = a.sort {|a,b| (a.downcase &lt;=&gt; b.downcase).nonzero? || a &lt;=&gt; b }
+b <span class="output"><span class="outputmark">&rarr;</span> ["A", "a", "AA", "Aa", "aA", "BB", "Bb", "bB", "bb", "z"]</span></code></div>
+
+		</dd>
+
+	<dt id="Numeric.remainder">remainder</dt>
+		<dd class="callseq"><i class="obj">num</i>.remainder( <i class="obj">aNumeric</i> )  &rarr; <i class="obj">aNumeric</i></dd>
+		<dd class="desc">If <i class="obj">num</i> and <i class="obj">aNumeric</i> have different signs, returns <em>mod</em>-<i class="obj">aNumeric</i>; otherwise, returns <em>mod</em>. In both cases <em>mod</em> is the value <i class="obj">num</i>.<code>modulo(</code><i class="obj">aNumeric</i><code>)</code>.  The differences between <code class="method">remainder</code> and modulo (<code>%</code>) are shown in <a href="ref_c_numeric.html#table_22.6">Table 22.6</a>. </dd>
+
+	<dt id="Numeric.zero_qm">zero?</dt>
+		<dd class="callseq"><i class="obj">num</i>.zero?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">num</i> has a zero value.</dd>
+</dl>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_c_numeric.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

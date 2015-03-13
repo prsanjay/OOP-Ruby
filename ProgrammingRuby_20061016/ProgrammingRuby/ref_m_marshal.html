@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Marshal</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_m_marshal',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="module" id="Marshal">module <strong>Marshal</strong></h1>
+
+<p>The marshaling library converts collections of Ruby objects into a   byte stream, allowing them to be stored outside the currently active   script. This data may subsequently be read and the original objects   reconstituted. Marshaling is described in the section &ldquo;<a href="ospace.html#marshalinganddistributedruby">Marshalling and Distributed Ruby</a>.&rdquo; Some objects cannot be dumped: if the objects to be dumped include   bindings, procedure objects, instances of class <code class="class">IO</code>, or   singleton objects, a <code class="exception">TypeError</code> will be raised.      If your class has special serialization needs (for example, if you want to serialize in some specific format), or if it contains objects that would otherwise not be serializable, you can implement your own serialization strategy by defining two methods, <code class="method">_dump</code> and <code class="method">_load</code>:</p>
+
+  <table>
+		<thead><tr>
+	<th>Method Type</th>
+	<th>Signature</th>
+<th>Returns</th>
+		</tr></thead>
+	<tr class="firstRow">
+		<td>Instance</td>
+		<td>_dump(aDepth)</td>
+		<td>Returns a <code class="class">String</code></td>
+	</tr>
+	<tr>
+		<td>Class</td>
+		<td>_load(aString)</td>
+		<td>Returns a reconstituted <code class="class">Object</code></td>
+	</tr>
+</table>
+
+<p>The instance method <code>_dump</code> should return a <code class="class">String</code> object containing all the information necessary to reconstitute objects of this class and all referenced objects up to a maximum depth of <em>aDepth</em> (a value of -1 should disable depth checking). The class method <code>_load</code> should take a <code class="class">String</code> and return an object of this class.</p>
+
+
+<h2 id="modulemethods">module methods</h2>
+<dl class="methodlist">
+	<dt id="Marshal.dump">dump</dt>
+		<dd class="callseq">dump( <i class="obj">anObject</i> [, <i class="obj">anIO</i>] , <i class="obj">limit</i>=-1 )  &rarr; <i class="obj">anIO</i></dd>
+		<dd class="desc">Serializes <i class="obj">anObject</i> and all descendent objects. If <i class="obj">anIO</i> is specified, the serialized data will be written to it, otherwise the data will be returned as a <code class="class">String</code>. If <i class="obj">limit</i> is specified, the traversal of subobjects will be limited to that depth. If <i class="obj">limit</i> is negative, no checking of depth will be performed.
+
+<div><code class="block">class Klass
+  def initialize(str)
+    @str = str
+  end
+  def sayHello
+    @str
+  end
+end</code></div>
+
+<div><code class="block">o = Klass.new("hello\n")
+data = Marshal.dump(o)
+obj = Marshal.load(data)
+obj.sayHello <span class="output"><span class="outputmark">&rarr;</span> "hello\n"</span></code></div>
+
+		</dd>
+
+	<dt id="Marshal.load">load</dt>
+		<dd class="callseq">load( <i class="obj">from</i> [, <i class="obj">aProc</i>] )  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Returns the result of converting the serialized data in <i class="obj">from</i> into a Ruby object (possibly with associated subordinate objects). <i class="obj">from</i> may be either an instance of <code class="class">IO</code> or an object that responds to <code class="method">to_str</code>. If <i class="obj">proc</i> is specified, it will be passed each object as it is deserialized. </dd>
+
+	<dt id="Marshal.restore">restore</dt>
+		<dd class="callseq">restore( <i class="obj">from</i> [, <i class="obj">aProc</i>] )  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">A synonym for <code class="module_module_method"><a href="ref_m_marshal.html#Marshal.load"><span class="module">Marshal</span>::<span class="method">load</span></a></code>.</dd>
+</dl>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_m_marshal.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

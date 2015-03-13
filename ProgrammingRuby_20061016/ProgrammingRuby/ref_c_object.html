@@ -1,0 +1,402 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Object</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_c_object',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="class" id="Object">class <strong>Object</strong></h1>
+
+<p><strong>Subclasses:</strong> Array, Binding, Continuation, Data, Dir, Exception, FalseClass, File::Stat, Hash, IO, MatchingData, Method, Module, NilClass, Numeric, Proc, Range, Regexp, String, Struct, Symbol, Thread, Time, TrueClass</p>
+
+<p><code class="class">Object</code> is the parent class of all classes in Ruby. Its methods are therefore available to all objects unless explicitly overridden.</p>
+
+<p><code class="class">Object</code> mixes in the <code class="module">Kernel</code> module, making the built-in kernel functions globally accessible. Although the instance methods of <code class="class">Object</code> are defined by the <code class="module">Kernel</code> module, we have chosen to document them here for clarity.</p>
+
+<p>In the descriptions that follow, the parameter <i class="obj">aSymbol</i> refers to a symbol, which is either a quoted string or a <code class="class">Symbol</code> (such as <code>:name</code>).</p>
+
+<h2 class="refsubsection" id="instancemethods">instance methods</h2>
+<dl class="methodlist">
+	<dt id="Object._eq_eq">==</dt>
+		<dd class="callseq"><i class="obj">obj</i> == <i class="obj">anObject</i>  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Equality&mdash;At the <code class="class">Object</code> level, <code>==</code> returns <code class="const">true</code> only if <i class="obj">obj</i> and <i class="obj">anObject</i> are the same object. Typically, this method is overridden in descendent classes to provide class-specific meaning. </dd>
+
+	<dt id="Object._eq_eq_eq">===</dt>
+		<dd class="callseq"><i class="obj">obj</i> === <i class="obj">anObject</i>  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Case Equality&mdash;A synonym for <code class="class_instance_method"><a href="ref_c_object.html#Object._eq_eq"><span class="class">Object</span>#<span class="method">==</span></a></code>, but typically overridden by descendents to provide meaningful semantics in <code>case</code> statements. </dd>
+
+	<dt id="Object._eq_sd">=~</dt>
+		<dd class="callseq"><i class="obj">obj</i> =~ <i class="obj">anObject</i>  &rarr; <code class="const">false</code></dd>
+		<dd class="desc">Pattern Match&mdash;Overridden by descendents (notably <code class="class">Regexp</code> and <code class="class">String</code>) to provide meaningful pattern-match semantics. </dd>
+
+	<dt id="Object.__id__">__id__</dt>
+		<dd class="callseq"><i class="obj">obj</i>.__id__  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><a href="ref_c_object.html#Object.id"><span class="class">Object</span>#<span class="method">id</span></a></code>. </dd>
+
+	<dt id="Object.__send__">__send__</dt>
+		<dd class="callseq"><i class="obj">obj</i>.__send__( <i class="obj">aSymbol</i> <i>[</i>, <i class="obj">args</i><i>]+</i> )  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><a href="ref_c_object.html#Object.send"><span class="class">Object</span>#<span class="method">send</span></a></code>. </dd>
+
+	<dt id="Object.class">class</dt>
+		<dd class="callseq"><i class="obj">obj</i>.class  &rarr; <i class="obj">aClass</i></dd>
+		<dd class="desc">Returns the class of <i class="obj">obj</i> (synonym for <code class="class_instance_method"><a href="ref_c_object.html#Object.type"><span class="class">Object</span>#<span class="method">type</span></a></code>). </dd>
+
+	<dt id="Object.clone">clone</dt>
+		<dd class="callseq"><i class="obj">obj</i>.clone  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Produces a shallow copy of <i class="obj">obj</i>&mdash;the instance variables of <i class="obj">obj</i> are copied, but not the objects they reference. Copies the frozen and tainted state of <i class="obj">obj</i>. See also the discussion under <code class="class_instance_method"><a href="ref_c_object.html#Object.dup"><span class="class">Object</span>#<span class="method">dup</span></a></code>.
+
+<div><code class="block">class Klass
+   attr_accessor :str
+end
+s1 = Klass.new     <span class="output2"><span class="outputmark">&rarr;</span> #&lt;Klass:0x401b5478&gt;</span>
+s1.str = "Hello"   <span class="output2"><span class="outputmark">&rarr;</span> "Hello"</span>
+s2 = s1.clone      <span class="output2"><span class="outputmark">&rarr;</span> #&lt;Klass:0x401b5194 @str="Hello"&gt;</span>
+s2.str[1,4] = "i"  <span class="output2"><span class="outputmark">&rarr;</span> "i"</span>
+s1.inspect         <span class="output2"><span class="outputmark">&rarr;</span> "#&lt;Klass:0x401b5478 @str=\"Hi\"&gt;"</span>
+s2.inspect         <span class="output2"><span class="outputmark">&rarr;</span> "#&lt;Klass:0x401b5194 @str=\"Hi\"&gt;"</span></code></div>
+
+		</dd>
+
+	<dt id="Object.display">display</dt>
+		<dd class="callseq"><i class="obj">obj</i>.display( <i class="obj">port</i>=<var>$&gt;</var> )  &rarr; <code>nil</code></dd>
+		<dd class="desc">Prints <i class="obj">obj</i> on the given port (default <var>$&gt;</var>). Equivalent
+      to:
+
+<div><code class="block">def display(port=$&gt;)
+  port.write self
+end</code></div>
+
+		</dd>
+
+	<dt id="Object.dup">dup</dt>
+		<dd class="callseq"><i class="obj">obj</i>.dup  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Produces a shallow copy of <i class="obj">obj</i>&mdash;the instance variables of <i class="obj">obj</i> are copied, but not the objects they reference. <code class="method">dup</code> copies the tainted state of <i class="obj">obj</i>. See also the discussion under <code class="class_instance_method"><a href="ref_c_object.html#Object.clone"><span class="class">Object</span>#<span class="method">clone</span></a></code>. In general, <code class="method">clone</code> and <code class="method">dup</code> may have different semantics in descendent classes. While <code class="method">clone</code> is used to duplicate an object, including its internal state, <code class="method">dup</code> typically uses the class of the descendent object to create the new instance. </dd>
+
+	<dt id="Object.eql_qm">eql?</dt>
+		<dd class="callseq"><i class="obj">obj</i>.eql?( <i class="obj">anObject</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">obj</i> and <i class="obj">anObject</i> have the
+      same value. Used by <code class="class">Hash</code> to test
+      members for equality. For objects of class <code class="class">Object</code>,
+      <code class="method">eql?</code> is synonymous with <code class="method">==</code>. Subclasses
+      normally continue this tradition, but there are
+      exceptions. <code class="class">Numeric</code> types, for example, perform type
+      conversion across <code class="method">==</code>, but not across <code class="method">eql?</code>, so:
+
+<div><code class="block">1 == 1.0 <span class="output"><span class="outputmark">&rarr;</span> true</span>
+1.eql? 1.0 <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+		</dd>
+
+	<dt id="Object.equal_qm">equal?</dt>
+		<dd class="callseq"><i class="obj">obj</i>.equal?( <i class="obj">anObject</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">obj</i> and <i class="obj">anObject</i> have the same object ID. This method should not be overridden by subclasses.
+
+<div><code class="block">a = [ 'cat', 'dog' ]
+b = [ 'cat', 'dog' ]
+a == b <span class="output"><span class="outputmark">&rarr;</span> true</span>
+a.id == b.id <span class="output"><span class="outputmark">&rarr;</span> false</span>
+a.eql?(b) <span class="output"><span class="outputmark">&rarr;</span> true</span>
+a.equal?(b) <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+		</dd>
+
+	<dt id="Object.extend">extend</dt>
+		<dd class="callseq"><i class="obj">obj</i>.extend( <i>[</i><i class="obj">aModule</i><i>]+</i> )  &rarr; <i class="obj">obj</i></dd>
+		<dd class="desc">Adds to <i class="obj">obj</i> the instance methods from each module given as a parameter.
+
+<div><code class="block">module Mod
+  def hello
+    "Hello from Mod.\n"
+  end
+end
+
+class Klass
+  def hello
+    "Hello from Klass.\n"
+  end
+end
+
+k = Klass.new
+k.hello <span class="output"><span class="outputmark">&rarr;</span> "Hello from Klass.\n"</span>
+k.extend(Mod) <span class="output"><span class="outputmark">&rarr;</span> #&lt;Klass:0x401b598c&gt;</span>
+k.hello <span class="output"><span class="outputmark">&rarr;</span> "Hello from Mod.\n"</span></code></div>
+
+		</dd>
+
+	<dt id="Object.freeze">freeze</dt>
+		<dd class="callseq"><i class="obj">obj</i>.freeze  &rarr; <i class="obj">obj</i></dd>
+		<dd class="desc">Prevents further modifications to <i class="obj">obj</i>. A <code class="exception">TypeError</code>
+      will be raised if modification is attempted. There is no way to
+      unfreeze a frozen object.
+      See also <code class="class_instance_method"><a href="ref_c_object.html#Object.frozen_qm"><span class="class">Object</span>#<span class="method">frozen?</span></a></code>.
+
+<div><code class="block">a = [ "a", "b", "c" ]
+a.freeze
+a &lt;&lt; "z"</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">prog.rb:3:in `&lt;&lt;': can't modify frozen array (TypeError)
+	from prog.rb:3</code></div>
+
+		</dd>
+
+	<dt id="Object.frozen_qm">frozen?</dt>
+		<dd class="callseq"><i class="obj">obj</i>.frozen?   &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns the freeze status of <i class="obj">obj</i>.
+
+<div><code class="block">a = [ "a", "b", "c" ]
+a.freeze <span class="output"><span class="outputmark">&rarr;</span> ["a", "b", "c"]</span>
+a.frozen? <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="Object.hash">hash</dt>
+		<dd class="callseq"><i class="obj">obj</i>.hash  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Generates a <code class="class">Fixnum</code> hash value for this object. This function must have the property that <code>a.eql?(b)</code> implies <code>a.hash == b.hash</code>. The hash value is used by class <code class="class">Hash</code>. Any hash value that exceeds the capacity of a <code class="class">Fixnum</code> will be truncated before being used. </dd>
+
+	<dt id="Object.id">id</dt>
+		<dd class="callseq"><i class="obj">obj</i>.id  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns an integer identifier for <i class="obj">obj</i>. The same number will be returned on all calls to <code class="method">id</code> for a given object, and no two active objects will share an id. <code class="class_instance_method"><a href="ref_c_object.html#Object.id"><span class="class">Object</span>#<span class="method">id</span></a></code> is a different concept from the <code>:name</code> notation, which returns the symbol id of <code>name</code>. </dd>
+
+	<dt id="Object.inspect">inspect</dt>
+		<dd class="callseq"><i class="obj">obj</i>.inspect  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns a string containing a human-readable representation of
+      <i class="obj">obj</i>. If not overridden, uses the <code>to_s</code> method to generate
+      the string.
+
+<div><code class="block">[ 1, 2, 3..4, 'five' ].inspect
+    <span class="output2"><span class="outputmark">&rarr;</span> "[1, 2, 3..4, \"five\"]"</span>
+Time.new.inspect <span class="output2"><span class="outputmark">&rarr;</span> "Sun Jun 09 00:18:15 CDT 2002"</span></code></div>
+
+		</dd>
+
+	<dt id="Object.instance_eval">instance_eval</dt>
+		<dd class="callseq"><i class="obj">obj</i>.instance_eval(<i class="obj">aString</i> [, <i class="obj">file</i> [<i class="obj">line</i>]] ) &rarr; <i class="obj">anObject</i></dd>
+		<dd class="callseq"><i class="obj">obj</i>.instance_eval {|  | block } &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Evaluates a string containing Ruby source code, or the given block, within the context of the receiver (<i class="obj">obj</i>). In order to set the context, the variable <var>self</var> is set to <i class="obj">obj</i> while the code is executing, giving the code access to <i class="obj">obj</i>'s instance variables. In the version of <code class="method">instance_eval</code> that takes a <code class="class">String</code>, the optional second and third parameters supply a filename and starting line number that are used when reporting compilation errors.
+
+<div><code class="block">class Klass
+  def initialize
+    @secret = 99
+  end
+end
+k = Klass.new
+k.instance_eval { @secret } <span class="output"><span class="outputmark">&rarr;</span> 99</span></code></div>
+
+		</dd>
+
+	<dt id="Object.instance_of_qm">instance_of?</dt>
+		<dd class="callseq"><i class="obj">obj</i>.instance_of?( <i class="obj">aClass</i> )   &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">obj</i> is an instance of the given class. See also <code class="class_instance_method"><a href="ref_c_object.html#Object.kind_of_qm"><span class="class">Object</span>#<span class="method">kind_of?</span></a></code>. </dd>
+
+	<dt id="Object.instance_variables">instance_variables</dt>
+		<dd class="callseq"><i class="obj">obj</i>.instance_variables  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns an array of instance variable names for the receiver. </dd>
+
+	<dt id="Object.is_a_qm">is_a?</dt>
+		<dd class="callseq"><i class="obj">obj</i>.is_a?( <i class="obj">aClass</i> )   &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><a href="ref_c_object.html#Object.kind_of_qm"><span class="class">Object</span>#<span class="method">kind_of?</span></a></code>. </dd>
+
+	<dt id="Object.kind_of_qm">kind_of?</dt>
+		<dd class="callseq"><i class="obj">obj</i>.kind_of?( <i class="obj">aClass</i> )   &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">aClass</i> is the class of <i class="obj">obj</i>, or if <i class="obj">aClass</i> is one of the superclasses of <i class="obj">obj</i> or modules included in <i class="obj">obj</i>.
+
+<div><code class="block">a = 1
+a.instance_of? Numeric <span class="output"><span class="outputmark">&rarr;</span> false</span>
+a.instance_of? Integer <span class="output"><span class="outputmark">&rarr;</span> false</span>
+a.instance_of? Fixnum <span class="output"><span class="outputmark">&rarr;</span> true</span>
+a.instance_of? Comparable <span class="output"><span class="outputmark">&rarr;</span> false</span>
+a.kind_of? Numeric <span class="output"><span class="outputmark">&rarr;</span> true</span>
+a.kind_of? Integer <span class="output"><span class="outputmark">&rarr;</span> true</span>
+a.kind_of? Fixnum <span class="output"><span class="outputmark">&rarr;</span> true</span>
+a.kind_of? Comparable <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="Object.method">method</dt>
+		<dd class="callseq"><i class="obj">obj</i>.method( <i class="obj">aSymbol</i> )  &rarr; <i class="obj">aMethod</i></dd>
+		<dd class="desc">Looks up the named method as a receiver in <i class="obj">obj</i>, returning a <code class="class">Method</code> object (or raising <code class="exception">NameError</code>). The <code class="class">Method</code> object acts as a closure in <i class="obj">obj</i>'s object instance, so instance variables and the value of <code class="const">self</code> remain available.
+
+<div><code class="block">class Demo
+  def initialize(n)
+    @iv = n
+  end
+  def hello()
+    "Hello, @iv = #{@iv}"
+  end
+end
+
+k = Demo.new(99)
+m = k.method(:hello)
+m.call <span class="output"><span class="outputmark">&rarr;</span> "Hello, @iv = 99"</span>
+
+l = Demo.new('Fred')
+m = l.method("hello")
+m.call <span class="output"><span class="outputmark">&rarr;</span> "Hello, @iv = Fred"</span></code></div>
+
+		</dd>
+
+	<dt id="Object.method_missing">method_missing</dt>
+		<dd class="callseq"><i class="obj">obj</i>.method_missing( <i class="obj">aSymbol</i> [, <i class="obj">*args</i>] )  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Invoked by Ruby when <i class="obj">obj</i> is sent a message it cannot handle. <i class="obj">aSymbol</i> is the symbol for the method called, and <i class="obj">args</i> are any arguments that were passed to it. The example below creates a class <code>Roman</code>, which responds to methods with names consisting of roman numerals, returning the corresponding integer values.
+
+<div><code class="block">class Roman
+  def romanToInt(str)
+    # ...
+  end
+  def method_missing(methId)
+    str = methId.id2name
+    romanToInt(str)
+  end
+end</code></div>
+
+<div><code class="block">r = Roman.new
+r.iv <span class="output"><span class="outputmark">&rarr;</span> 4</span>
+r.xxiii <span class="output"><span class="outputmark">&rarr;</span> 23</span>
+r.mm <span class="output"><span class="outputmark">&rarr;</span> 2000</span></code></div>
+
+		</dd>
+
+	<dt id="Object.methods">methods</dt>
+		<dd class="callseq"><i class="obj">obj</i>.methods  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns a list of the names of methods publicly accessible in <i class="obj">obj</i>. This will include all the methods accessible in <i class="obj">obj</i>'s ancestors.
+
+<div><code class="block">class Klass
+  def kMethod()
+  end
+end
+k = Klass.new
+k.methods[0..9]
+   <span class="output2"><span class="outputmark">&rarr;</span> ["kMethod", "dup", "eql?",
+      "protected_methods", "==", "frozen?",
+      "===", "respond_to?", "class", "kind_of?"]</span>
+k.methods.length <span class="output2"><span class="outputmark">&rarr;</span> 38</span></code></div>
+
+		</dd>
+
+	<dt id="Object.nil_qm">nil?</dt>
+		<dd class="callseq"><i class="obj">obj</i>.nil?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">All objects except <code>nil</code> return <code class="const">false</code>. </dd>
+
+	<dt id="Object.private_methods">private_methods</dt>
+		<dd class="callseq"><i class="obj">obj</i>.private_methods  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns a list of private methods accessible within <i class="obj">obj</i>. This will include the private methods in <i class="obj">obj</i>'s ancestors, along with any mixed-in module functions. </dd>
+
+	<dt id="Object.protected_methods">protected_methods</dt>
+		<dd class="callseq"><i class="obj">obj</i>.protected_methods  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns the list of protected methods accessible to <i class="obj">obj</i>. </dd>
+
+	<dt id="Object.public_methods">public_methods</dt>
+		<dd class="callseq"><i class="obj">obj</i>.public_methods  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><a href="ref_c_object.html#Object.methods"><span class="class">Object</span>#<span class="method">methods</span></a></code>. </dd>
+
+	<dt id="Object.respond_to_qm">respond_to?</dt>
+		<dd class="callseq"><i class="obj">obj</i>.respond_to?( <i class="obj">aSymbol</i>, <i class="obj">includePriv</i>=<code class="const">false</code> ) &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">obj</i> responds to the given method. Private methods are included in the search only if the optional second parameter evaluates to <code class="const">true</code>. </dd>
+
+	<dt id="Object.send">send</dt>
+		<dd class="callseq"><i class="obj">obj</i>.send( <i class="obj">aSymbol</i> <i>[</i>, <i class="obj">args</i><i>]*</i> )  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Invokes the method identified by <i class="obj">aSymbol</i>, passing it any arguments specified. You can use <code class="method">__send__</code> if the name <code class="method">send</code> clashes with an existing method in <i class="obj">obj</i>.
+
+<div><code class="block">class Klass
+  def hello(*args)
+    "Hello " + args.join(' ')
+  end
+end
+k = Klass.new
+k.send :hello, "gentle", "readers"
+   <span class="output2"><span class="outputmark">&rarr;</span> "Hello gentle readers"</span></code></div>
+
+		</dd>
+
+	<dt id="Object.singleton_methods">singleton_methods</dt>
+		<dd class="callseq"><i class="obj">obj</i>.singleton_methods  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns an array of the names of singleton methods for <i class="obj">obj</i>.
+
+<div><code class="block">class Klass
+  def Klass.classMethod
+  end
+end
+k = Klass.new
+def k.sm()
+end
+Klass.singleton_methods <span class="output"><span class="outputmark">&rarr;</span> ["classMethod"]</span>
+k.singleton_methods <span class="output"><span class="outputmark">&rarr;</span> ["sm"]</span></code></div>
+
+		</dd>
+
+	<dt id="Object.taint">taint</dt>
+		<dd class="callseq"><i class="obj">obj</i>.taint  &rarr; <i class="obj">obj</i></dd>
+		<dd class="desc">Marks <i class="obj">obj</i> as tainted (see Chapter 20, &ldquo;<a href="taint.html#lockingrubyinthesafe">Locking Ruby in the Safe</a>&rdquo;).
+
+		</dd>
+
+	<dt id="Object.tainted_qm">tainted?</dt>
+		<dd class="callseq"><i class="obj">obj</i>.tainted?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the object is tainted.
+
+		</dd>
+
+	<dt id="Object.to_a">to_a</dt>
+		<dd class="callseq"><i class="obj">obj</i>.to_a  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns an array representation of <i class="obj">obj</i>. For objects of class <code class="class">Object</code> and others that don't explicitly override the method, the return value is an array containing <code class="const">self</code>.
+
+<div><code class="block">self.to_a      <span class="output2"><span class="outputmark">&rarr;</span> [main]</span>
+"hello".to_a   <span class="output2"><span class="outputmark">&rarr;</span> ["hello"]</span>
+Time.new.to_a  <span class="output2"><span class="outputmark">&rarr;</span> [15, 18, 0, 9, 6, 2002,
+                  0, 160, true, "CDT"]</span></code></div>
+
+		</dd>
+
+	<dt id="Object.to_s">to_s</dt>
+		<dd class="callseq"><i class="obj">obj</i>.to_s  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns a string representing <i class="obj">obj</i>. The default <code class="method">to_s</code> prints the object's class and an encoding of the object id. As a special case, the top-level object that is the initial execution context of Ruby programs returns &ldquo;main.&rdquo; </dd>
+
+	<dt id="Object.type">type</dt>
+		<dd class="callseq"><i class="obj">obj</i>.type  &rarr; <i class="obj">aClass</i></dd>
+		<dd class="desc">Returns the class of <i class="obj">obj</i>.
+
+		</dd>
+
+	<dt id="Object.untaint">untaint</dt>
+		<dd class="callseq"><i class="obj">obj</i>.untaint  &rarr; <i class="obj">obj</i></dd>
+		<dd class="desc">Removes the taint from <i class="obj">obj</i>.</dd>
+</dl>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_c_object.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

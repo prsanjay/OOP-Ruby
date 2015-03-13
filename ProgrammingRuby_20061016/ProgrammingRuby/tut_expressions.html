@@ -1,0 +1,678 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Expressions</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	<a href="tut_methods.html" class="prev">&lt; Previous</a><a href="tut_exceptions.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'tut_expressions',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+<h1 id="expressions">Expressions</h1>
+<p>So far we've been fairly cavalier in our use of expressions in Ruby. After all, <code>a=b+c</code> is pretty standard stuff.  You could write a whole heap of Ruby code without reading any of this chapter.</p>
+<p>But it wouldn't be as much fun <code>;-)</code>.</p>
+<p>One of the first differences with Ruby is that anything that can reasonably return a value does: just about everything is an expression. What does this mean in practice?</p>
+<p>Some obvious things include the ability to chain statements together.</p>
+
+<div><code class="block">a = b = c = 0 <span class="output"><span class="outputmark">&rarr;</span> 0</span>
+[ 3, 1, 7, 0 ].sort.reverse <span class="output"><span class="outputmark">&rarr;</span> [7, 3, 1, 0]</span></code></div>
+
+
+<p>Perhaps less obvious, things that are normally statements in C or Java are expressions in Ruby. For example, the <code class="keyword">if</code> and <code class="keyword">case</code> statements both return the value of the last expression executed.</p>
+
+<div><code class="block">songType = if song.mp3Type == MP3::Jazz
+             if song.written &lt; Date.new(1935, 1, 1)
+               Song::TradJazz
+             else
+               Song::Jazz
+             end
+           else
+             Song::Other
+           end
+
+rating = case votesCast
+           when 0...10    then Rating::SkipThisOne
+           when 10...50   then Rating::CouldDoBetter
+           else                Rating::Rave
+           end</code></div>
+
+<p>We'll talk more about <code class="keyword">if</code> and <code class="keyword">case</code> starting in the section &ldquo;<a href="tut_expressions.html#ifandunlessexpressions">If and Unless Expressions</a>.&rdquo;</p>
+
+<h2 id="operatorexpressions">Operator Expressions</h2>
+<p>Ruby has the basic set of operators (+, -, *, /, and so on) as well as a few surprises. A complete list of the operators, and their precedences, is given in <a href="language.html#table_18.4">Table 18.4</a>.</p>
+<p>In Ruby, many operators are actually method calls. When you write <code>a*b+c</code> you're actually asking the object referenced by <var>a</var> to execute the method &ldquo;<code>*</code>&rdquo;, passing in the parameter <var>b</var>. You then ask the object that results from that calculation to execute &ldquo;<code>+</code>&rdquo;, passing <var>c</var> as a parameter. This is exactly equivalent to writing</p>
+
+<div><code class="block">  (a.*(b)).+(c)
+
+(a.*(b)).+(c)</code></div>
+
+<p>Because everything is an object, and because you can redefine instance methods, you can always redefine basic arithmetic if you don't like the answers you're getting.</p>
+
+<div><code class="block">class Fixnum
+  alias oldPlus +
+  def +(other)
+    oldPlus(other).succ
+  end
+end
+
+1 + 2 <span class="output"><span class="outputmark">&rarr;</span> 4</span>
+a = 3
+a += 4 <span class="output"><span class="outputmark">&rarr;</span> 8</span></code></div>
+
+
+<p>More useful is the fact that classes that you write can participate in operator expressions just as if they were built-in objects. For example, we might want to be able to extract a number of seconds of music from the middle of a song. We could using the indexing operator &ldquo;<code>[]</code>&rdquo; to specify the music to be extracted.</p>
+
+<div><code class="block">class Song
+  def [](fromTime, toTime)
+    result = Song.new(self.title + " [extract]",
+                      self.artist,
+                      toTime - fromTime)
+    result.setStartTime(fromTime)
+    result
+  end
+end</code></div>
+<p>This code fragment extends class <code class="class">Song</code> with the method &ldquo;<code>[]</code>&rdquo;, which takes two parameters (a start time and an end time).  It returns a new song, with the music clipped to the given interval.  We could then play the introduction to a song with code such as:</p>
+
+<div><code class="block">aSong[0, 0.15].play</code></div>
+
+<h2 id="miscellaneousexpressions">Miscellaneous Expressions</h2>
+<p>As well as the obvious operator expressions and method calls, and the (perhaps) less obvious statement expressions (such as <code class="keyword">if</code> and <code class="keyword">case</code>), Ruby has a few more things that you can use in expressions.</p>
+
+<h3 id="commandexpansion">Command Expansion</h3>
+<p>If you enclose a string in backquotes, or use the delimited form prefixed by <code>%x</code>, it will (by default) be executed as a command by your underlying operating system. The value of the expression is the standard output of that command. Newlines will not be stripped, so it is likely that the value you get back will have a trailing return or linefeed character.</p>
+
+<div><code class="block">`date` <span class="output"><span class="outputmark">&rarr;</span> "Sun Jun  9 00:08:26 CDT 2002\n"</span>
+`dir`.split[34] <span class="output"><span class="outputmark">&rarr;</span> "lib_singleton.tip"</span>
+%x{echo "Hello there"} <span class="output"><span class="outputmark">&rarr;</span> "Hello there\n"</span></code></div>
+
+
+<p>You can use expression expansion and all the usual escape sequences in the command string.</p>
+
+<div><code class="block">for i in 0..3
+  status = `dbmanager status id=#{i}`
+  # ...
+end</code></div>
+<p>The exit status of the command is available in the global variable <var>$?</var>.</p>
+
+<h4 id="backquotesaresoft">Backquotes Are Soft</h4>
+<p>In the description of the command output expression, we said that the string in backquotes would &ldquo;by default&rdquo; be executed as a command. In fact, the string is passed to the method called <code class="module_module_method"><a href="ref_m_kernel.html#Kernel._bq"><span class="class">Kernel</span>::<span class="method">`</span></a></code> (a single backquote). If you want, you can override this.</p>
+
+<div><code class="block">alias oldBackquote `
+def `(cmd)
+  result = oldBackquote(cmd)
+  if $? != 0
+    raise "Command #{cmd} failed"
+  end
+  result
+end
+print `date`
+print `data`</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Sun Jun  9 00:08:26 CDT 2002
+prog.rb:3: command not found: data
+prog.rb:5:in &ldquo;': Command data failed (RuntimeError)
+	from prog.rb:10</code></div>
+
+<h2 id="assignment">Assignment</h2>
+<p>Just about every example we've given so far in this book has featured assignment. Perhaps it's about time we said something about it.</p>
+<p>An assignment statement sets the variable or attribute on its left side (the <em>lvalue</em>) to refer to the value on the right (the <em>rvalue</em>). It then returns that value as the result of the assignment expression.  This means that you can chain assignments and that you can perform assignments in some unexpected places.</p>
+
+<div><code class="block">a = b = 1 + 2 + 3
+a <span class="output"><span class="outputmark">&rarr;</span> 6</span>
+b <span class="output"><span class="outputmark">&rarr;</span> 6</span>
+a = (b = 1 + 2) + 3
+a <span class="output"><span class="outputmark">&rarr;</span> 6</span>
+b <span class="output"><span class="outputmark">&rarr;</span> 3</span>
+File.open(name = gets.chomp)</code></div>
+
+
+<p>There are two basic forms of assignment in Ruby. The first assigns an object reference to a variable or constant.  This form of assignment is hard-wired into the language.</p>
+
+<div><code class="block">instrument = "piano"
+MIDDLE_A   = 440</code></div>
+<p>The second form of assignment involves having an object attribute or element reference on the left-hand side.</p>
+
+<div><code class="block">aSong.duration    = 234
+instrument["ano"] = "ccolo"</code></div>
+
+<p>These forms are special, because they are implemented by calling methods in the lvalues, which means you can override them.</p>
+<p>We've already seen how to define a writable object attribute. Simply define a method name ending in an equals sign. This method receives as its parameter the assignment's rvalue.</p>
+
+<div><code class="block">class Song
+  def duration=(newDuration)
+    @duration = newDuration
+  end
+end</code></div>
+
+<p>There is no reason that these attribute setting methods must correspond with internal instance variables, or that there has to be an attribute reader for every attribute writer (or vice versa).</p>
+
+<div><code class="block">class Amplifier
+  def volume=(newVolume)
+    self.leftChannel = self.rightChannel = newVolume
+  end
+  # ...
+end</code></div>
+
+<div class="sidebar">
+<h5>Using Accessors Within a Class</h5>
+<p>Why did we write <code>self.leftChannel</code> in the example on page   74? Well, there's a hidden gotcha with writable   attributes. Normally, methods within a class can invoke other   methods in the same class and its superclasses in functional form   (that is, with an implicit receiver of <code>self</code>). However, this   doesn't work with attribute writers. Ruby sees the assignment and   decides that the name on the left must be a local variable, not a   method call to an attribute writer.</p>
+<div><code class="block">class BrokenAmplifier
+  attr_accessor :leftChannel, :rightChannel
+  def volume=(vol)
+    leftChannel = self.rightChannel = vol
+  end
+end
+
+ba = BrokenAmplifier.new
+ba.leftChannel = ba.rightChannel = 99
+ba.volume = 5
+ba.leftChannel <span class="output"><span class="outputmark">&rarr;</span> 99</span>
+ba.rightChannel <span class="output"><span class="outputmark">&rarr;</span> 5</span></code></div>
+
+
+<p>We forgot to put &ldquo;<code>self.</code>&rdquo; in front of the assignment to <code>leftChannel</code>, so Ruby stored the new value in a local variable of method <code class="method">volume=</code>; the object's attribute never got updated. This can be a tricky bug to track down.</p>
+</div>
+
+<div style="margin-right:55%">
+<h3 id="parallelassignment">Parallel Assignment</h3>
+<p>During your first week in a programming course (or the second semester if it was a party school), you may have had to write code to swap the values in two variables:</p>
+
+<div><code class="block">int a = 1;
+int b = 2;
+int temp;
+
+temp = a;
+a = b;
+b = temp;</code></div>
+<p>You can do this much more cleanly in Ruby:</p>
+<div><code class="block">a, b = b, a</code></div>
+
+</div>
+
+<p>Ruby assignments are effectively performed in parallel, so the values assigned are not affected by the assignment itself.  The values on the right-hand side are evaluated in the order in which they appear before any assignment is made to variables or attributes on the left. A somewhat contrived example illustrates this. The second line assigns to the variables <code>a</code>, <code>b</code>, and <code>c</code> the values of the expressions <code>x</code>, <code>x+=1</code>, and <code>x+=1</code>, respectively.</p>
+
+<div><code class="block">x = 0 <span class="output"><span class="outputmark">&rarr;</span> 0</span>
+a, b, c   =   x, (x += 1), (x += 1) <span class="output"><span class="outputmark">&rarr;</span> [0, 1, 2]</span></code></div>
+
+
+<p>When an assignment has more than one lvalue, the assignment expression returns an array of the rvalues. If an assignment contains more lvalues than rvalues, the excess lvalues are set to <code>nil</code>. If a multiple assignment contains more rvalues than lvalues, the extra rvalues are ignored. As of Ruby 1.6.2, if an assignment has one lvalue and multiple rvalues, the rvalues are converted to an array and assigned to the lvalue.</p>
+<p>You can collapse and expand arrays using Ruby's parallel assignment operator.  If the last lvalue is preceded by an asterisk, all the remaining rvalues will be collected and assigned to that lvalue as an array. Similarly, if the last rvalue is an array, you can prefix it with an asterisk, which effectively expands it into its constituent values in place.  (This is not necessary if the rvalue is the only thing on the right-hand side&mdash;the array will be expanded automatically.)</p>
+
+<div><code class="block">a = [1, 2, 3, 4]
+b,  c = a <span class="output"><span class="outputmark">&rarr;</span> b == 1,  c == 2</span>
+b, *c = a <span class="output"><span class="outputmark">&rarr;</span> b == 1,  c == [2, 3, 4]</span>
+b,  c = 99,  a <span class="output"><span class="outputmark">&rarr;</span> b == 99, c == [1, 2, 3, 4]</span>
+b, *c = 99,  a <span class="output"><span class="outputmark">&rarr;</span> b == 99, c == [[1, 2, 3, 4]]</span>
+b,  c = 99, *a <span class="output"><span class="outputmark">&rarr;</span> b == 99, c == 1</span>
+b, *c = 99, *a <span class="output"><span class="outputmark">&rarr;</span> b == 99, c == [1, 2, 3, 4]</span>
+</code></div>
+
+<h4 id="nestedassignments">Nested Assignments</h4>
+<p>Parallel assignments have one more feature worth mentioning. The left-hand side of an assignment may contain a parenthesized list of terms. Ruby treats these terms as if they were a nested assignment statement. It extracts out the corresponding rvalue, assigning it to the parenthesized terms, before continuing with the higher-level assignment.</p>
+
+<div><code class="block">b, (c, d), e = 1,2,3,4 <span class="output" style="width:24em"><span class="outputmark">&rarr;</span> b == 1, c == 2, d == nil,    e == 3</span>
+b, (c, d), e = [1,2,3,4] <span class="output" style="width:24em"><span class="outputmark">&rarr;</span> b == 1, c == 2, d == nil,    e == 3</span>
+b, (c, d), e = 1,[2,3],4 <span class="output" style="width:24em"><span class="outputmark">&rarr;</span> b == 1, c == 2, d == 3,      e == 4</span>
+b, (c, d), e = 1,[2,3,4],5 <span class="output" style="width:24em"><span class="outputmark">&rarr;</span> b == 1, c == 2, d == 3,      e == 5</span>
+b, (c,*d), e = 1,[2,3,4],5 <span class="output" style="width:24em"><span class="outputmark">&rarr;</span> b == 1, c == 2, d == [3, 4], e == 5</span></code></div>
+
+
+<h3 id="otherformsofassignment">Other Forms of Assignment</h3>
+<p>In common with many other languages, Ruby has a syntactic shortcut: <code>a=a+2</code> may be written as <code>a+=2</code>.</p>
+<p>The second form is converted internally to the first. This means that operators that you have defined as methods in your own classes work as you'd expect.</p>
+
+<div><code class="block">class Bowdlerize
+  def initialize(aString)
+    @value = aString.gsub(/[aeiou]/, '*')
+  end
+  def +(other)
+    Bowdlerize.new(self.to_s + other.to_s)
+  end
+  def to_s
+    @value
+  end
+end
+
+a = Bowdlerize.new("damn ") <span class="output"><span class="outputmark">&rarr;</span> d*mn</span>
+a += "shame" <span class="output"><span class="outputmark">&rarr;</span> d*mn sh*m*</span></code></div>
+
+
+
+<h2 id="conditionalexecution">Conditional Execution</h2>
+<p>Ruby has several different mechanisms for conditional execution of code; most of them should feel familiar, and many have some neat twists. Before we get into them, though, we need to spend a short time looking at boolean expressions.</p>
+
+<h3 id="booleanexpressions">Boolean Expressions</h3>
+<p>Ruby has a simple definition of truth. Any value that is not <code>nil</code> or the constant <code class="const">false</code> is true. You'll find that the library routines use this fact consistently. For example, <code class="class_instance_method"><a href="ref_c_io.html#IO.gets"><span class="class">IO</span>#<span class="method">gets</span></a></code>, which returns the next line from a file, returns <code>nil</code> at end of file, enabling you to write loops such as:</p>
+
+<div><code class="block">while line = gets
+  # process line
+end</code></div>
+<p>However, there's a trap here for C, C++, and Perl programmers. The number zero is <em>not</em> interpreted as a false value. Neither is a zero-length string. This can be a tough habit to break.</p>
+
+<h4 id="definedandorandnot">Defined?, And, Or, and Not</h4>
+<p>Ruby supports all the standard boolean operators and introduces the new operator <code>defined?</code>.</p>
+<p>Both &ldquo;<code>and</code>&rdquo; and &ldquo;<code>&amp;&amp;</code>&rdquo; evaluate to true only if both operands are true. They evaluate the second operand only if the first is true (this is sometimes known as &ldquo;short-circuit evaluation&rdquo;).  The only difference in the two forms is precedence (&ldquo;<code>and</code>&rdquo; binds lower than &ldquo;<code>&amp;&amp;</code>&rdquo;).</p>
+<p>Similarly, both &ldquo;<code>or</code>&rdquo; and &ldquo;<code>||</code>&rdquo; evaluate to true if either operand is true.  They evaluate their second operand only if the first is false.  As with &ldquo;<code>and</code>&rdquo;, the only difference between &ldquo;<code>or</code>&rdquo; and &ldquo;<code>||</code>&rdquo; is their precedence.</p>
+<p>Just to make life interesting, &ldquo;<code>and</code>&rdquo; and &ldquo;<code>or</code>&rdquo; have the same precedence, while &ldquo;<code>&amp;&amp;</code>&rdquo; has a higher precedence than &ldquo;<code>||</code>&rdquo;.</p>
+<p>&ldquo;<code>not</code>&rdquo; and &ldquo;<code>!</code>&rdquo; return the opposite of their operand (false if the operand is true, and true if the operand is false). And, yes, &ldquo;<code>not</code>&rdquo; and &ldquo;<code>!</code>&rdquo; differ only in precedence.</p>
+<p>All these precedence rules are summarized in <a href="language.html#table_18.4">Table 18.4</a>.</p>
+<p>The <code>defined?</code> operator returns <code>nil</code> if its argument (which can be an arbitrary expression) is not defined, otherwise it returns a description of that argument. If the argument is <code class="keyword">yield</code>, <code>defined?</code> returns the string &ldquo;yield&rdquo; if a code block is associated with the current context.</p>
+
+<div><code class="block">defined? 1 <span class="output"><span class="outputmark">&rarr;</span> "expression"</span>
+defined? dummy <span class="output"><span class="outputmark">&rarr;</span> nil</span>
+defined? printf <span class="output"><span class="outputmark">&rarr;</span> "method"</span>
+defined? String <span class="output"><span class="outputmark">&rarr;</span> "constant"</span>
+defined? $&amp; <span class="output"><span class="outputmark">&rarr;</span> nil</span>
+defined? $_ <span class="output"><span class="outputmark">&rarr;</span> "global-variable"</span>
+defined? Math::PI <span class="output"><span class="outputmark">&rarr;</span> "constant"</span>
+defined? ( c,d = 1,2 ) <span class="output"><span class="outputmark">&rarr;</span> "assignment"</span>
+defined? 42.abs <span class="output"><span class="outputmark">&rarr;</span> "method"</span></code></div>
+
+
+<p>In addition to the boolean operators, Ruby objects support comparison using the methods <code>==</code>, <code>===</code>, <code>&lt;=&gt;</code>, <code>=~</code>, <code>eql?</code>, and <code>equal?</code> (see <a href="tut_expressions.html#table_7.1">Table 7.1</a>). All but <code>&lt;=&gt;</code> are defined in class <code class="class">Object</code> but are often overridden by descendents to provide appropriate semantics. For example, class <code class="class">Array</code> redefines <code>==</code> so that two array objects are equal if they have the same number of elements and corresponding elements are equal.</p>
+
+<table class="figure" id="table_7.1">
+<caption>Table 7.1 : Common comparison operators</caption>
+<thead><tr>
+  <th>Operator</th>
+  <th>Meaning</th>
+</tr></thead><tbody>
+<tr class="firstRow">
+  <td><code>==</code></td>
+  <td>Test for equal value.</td>
+</tr>
+<tr>
+  <td><code>===</code></td>
+  <td>Used to test equality within a <code class="keyword">when</code> clause of a
+                <code class="keyword">case</code> statement.</td>
+</tr>
+<tr>
+  <td><code>&lt;=&gt;</code></td>
+  <td>General comparison operator. Returns -1, 0, or +1,
+                depending on whether its receiver is less than, equal to, or
+                greater than its argument.</td>
+</tr>
+<tr>
+  <td><code>&lt;</code>, <code>&lt;=</code>, <code>&gt;=</code>, <code>&gt;</code></td>
+  <td>Comparison operators for less than, less than or
+                equal, greater than or equal, and greater than.</td>
+</tr>
+<tr>
+  <td><code>=~</code></td>
+  <td>Regular expression pattern match.</td>
+</tr>
+<tr>
+  <td><code>eql?</code></td>
+  <td>True if the receiver and argument have both the same
+                type and equal values. 1 == 1.0 returns <code class="const">true</code>,
+                but 1.eql?(1.0) is <code class="const">false</code>.</td>
+</tr>
+<tr>
+  <td><code>equal?</code></td>
+  <td>True if the receiver and argument have the same
+                object id.</td>
+</tr></tbody>
+</table>
+
+
+
+<p>Both <code>==</code> and <code>=~</code> have negated forms, <code>!=</code> and <code>!~</code>. However, these are converted by Ruby when your program is read. <code>a!=b</code> is equivalent to <code>!(a==b)</code>, and <code>a!~b</code> is the same as <code>!(a=~b)</code>.  This means that if you write a class that overrides <code>==</code> or <code>=~</code> you get a working <code>!=</code> and <code>!~</code> for free. But on the flip side, this also means that you cannot define <code>!=</code> and <code>!~</code> independent of <code>==</code> and <code>=~</code>, respectively.</p>
+<p>You can use a Ruby range as a boolean expression. A range such as <code>exp1..exp2</code> will evaluate as false until <code>exp1</code> becomes true. The range will then evaluate as true until <code>exp2</code> becomes true. Once this happens, the range resets, ready to fire again. We show some examples of this in &ldquo;<a href="tut_expressions.html#loops">Loops</a>.&rdquo;</p>
+<p>Finally, you can use a bare regular expression as a boolean expression. Ruby expands it to <code>$_=~/re/</code>.</p>
+
+<h3 id="ifandunlessexpressions">If and Unless Expressions</h3>
+<p>An <code class="keyword">if</code> expression in Ruby is pretty similar to &ldquo;if&rdquo; statements in other languages.</p>
+
+<div><code class="block">if aSong.artist == "Gillespie" then
+  handle = "Dizzy"
+elsif aSong.artist == "Parker" then
+  handle = "Bird"
+else
+  handle = "unknown"
+end</code></div>
+<p>If you lay out your <code class="keyword">if</code> statements on multiple lines, you can leave off the <code class="keyword">then</code> keyword.</p>
+
+<div><code class="block">if aSong.artist == "Gillespie"
+  handle = "Dizzy"
+elsif aSong.artist == "Parker"
+  handle = "Bird"
+else
+  handle = "unknown"
+end</code></div>
+<p>However, if you lay your code out more tightly, the <code class="keyword">then</code> keyword is necessary to separate the boolean expression from the following statements.</p>
+
+<div><code class="block">if aSong.artist == "Gillespie" then  handle = "Dizzy"
+elsif aSong.artist == "Parker" then  handle = "Bird"
+else  handle = "unknown"
+end</code></div>
+<p>You can have zero or more <code>elsif</code> clauses and an optional <code>else</code> clause.</p>
+<p>As we've said before, <code>if</code> is an expression, not a statement&mdash;it returns a value.  You don't have to use the value of an <code>if</code> expression, but it can come in handy.</p>
+
+<div><code class="block">handle = if aSong.artist == "Gillespie" then
+           "Dizzy"
+         elsif aSong.artist == "Parker" then
+           "Bird"
+         else
+           "unknown"
+         end</code></div>
+
+<p>Ruby also has a negated form of the <code>if</code> statement:</p>
+
+<div><code class="block">unless aSong.duration &gt; 180 then
+  cost = .25
+else
+  cost = .35
+end</code></div>
+<p>Finally, for the C fans out there, Ruby also supports the C-style conditional expression:</p>
+
+<div><code class="block">cost = aSong.duration &gt; 180 ? .35 : .25</code></div>
+<p>The conditional expression returns the value of either the expression before or the expression after the colon, depending on whether the boolean expression before the question mark evaluates to <code class="const">true</code> or <code class="const">false</code>. In this case, if the song duration is greater than 3 minutes, the expression returns .35. For shorter songs, it returns .25. Whatever the result, it is then assigned to <var>cost</var>.</p>
+
+<h4 id="ifandunlessmodifiers">If and Unless Modifiers</h4>
+<p>Ruby shares a neat feature with Perl. Statement modifiers let you tack conditional statements onto the end of a normal statement.</p>
+
+<div><code class="block">mon, day, year = $1, $2, $3 if /(\d\d)-(\d\d)-(\d\d)/
+puts "a = #{a}" if fDebug
+print total unless total == 0</code></div>
+<p>For an <code class="keyword">if</code> modifier, the preceding expression will be evaluated only if the condition is true. <code class="keyword">unless</code> works the other way around.</p>
+
+<div><code class="block">while gets
+  next if /^#/            # Skip comments
+  parseLine unless /^$/   # Don't parse empty lines
+end</code></div>
+<p>Because <code class="keyword">if</code> itself is an expression, you can get really obscure with statements such as:</p>
+
+<div><code class="block">if artist == "John Coltrane"
+  artist = "'Trane"
+end unless nicknames == "no"</code></div>
+<p>This path leads to the gates of madness.</p>
+
+<h2 id="caseexpressions">Case Expressions</h2>
+<p>The Ruby <code>case</code> expression is a powerful beast: a multiway <code>if</code> on steroids.</p>
+
+<div><code class="block">case inputLine
+
+  when "debug"
+    dumpDebugInfo
+    dumpSymbols
+
+  when /p\s+(\w+)/
+    dumpVariable($1)
+
+  when "quit", "exit"
+    exit
+
+  else
+    print "Illegal command: #{inputLine}"
+end</code></div>
+<p>As with <code>if</code>, <code class="keyword">case</code> returns the value of the last expression executed, and you also need a <code class="keyword">then</code> keyword if the expression is on the same line as the condition.</p>
+
+<div><code class="block">kind = case year
+         when 1850..1889 then "Blues"
+         when 1890..1909 then "Ragtime"
+         when 1910..1929 then "New Orleans Jazz"
+         when 1930..1939 then "Swing"
+         when 1940..1950 then "Bebop"
+         else                 "Jazz"
+       end</code></div>
+<p><code>case</code> operates by comparing the target (the expression after the keyword <code class="keyword">case</code>) with each of the comparison expressions after the <code class="keyword">when</code> keywords.  This test is done using <em>comparison</em> <code>===</code> <em>target</em>. As long as a class defines meaningful semantics for <code>===</code> (and all the built-in classes do), objects of that class can be used in case expressions.</p>
+<p>For example, regular expressions define <code>===</code> as a simple pattern match.</p>
+
+<div><code class="block">case line
+  when /title=(.*)/
+    puts "Title is #$1"
+  when /track=(.*)/
+    puts "Track is #$1"
+  when /artist=(.*)/
+    puts "Artist is #$1"
+end</code></div>
+<p>Ruby classes are instances of class <code class="class">Class</code>, which defines <code>===</code> as a test to see if the argument is an instance of the class or one of its superclasses. So (abandoning the benefits of polymorphism and bringing the gods of refactoring down around your ears), you can test the class of objects:</p>
+
+<div><code class="block">case shape
+  when Square, Rectangle
+    # ...
+  when Circle
+    # ...
+  when Triangle
+    # ...
+  else
+    # ...
+end</code></div>
+
+<h2 id="loops">Loops</h2>
+<p>Don't tell anyone, but Ruby has pretty primitive built-in looping constructs.</p>
+<p>The <code class="keyword">while</code> loop executes its body zero or more times as long as its condition is true. For example, this common idiom reads until the input is exhausted.</p>
+
+<div><code class="block">while gets
+  # ...
+end</code></div>
+<p>There's also a negated form that executes the body until the condition becomes true.</p>
+
+<div><code class="block">until playList.duration &gt; 60
+  playList.add(songList.pop)
+end</code></div>
+<p>As with <code class="keyword">if</code> and <code class="keyword">unless</code>, both of the loops can also be used as statement modifiers.</p>
+
+<div><code class="block">a *= 2 while a &lt; 100
+a -= 10 until a &lt; 100</code></div>
+<p>In <a href="tut_expressions.html#booleanexpressions">the section on boolean expressions</a>, we said that a range can be used as a kind of flip-flop, returning true when some event happens and then staying true until a second event occurs. This facility is normally used within loops. In the example that follows, we read a text file containing the first ten ordinal numbers (&ldquo;first,&rdquo; &ldquo;second,&rdquo; and so on) but only print the lines starting with the one that matches &ldquo;third&rdquo; and ending with the one that matches &ldquo;fifth.&rdquo;</p>
+
+<div><code class="block">file = File.open("ordinal")
+while file.gets
+  print  if /third/ .. /fifth/
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">third
+fourth
+fifth</code></div>
+<p>The elements of a range used in a boolean expression can themselves be expressions. These are evaluated each time the overall boolean expression is evaluated. For example, the following code uses the fact that the variable <var>$.</var> contains the current input line number to display line numbers one through three and those between a match of <code>/eig/</code> and <code>/nin/</code>.</p>
+
+<div><code class="block">file = File.open("ordinal")
+while file.gets
+  print if ($. == 1) || /eig/ .. ($. == 3) || /nin/
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">first
+second
+third
+eighth
+ninth</code></div>
+<p>There's one wrinkle when <code class="keyword">while</code> and <code class="keyword">until</code> are used as statement modifiers. If the statement they are modifying is a <code class="keyword">begin</code>/<code class="keyword">end</code> block, the code in the block will always execute at least one time, regardless of the value of the boolean expression.</p>
+
+<div><code class="block">print "Hello\n" while false
+begin
+  print "Goodbye\n"
+end while false</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Goodbye</code></div>
+
+<h3 id="iterators">Iterators</h3>
+<p>If you read the beginning of the previous section, you might have been discouraged. &ldquo;Ruby has pretty primitive built-in looping constructs,&rdquo; it said. Don't despair, gentle reader, for there's good news. Ruby doesn't need any sophisticated built-in loops, because all the fun stuff is implemented using Ruby iterators.</p>
+<p>For example, Ruby doesn't have a &ldquo;for&rdquo; loop&mdash;at least not the kind you'd find in C, C++, and Java. Instead, Ruby uses methods defined in various built-in classes to provide equivalent, but less error-prone, functionality.</p>
+<p>Let's look at some examples.</p>
+
+<div><code class="block">3.times do
+  print "Ho! "
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Ho! Ho! Ho!</code></div>
+<p>It's easy to avoid fencepost and off-by-1 errors; this loop will execute three times, period.  In addition to <code class="method">times</code>, integers can loop over specific ranges by calling <code class="method">downto</code>, <code class="method">upto</code>, and <code class="method">step</code>. For instance, a traditional &ldquo;for&rdquo; loop that runs from 0 to 9 (something like <code>i=0; i &lt; 10; i++</code>) is written as follows.</p>
+
+<div><code class="block">0.upto(9) do |x|
+  print x, " "
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">0 1 2 3 4 5 6 7 8 9</code></div>
+<p>A loop from 0 to 12 by 3 can be written as follows.</p>
+
+<div><code class="block">0.step(12, 3) {|x| print x, " " }</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">0 3 6 9 12</code></div>
+<p>Similarly, iterating over arrays and other containers is made easy using their <code class="method">each</code> method.</p>
+
+<div><code class="block">[ 1, 1, 2, 3, 5 ].each {|val| print val, " " }</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">1 1 2 3 5</code></div>
+<p>And once a class supports <code class="method">each</code>, the additional methods in the <code class="module">Enumerable</code> module (documented in the reference library entry for <code class="module"><a href="ref_m_enumerable.html">Enumerable</a></code> and summarized in &ldquo;<a href="tut_modules.html#iteratorsandtheenumerablemodule">Iterators and the Enumerable Module</a>&rdquo;) become available. For example, the <code class="class">File</code> class provides an <code class="method">each</code> method, which returns each line of a file in turn. Using the <code class="method">grep</code> method in <code class="module">Enumerable</code>, we could iterate over only those lines that meet a certain condition.</p>
+
+<div><code class="block">File.open("ordinal").grep /d$/ do |line|
+  print line
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">second
+third</code></div>
+<p>Last, and probably least, is the most basic loop of all. Ruby provides a built-in iterator called <code class="method">loop</code>.</p>
+
+<div><code class="block">loop {
+  # block ...
+}</code></div>
+<p>The <code class="method">loop</code> iterator calls the associated block forever (or at least until you break out of the loop, but you'll have to read ahead to find out how to do that).</p>
+
+<h3 id="forin">For ... In</h3>
+<p>Earlier we said that the only built-in Ruby looping primitives were <code class="keyword">while</code> and <code class="keyword">until</code>. What's this &ldquo;<code class="keyword">for</code>&rdquo; thing, then? Well, <code class="keyword">for</code> is almost a lump of syntactic sugar. When you write</p>
+
+<div><code class="block">for aSong in songList
+  aSong.play
+end</code></div>
+<p>Ruby translates it into something like:</p>
+
+<div><code class="block">songList.each do |aSong|
+  aSong.play
+end</code></div>
+<p>The only difference between the <code class="keyword">for</code> loop and the <code class="method">each</code> form is the scope of local variables that are defined in the body. This is discussed in &ldquo;<a href="tut_expressions.html#variablescopeandloops">Variable Scope and Loops</a>.&rdquo;</p>
+<p>You can use <code class="keyword">for</code> to iterate over any object that responds to the method <code>each</code>, such as an <code class="class">Array</code> or a <code class="class">Range</code>.</p>
+
+<div><code class="block">for i in ['fee', 'fi', 'fo', 'fum']
+  print i, " "
+end
+for i in 1..3
+  print i, " "
+end
+for i in File.open("ordinal").find_all { |l| l =~ /d$/}
+  print i.chomp, " "
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">fee fi fo fum 1 2 3 second third</code></div>
+<p>As long as your class defines a sensible <code>each</code> method, you can use a <code>for</code> loop to traverse it.</p>
+
+<div><code class="block">class Periods
+  def each
+    yield "Classical"
+    yield "Jazz"
+    yield "Rock"
+  end
+end
+
+periods = Periods.new
+for genre in periods
+  print genre, " "
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Classical Jazz Rock</code></div>
+
+<h3 id="breakredoandnext">Break, Redo, and Next</h3>
+<p>The loop control constructs <code class="keyword">break</code>, <code class="keyword">redo</code>, and <code class="keyword">next</code> let you alter the normal flow through a loop or iterator.</p>
+<p><code class="keyword">break</code> terminates the immediately enclosing loop; control resumes at the statement following the block.  <code class="keyword">redo</code> repeats the loop from the start, but without reevaluating the condition or fetching the next element (in an iterator).  <code class="keyword">next</code> skips to the end of the loop, effectively starting the next iteration.</p>
+
+<div><code class="block">while gets
+  next if /^\s*#/   # skip comments
+  break if /^END/   # stop at end
+                    # substitute stuff in backticks and try again
+  redo if gsub!(/`(.*?)`/) { eval($1) }
+  # process line ...
+end</code></div>
+<p>These keywords can also be used with any of the iterator-based looping mechanisms:</p>
+
+<div><code class="block">i=0
+loop do
+  i += 1
+  next if i &lt; 3
+  print i
+  break if i &gt; 4
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">345</code></div>
+
+<h3 id="retry">Retry</h3>
+<p>The <code class="keyword">redo</code> statement causes a loop to repeat the current iteration. Sometimes, though, you need to wind the loop right back to the very beginning. The <code class="keyword">retry</code> statement is just the ticket. <code class="keyword">retry</code> restarts any kind of iterator loop.</p>
+
+<div><code class="block">for i in 1..100
+  print "Now at #{i}. Restart? "
+  retry if gets =~ /^y/i
+end</code></div>
+<p>Running this interactively, you might see</p>
+
+<div><code class="block">Now at 1. Restart? n
+Now at 2. Restart? y
+Now at 1. Restart? n
+ . . .</code></div>
+<p><code>retry</code> will reevaluate any arguments to the iterator before restarting it. The online Ruby documentation has the following example of a do-it-yourself <em>until</em> loop.</p>
+
+<div><code class="block">def doUntil(cond)
+  yield
+  retry unless cond
+end
+
+i = 0
+doUntil(i &gt; 3) {
+  print i, " "
+  i += 1
+}</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">0 1 2 3 4</code></div>
+
+<h2 id="variablescopeandloops">Variable Scope and Loops</h2>
+<p>The <code class="keyword">while</code>, <code class="keyword">until</code>, and <code class="keyword">for</code> loops are built into the language and do not introduce new scope; previously existing locals can be used in the loop, and any new locals created will be available afterward.</p>
+<p>The blocks used by iterators (such as <code class="keyword">loop</code> and <code class="keyword">each</code>) are a little different.  Normally, the local variables created in these blocks are not accessible outside the block.</p>
+
+<div><code class="block">[ 1, 2, 3 ].each do |x|
+  y = x + 1
+end
+[ x, y ]</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">prog.rb:4: undefined local variable or method `x'
+for #&lt;Object:0x401c2ce0&gt; (NameError)</code></div>
+<p>However, if at the time the block executes a local variable already exists with the same name as that of a variable in the block, the existing local variable will be used in the block. Its value will therefore be available after the block finishes. As the following example shows, this applies both to normal variables in the block and to the block's parameters.</p>
+
+<div><code class="block">x = nil
+y = nil
+[ 1, 2, 3 ].each do |x|
+  y = x + 1
+end
+[ x, y ] <span class="output"><span class="outputmark">&rarr;</span> [3, 4]</span></code></div>
+
+
+<div id="menubot" class="menu">
+	<a href="tut_methods.html" class="prev">&lt; Previous</a><a href="tut_exceptions.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="tut_expressions.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

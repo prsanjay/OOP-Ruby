@@ -1,0 +1,318 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Process</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_m_process',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="module" id="Process">module <strong>Process</strong></h1>
+
+<p>The <code class="module">Process</code> module is a collection of methods used to manipulate    processes.</p>
+
+<h2 class="refsubsection" id="constants">constants</h2>
+<table class="constants">
+<tr class="firstRow">
+	<td id="Process.PRIO_PGRP"><code class="constant">PRIO_PGRP</code></td>
+	<td>1</td>
+	<td>Process Group priority.</td>
+</tr><tr>
+	<td id="Process.PRIO_PROCESS"><code class="constant">PRIO_PROCESS</code></td>
+	<td>0</td>
+	<td>Process priority.</td>
+</tr><tr>
+	<td id="Process.PRIO_USER"><code class="constant">PRIO_USER</code></td>
+	<td>2</td>
+	<td>User priority.</td>
+</tr><tr>
+	<td id="Process.WNOHANG"><code class="constant">WNOHANG</code></td>
+	<td>1</td>
+	<td>Do not block if no child has exited. Not available on all platforms.</td>
+</tr><tr>
+	<td id="Process.WUNTRACED"><code class="constant">WUNTRACED</code></td>
+	<td>2</td>
+	<td>Return stopped children as well. Not available on all platforms.</td>
+	</tr>
+</table>
+
+<h2 id="modulemethods">module methods</h2>
+<dl class="methodlist">
+	<dt id="Process.egid">egid</dt>
+		<dd class="callseq">Process.egid   &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns the effective group id for this process.
+
+<div><code class="block">Process.egid <span class="output"><span class="outputmark">&rarr;</span> 500</span></code></div>
+
+		</dd>
+
+	<dt id="Process.egid_eq">egid=</dt>
+		<dd class="callseq">Process.egid= <i class="obj">aFixnum</i>  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Sets the effective group id for this process.
+
+		</dd>
+
+	<dt id="Process.euid">euid</dt>
+		<dd class="callseq">Process.euid   &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns the effective user id for this process.
+
+<div><code class="block">Process.euid <span class="output"><span class="outputmark">&rarr;</span> 501</span></code></div>
+
+		</dd>
+
+	<dt id="Process.euid_eq">euid=</dt>
+		<dd class="callseq">Process.euid= <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Sets the effective user id for this process.
+      Not available on all platforms.
+
+		</dd>
+
+	<dt id="Process.exit_oh">exit!</dt>
+		<dd class="callseq">Process.exit!( <i class="obj">aFixnum</i>=-1 )</dd>
+		<dd class="desc">Exits the process immediately.
+      No exit handlers are run.
+      <i class="obj">aFixnum</i> is returned to the underlying system as the exit
+      status.
+
+<div><code class="block">Process.exit!(0)</code></div>
+
+		</dd>
+
+	<dt id="Process.fork">fork</dt>
+		<dd class="callseq">Process.fork [{ block } ] &rarr; <i class="obj">aFixnum</i> or <code>nil</code></dd>
+		<dd class="desc">See <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.fork"><span class="module">Kernel</span>::<span class="method">fork</span></a></code>.
+
+		</dd>
+
+	<dt id="Process.getpgid">getpgid</dt>
+		<dd class="callseq">Process.getpgid( <i class="obj">anInteger</i> )  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Returns the process group id for the given process id.
+      Not available on all platforms.
+
+<div><code class="block">Process.getpgid(Process.ppid()) <span class="output"><span class="outputmark">&rarr;</span> 32438</span></code></div>
+
+		</dd>
+
+	<dt id="Process.getpgrp">getpgrp</dt>
+		<dd class="callseq">Process.getpgrp  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Returns the process group id for this process.
+      Not available on all platforms.
+
+<div><code class="block">Process.getpgid(0) <span class="output"><span class="outputmark">&rarr;</span> 32438</span>
+Process.getpgrp <span class="output"><span class="outputmark">&rarr;</span> 32438</span></code></div>
+
+		</dd>
+
+	<dt id="Process.getpriority">getpriority</dt>
+		<dd class="callseq">Process.getpriority( <i class="obj">aKind</i>, <i class="obj">anInteger</i> )  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Gets the
+      scheduling priority for specified process, process group, or
+      user.  <i class="obj">aKind</i> indicates the kind of entity to find:
+      one of <code class="module_constant"><a href="ref_m_process.html#Process.PRIO_PGRP"><span class="module">Process</span>::<span class="constant">PRIO_PGRP</span></a></code>,
+      <code class="module_constant"><a href="ref_m_process.html#Process.PRIO_USER"><span class="module">Process</span>::<span class="constant">PRIO_USER</span></a></code>, or <code class="module_constant"><a href="ref_m_process.html#Process.PRIO_PROCESS"><span class="module">Process</span>::<span class="constant">PRIO_PROCESS</span></a></code>.
+      <i class="obj">anInteger</i> is an id indicating the particular process,
+      process group, or user (an id of 0 means <em>current</em>).
+      Lower priorities are more favorable for
+      scheduling.  Not available on all platforms.
+
+<div><code class="block">Process.getpriority(Process::PRIO_USER, 0) <span class="output"><span class="outputmark">&rarr;</span> 0</span>
+Process.getpriority(Process::PRIO_PROCESS, 0) <span class="output"><span class="outputmark">&rarr;</span> 0</span></code></div>
+
+		</dd>
+
+	<dt id="Process.gid">gid</dt>
+		<dd class="callseq">Process.gid   &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns the group id for this process.
+
+<div><code class="block">Process.gid <span class="output"><span class="outputmark">&rarr;</span> 500</span></code></div>
+
+		</dd>
+
+	<dt id="Process.gid_eq">gid=</dt>
+		<dd class="callseq">Process.gid= <i class="obj">aFixnum</i>  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Sets the group id for this process.
+
+		</dd>
+
+	<dt id="Process.kill">kill</dt>
+		<dd class="callseq">Process.kill( <i class="obj">aSignal</i>,  <i>[</i><i class="obj">aPid</i><i>]+</i> )  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Sends the given signal to the specified process id(s),
+      or to the
+      current process if <i class="obj">aPid</i> is zero.  <i class="obj">aSignal</i> may be an
+      integer signal number or a POSIX signal name (either with or
+      without a <code>SIG</code> prefix).  If <i class="obj">aSignal</i> is negative (or
+      starts with a &ldquo;<code>-</code>&rdquo; sign), kills process groups instead
+      of processes.  Not all signals are available on all platforms.
+
+<div><code class="block">trap("SIGHUP") { close_then_exit }
+Process.kill("SIGHUP", 0)</code></div>
+
+		</dd>
+
+	<dt id="Process.pid">pid</dt>
+		<dd class="callseq">Process.pid  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns the process id of this process.
+      Not available on all platforms.
+
+<div><code class="block">Process.pid <span class="output"><span class="outputmark">&rarr;</span> 1488</span></code></div>
+
+		</dd>
+
+	<dt id="Process.ppid">ppid</dt>
+		<dd class="callseq">Process.ppid  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns the process id of the parent of this process.
+      Always returns 0 on NT.
+      Not available on all platforms.
+
+<div><code class="block">print "I am ", Process.pid, "\n"
+Process.fork { print "Dad is ", Process.ppid, "\n" }</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">I am 1490
+Dad is 1490</code></div>
+
+		</dd>
+
+	<dt id="Process.setpgid">setpgid</dt>
+		<dd class="callseq">Process.setpgid( <i class="obj">aPid</i>, <i class="obj">anInteger</i> )  &rarr; 0</dd>
+		<dd class="desc">Sets the process group id of <i class="obj">aPid</i> (0 indicates this
+      process) to <i class="obj">anInteger</i>.
+      Not available on all platforms.
+
+		</dd>
+
+	<dt id="Process.setpgrp">setpgrp</dt>
+		<dd class="callseq">Process.setpgrp  &rarr; 0</dd>
+		<dd class="desc">Equivalent to <code>setpgid(0,0)</code>.
+      Not available on all platforms.
+
+		</dd>
+
+	<dt id="Process.setpriority">setpriority</dt>
+		<dd class="callseq">Process.setpriority( <i class="obj">kind</i>, <i class="obj">anInteger</i>, <i class="obj">anIntPriority</i> ) &rarr; 0</dd>
+		<dd class="desc">See <code class="module_instance_method"><a href="ref_m_process.html#Process.getpriority"><span class="module">Process</span>#<span class="method">getpriority</span></a></code>.
+
+<div><code class="block">Process.setpriority(Process::PRIO_USER, 0, 19) <span class="output"><span class="outputmark">&rarr;</span> 0</span>
+Process.setpriority(Process::PRIO_PROCESS, 0, 19) <span class="output"><span class="outputmark">&rarr;</span> 0</span>
+Process.getpriority(Process::PRIO_USER, 0) <span class="output"><span class="outputmark">&rarr;</span> 19</span>
+Process.getpriority(Process::PRIO_PROCESS, 0) <span class="output"><span class="outputmark">&rarr;</span> 19</span></code></div>
+
+		</dd>
+
+	<dt id="Process.setsid">setsid</dt>
+		<dd class="callseq">Process.setsid  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Establishes this process as a new session and process group
+      leader, with no controlling tty.
+      Returns the session id.
+      Not available on all platforms.
+
+<div><code class="block">Process.setsid <span class="output"><span class="outputmark">&rarr;</span> 1495</span></code></div>
+
+		</dd>
+
+	<dt id="Process.uid">uid</dt>
+		<dd class="callseq">Process.uid  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns the user id of this process.
+
+<div><code class="block">Process.uid <span class="output"><span class="outputmark">&rarr;</span> 501</span></code></div>
+
+		</dd>
+
+	<dt id="Process.uid_eq">uid=</dt>
+		<dd class="callseq">Process.uid= <i class="obj">anInteger</i>  &rarr; <i class="obj">aNumeric</i></dd>
+		<dd class="desc">Sets the (integer) user id for this process.
+      Not available on all platforms.
+
+		</dd>
+
+	<dt id="Process.wait">wait</dt>
+		<dd class="callseq">Process.wait  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Waits for any child process to exit and returns the process id
+      of that child.
+      Raises a <code class="exception">SystemError</code> if there are no child processes.
+      Not available on all platforms.
+
+<div><code class="block">Process.fork { exit 1; } <span class="output"><span class="outputmark">&rarr;</span> 1500</span>
+Process.wait <span class="output"><span class="outputmark">&rarr;</span> 1500</span></code></div>
+
+		</dd>
+
+	<dt id="Process.wait2">wait2</dt>
+		<dd class="callseq">Process.wait2  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Waits for any child process to exit and returns an array
+      containing the process id and the exit status
+      of that child.
+      Raises a <code class="exception">SystemError</code> if there are no child processes.
+
+<div><code class="block">Process.fork { exit 1 } <span class="output"><span class="outputmark">&rarr;</span> 1503</span>
+Process.wait2 <span class="output"><span class="outputmark">&rarr;</span> [1503, 256]</span></code></div>
+
+		</dd>
+
+	<dt id="Process.waitpid">waitpid</dt>
+		<dd class="callseq">Process.waitpid( <i class="obj">aPid</i>, <i class="obj">anInteger</i>=0 ) &rarr; <i class="obj">aPid</i></dd>
+		<dd class="desc">Waits for the given child process to exit. <i class="obj">anInteger</i> may be
+      a logical or of the flag value
+      <code class="module_constant"><a href="ref_m_process.html#Process.WNOHANG"><span class="module">Process</span>::<span class="constant">WNOHANG</span></a></code> (do not block if no child available)
+      or <code class="module_constant"><a href="ref_m_process.html#Process.WUNTRACED"><span class="module">Process</span>::<span class="constant">WUNTRACED</span></a></code> (return stopped children that haven't
+      been reported).
+      Not all flags are available on all platforms, but a flag value
+      of zero will work on all platforms.
+
+<div><code class="block">include Process
+pid = fork { sleep 3 } <span class="output"><span class="outputmark">&rarr;</span> 1506</span>
+Time.now <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:20:09 CDT 2002</span>
+waitpid(pid, Process::WNOHANG) <span class="output"><span class="outputmark">&rarr;</span> nil</span>
+Time.now <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:20:09 CDT 2002</span>
+waitpid(pid, 0) <span class="output"><span class="outputmark">&rarr;</span> 1506</span>
+Time.now <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:20:12 CDT 2002</span></code></div>
+
+		</dd>
+
+	<dt id="Process.waitpid2">waitpid2</dt>
+		<dd class="callseq">Process.waitpid2( <i class="obj">aPid</i>, <i class="obj">anInteger</i>=0 ) &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Waits for the given child process to exit, returning that
+      child's process id and exit status. <i class="obj">anInteger</i> may be
+      a logical or of the flag value
+      <code class="module_constant"><a href="ref_m_process.html#Process.WNOHANG"><span class="module">Process</span>::<span class="constant">WNOHANG</span></a></code> (do not block if no child available)
+      or <code class="module_constant"><a href="ref_m_process.html#Process.WUNTRACED"><span class="module">Process</span>::<span class="constant">WUNTRACED</span></a></code> (return stopped children that haven't
+      been reported).
+      Not all flags are available on all platforms, but a flag value
+      of zero will work on all platforms.</dd>
+</dl>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_m_process.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

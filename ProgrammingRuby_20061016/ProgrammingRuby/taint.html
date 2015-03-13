@@ -1,0 +1,210 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Locking Ruby in the Safe</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	<a href="classes.html" class="prev">&lt; Previous</a><a href="ospace.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'taint',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 id="lockingrubyinthesafe">Locking Ruby in the Safe</h1>
+<p>Walter Webcoder has a great idea for a portal site: The Web Arithmetic Page. Surrounded by all sorts of cool mathematical links and banner ads that will make him rich is a simple central frame, containing a text field and a button. Users type an arithmetic expression into the field, press the button, and the answer is displayed. All the world's calculators become obsolete overnight, and Walter cashes in and retires to devote his life to his collection of car license plate numbers.</p>
+<p>Implementing the calculator is easy, thinks Walter. He accesses the contents of the form field using Ruby's CGI library, and uses the <code>eval</code> method to evaluate the string as an expression.</p>
+
+<div><code class="block">require 'cgi'
+
+cgi = CGI::new("html4")
+
+# Fetch the value of the form field "expression"
+expr = cgi["expression"].to_s
+
+begin
+result = eval(expr)
+rescue Exception =&gt; detail
+# handle bad expressions
+end
+
+# display result back to user...
+</code></div>
+<p>Roughly seven seconds after Walter puts the application online, a twelve-year-old from Waxahachie with glandular problems and no real life types &ldquo;<code>system("rm *")</code>&rdquo; into the form and, like his application, Walter's dreams come tumbling down.</p>
+<p>Walter learned an important lesson: <em>All external data is dangerous. Don't let it close to interfaces that can modify your system.</em> In this case, the content of the form field was the external data, and the call to <code>eval</code> was the security breach.</p>
+<p>Fortunately, Ruby provides support for reducing this risk. All information from the outside world can be marked as <em>tainted</em>. When running in a safe mode, potentially dangerous methods will raise a <code class="exception">SecurityError</code> if passed a tainted object.</p>
+
+<h2 id="safelevels">Safe Levels</h2>
+<p>The variable <var>$SAFE</var> determines Ruby's level of paranoia. <a href="taint.html#table_20.1">Table 20.1</a> gives details of the checks performed at each safe level.</p>
+
+<table>
+<thead><tr>
+  <th>$SAFE</th>
+  <th>Constraints</th>
+</tr></thead><tbody>
+<tr class="firstRow">
+	<td>0</td>
+	<td>No checking of the use of externally supplied (tainted) data is performed. This is Ruby's default mode.</td>
+</tr><tr>
+	<td>&gt;= 1</td>
+	<td>Ruby disallows the use of tainted data by potentially dangerous operations.</td>
+</tr><tr>
+	<td>&gt;= 2</td>
+	<td>Ruby prohibits the loading of program files from globally writable locations.</td>
+</tr><tr>
+	<td>&gt;= 3</td>
+	<td>All newly created objects are considered tainted.</td>
+</tr><tr>
+	<td>&gt;= 4</td>
+	<td>Ruby effectively partitions the running program in two. Nontainted objects may not be modified. Typically, this will be used to create a sandbox: the program sets up an environment using a lower<var>$SAFE</var> level, then resets <var>$SAFE</var> to 4 to prevent subsequent changes to that environment.</td>
+</tr></tbody></table>
+
+<p>The default value of <var>$SAFE</var> is zero under most circumstances. However, if a Ruby script is run <em>setuid</em> or <em>setgid</em>, <span class="footnote">(a Unix script may be flagged to be run under a different user or group id than the person running it. This allows the script to have privileges that the user does not have; the script can access resources that the user would otherwise be prohibited from using. These scripts are called <em>setuid</em> or <em>setgid</em>)</span> its safe level is automatically set to 1. The safe level may also be set using the <code class="cmdopt">-T</code> command-line option, and by assigning to <var>$SAFE</var> within the program. It is not possible to lower the value of <var>$SAFE</var> by assignment.</p>
+<p>The current value of <var>$SAFE</var> is inherited when new threads are created. However, within each thread, the value of <var>$SAFE</var> may be changed without affecting the value in other threads. This facility may be used to implement secure &ldquo;sandboxes,&rdquo; areas where external code may run safely without risking the rest of your application or system. Do this by wrapping code that you load from a file in its own, anonymous module. This will protect your program's namespace from any unintended alteration.</p>
+
+<div><code class="block">f=open(fileName,"w")
+f.print ...   # write untrusted program into file.
+f.close
+Thread.start {
+  $SAFE = 4
+  load(fileName, true)
+}
+</code></div>
+
+<p>With a <var>$SAFE</var> level of 4, you can load <em>only</em> wrapped files. See <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.load"><span class="class">Kernel</span>::<span class="method">load</span></a></code> for details.</p>
+
+<h2 id="taintedobjects">Tainted Objects</h2>
+<p>Any Ruby object derived from some external source (for example, a string read from a file, or an environment variable) is automatically marked as being tainted. If your program uses a tainted object to derive a new object, then that new object will also be tainted, as shown in the code below. Any object with external data somewhere in its past will be tainted. This tainting process is performed regardless of the current safe level. You can inspect the tainted status of an object using <code class="class_instance_method"><a href="ref_c_object.html#Object.tainted_qm"><span class="class">Object</span>#<span class="method">tainted?</span></a></code>.</p>
+<table cellspacing="10" class="layout"><tr><td><div><code class="block"># internal data
+# =============
+x1 = "a string"
+x1.tainted?     <span class="output2"><span class="outputmark">&rarr;</span> false</span>
+x2 = x1[2, 4]
+x2.tainted?     <span class="output2"><span class="outputmark">&rarr;</span> false</span>
+x1 =~ /([a-z])/ <span class="output2" style="width:5em"><span class="outputmark">&rarr;</span> 0</span>
+$1.tainted?     <span class="output2"><span class="outputmark">&rarr;</span> false</span></code></div></td><td><div><code class="block"># external data
+# =============
+y1 = ENV["HOME"]
+y1.tainted?      <span class="output2"><span class="outputmark">&rarr;</span> true</span>
+y2 = y1[2, 4]
+y2.tainted?      <span class="output2"><span class="outputmark">&rarr;</span> true</span>
+y1 =~ /([a-z])/  <span class="output2"><span class="outputmark">&rarr;</span> 1</span>
+$1.tainted?      <span class="output2"><span class="outputmark">&rarr;</span> true</span></code></div></td></tr></table>
+
+
+<p>You can force any object to become tainted by invoking its <code class="method">taint</code> method. If the safe level is less than 3, you can remove the taint from an object by invoking <code class="method">untaint</code>. <span class="footnote">(There are also some devious ways of doing this without using <code class="method">untaint</code>. We'll leave it up to your darker side to find them.)</span> This is clearly not something to do lightly.</p>
+<p>Clearly, Walter should have run his CGI script at a safe level of 1. This would have raised an exception when the program tried to pass form data to <code class="method">eval</code>. Once this had happened, Walter would have had a number of choices. He could have chosen to implement a proper expression parser, bypassing the risks inherent in using <code class="method">eval</code>. However, being lazy, it's more likely he'd have performed some simple sanity check on the form data, and untaint it if it looked innocuous.</p>
+
+<div><code class="block">require 'cgi';
+
+$SAFE = 1
+
+cgi = CGI::new("html4")
+
+expr = cgi["field"].to_s
+
+if expr =~ %r{^[-+*/\d\seE.()]*$}
+  expr.untaint
+  result = eval(expr)
+  # display result back to user...
+else
+  # display error message...
+end
+</code></div>
+<p>Personally, we think Walter's still taking undue risks. We'd probably prefer to see a real parser here, but implementing one here has nothing to teach us about tainting, so we'll move on.</p>
+<p>And remember&mdash;it's a dangerous world out there. Be careful.</p>
+
+<div style="margin-top:3em">
+<table id="table_20.1">
+	<caption>Table 20.1 : Definition of the safe levels</caption>
+	<tr class="firstRow"><td><dl>
+		<dt><var>$SAFE</var> &gt;= 1</dt>
+		<dd><ul>
+			<li>The environment variables <code>RUBYLIB</code> and <code>RUBYOPT</code> are not processed, and the current directory is not added to the path.</li>
+			<li>The command-line options <code>-e</code>, <code>-i</code>, <code>-I</code>, <code>-r</code>, <code>-s</code>, <code>-S</code>, and <code>-x</code> are not allowed.</li>
+			<li>Can't start processes from <code>$PATH</code> if any directory in it is world-writable.</li>
+			<li>Can't manipulate or chroot to a directory whose name is a tainted string.</li>
+			<li>Can't glob tainted strings.</li>
+			<li>Can't eval tainted strings.</li>
+			<li>Can't load or require a file whose name is a tainted string.</li>
+			<li>Can't manipulate or query the status of a file or pipe whose name is a tainted string.</li>
+			<li>Can't execute a system command or exec a program from a tainted string.</li>
+			<li>Can't pass <code class="method">trap</code> a tainted string.</li>
+		</ul></dd>
+	</dl></td></tr><tr><td><dl>
+		<dt><var>$SAFE</var> &gt;= 2</dt>
+		<dd><ul>
+			<li>Can't change, make, or remove directories, or use chroot.</li>
+			<li>Can't load a file from a world-writable directory.</li>
+			<li>Can't load a file from a tainted filename starting with ~.</li>
+			<li>Can't use <code class="class_instance_method"><a href="ref_c_file.html#File.chmod"><span class="class">File</span>#<span class="method">chmod</span></a></code>, <code class="class_instance_method"><a href="ref_c_file.html#File.chown"><span class="class">File</span>#<span class="method">chown</span></a></code>, <code class="class_instance_method"><a href="ref_c_file.html#File.lstat"><span class="class">File</span>#<span class="method">lstat</span></a></code>, <code class="class_class_method"><a href="ref_c_file.html#File.stat"><span class="class">File</span>.<span class="method">stat</span></a></code>, <code class="class_instance_method"><a href="ref_c_file.html#File.truncate"><span class="class">File</span>#<span class="method">truncate</span></a></code>, <code class="class_class_method"><a href="ref_c_file.html#File.umask"><span class="class">File</span>.<span class="method">umask</span></a></code>, <code class="class_instance_method"><a href="ref_c_file.html#File.flock"><span class="class">File</span>#<span class="method">flock</span></a></code>, <code class="class_instance_method"><a href="ref_c_io.html#IO.ioctl"><span class="class">IO</span>#<span class="method">ioctl</span></a></code>, <code class="class_instance_method"><a href="ref_c_io.html#IO.stat"><span class="class">IO</span>#<span class="method">stat</span></a></code>, <code class="module_instance_method"><a href="ref_m_kernel.html#Kernel.fork"><span class="class">Kernel</span>#<span class="method">fork</span></a></code>, <code class="module_instance_method"><a href="ref_m_kernel.html#Kernel.syscall"><span class="class">Kernel</span>#<span class="method">syscall</span></a></code>, <code class="module_instance_method"><a href="ref_m_kernel.html#Kernel.trap"><span class="class">Kernel</span>#<span class="method">trap</span></a></code>. <code class="module_module_method"><a href="ref_m_process.html#Process.setpgid"><span class="class">Process</span>::<span class="method">setpgid</span></a></code>, <code class="module_module_method"><a href="ref_m_process.html#Process.setsid"><span class="class">Process</span>::<span class="method">setsid</span></a></code>, <code class="module_module_method"><a href="ref_m_process.html#Process.setpriority"><span class="class">Process</span>::<span class="method">setpriority</span></a></code>, or <code class="module_module_method"><a href="ref_m_process.html#Process.egid_eq"><span class="class">Process</span>::<span class="method">egid=</span></a></code>.</li>
+			<li>Can't handle signals using <code class="method">trap</code>.</li>
+		</ul></dd>
+	</dl></td></tr><tr><td><dl>
+		<dt><var>$SAFE</var> &gt;= 3</dt>
+		<dd><ul>
+			<li>All objects are created tainted.</li>
+			<li>Can't untaint objects.</li>
+		</ul></dd>
+	</dl></td></tr><tr><td><dl>
+		<dt><var>$SAFE</var> &gt;= 4</dt>
+		<dd><ul>
+			<li>Can't modify a nontainted array, hash, or string.</li>
+			<li>Can't modify a global variable.</li>
+			<li>Can't access instance variables of nontainted objects.</li>
+			<li>Can't change an environment variable.</li>
+			<li>Can't close or reopen nontainted files.</li>
+			<li>Can't freeze nontainted objects.</li>
+			<li>Can't change visibility of methods (private/public/protected).</li>
+			<li>Can't make an alias in a nontainted class or module.</li>
+			<li>Can't get meta information (such as method or variable lists).</li>
+			<li>Can't define, redefine, remove, or undef a method in a nontainted class or module.</li>
+			<li>Can't modify <code class="class">Object</code>.</li>
+			<li>Can't remove instance variables or constants from nontainted objects.</li>
+			<li>Can't manipulate threads, terminate a thread other than the current, or set <code>abort_on_exception</code>.</li>
+			<li>Can't have thread local variables.</li>
+			<li>Can't raise an exception in a thread with a lower <code>$SAFE</code> value.</li>
+			<li>Can't move threads between ThreadGroups.</li>
+			<li>Can't invoke <code class="method">exit</code>, <code class="method">exit!</code>, or <code class="method">abort</code>.</li>
+			<li>Can load only wrapped files, and can't include modules in nontainted classes and modules.</li>
+			<li>Can't convert symbol identifiers to object references.</li>
+			<li>Can't write to files or pipes.</li>
+			<li>Can't use <code class="method">autoload</code>.</li>
+			<li>Can't taint objects.</li>
+		</ul></dd>
+	</dl></td></tr>
+</table>
+</div>
+
+<div id="menubot" class="menu">
+	<a href="classes.html" class="prev">&lt; Previous</a><a href="ospace.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="taint.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Ruby.new</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	<a href="roadmap.html" class="prev">&lt; Previous</a><a href="tut_classes.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'intro',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+<h1 id="rubynew">Ruby.new</h1>
+<p>When we originally wrote this book, we had a grand plan (we were younger then). We wanted to document the language from the top down, starting with classes and objects, and ending with the nitty-gritty syntax details. It seemed like a good idea at the time. After all, most everything in Ruby is an object, so it made sense to talk about objects first.</p>
+<p>Or so we thought.</p>
+<p>Unfortunately, it turns out to be difficult to describe a language that way. If you haven't covered strings, <code>if</code> statements, assignments, and other details, it's difficult to write examples of classes. Throughout our top-down description, we kept coming across low-level details we needed to cover so that the example code would make sense.</p>
+<p>So, we came up with another grand plan (they don't call us pragmatic for nothing). We'd still describe Ruby starting at the top. But before we did that, we'd add a short chapter that described all the common language features used in the examples along with the special vocabulary used in Ruby, a kind of minitutorial to bootstrap us into the rest of the book.</p>
+
+<h2 id="rubyisanobjectorientedlanguage">Ruby Is an Object-Oriented Language</h2>
+<p>Let's say it again. Ruby is a genuine object-oriented language. Everything you manipulate is an object, and the results of those manipulations are themselves objects. However, many languages make the same claim, and they often have a different interpretation of what object-oriented means and a different terminology for the concepts they employ.</p>
+<p>So, before we get too far into the details, let's briefly look at the terms and notation that <em>we'll</em> be using.</p>
+<p>When you write object-oriented code, you're normally looking to model concepts from the real world in your code. Typically during this modeling process you'll discover categories of things that need to be represented in code. In a jukebox, the concept of a &ldquo;song&rdquo; might be such a category.  In Ruby, you'd define a <em>class</em> to represent each of these entities.  A class is a combination of state (for example, the name of the song) and methods that use that state (perhaps a method to play the song).</p>
+<p>Once you have these classes, you'll typically want to create a number of <em>instances</em> of each. For the jukebox system containing a class called <code class="class">Song</code>, you'd have separate instances for popular hits such as &ldquo;Ruby Tuesday,&rdquo; &ldquo;Enveloped in Python,&rdquo; &ldquo;String of Pearls,&rdquo; &ldquo;Small talk,&rdquo; and so on. The word <em>object</em> is used interchangeably with class instance (and being lazy typists, we'll probably be using the word &ldquo;object&rdquo; more frequently).</p>
+<p>In Ruby, these objects are created by calling a constructor, a special method associated with a class. The standard constructor is called <code class="method">new</code>.</p>
+
+<div><code class="block">song1 = Song.new("Ruby Tuesday")
+song2 = Song.new("Enveloped in Python")
+# and so on</code></div>
+<p>These instances are both derived from the same class, but they have unique characteristics.  First, every object has a unique <em>object   identifier</em> (abbreviated as <em>object id</em>). Second, you can define <em>instance variables</em>, variables with values that are unique to each instance.  These instance variables hold an object's state.  Each of our songs, for example, will probably have an instance variable that holds the song title.</p>
+<p>Within each class, you can define <em>instance methods</em>. Each method is a chunk of functionality which may be called from within the class and (depending on accessibility constraints) from outside. These instance methods in turn have access to the object's instance variables, and hence to the object's state.</p>
+<p>Methods are invoked by sending a message to an object. The message contains the method's name, along with any parameters the method may need. <span class="footnote">This idea of expressing  method calls in the form of   messages comes from Smalltalk.</span> When an object receives a message, it looks into its own class for a corresponding method. If found, that method is executed. If the method <em>isn't</em> found, ... well, we'll get to that later.</p>
+<p>This business of methods and messages may sound complicated, but in practice it is very natural. Let's look at some method calls. (Remember that the arrows in the code examples show the values returned by the corresponding expressions.)</p>
+
+<div><code class="block">"gin joint".length <span class="output"><span class="outputmark">&rarr;</span> 9</span>
+"Rick".index("c") <span class="output"><span class="outputmark">&rarr;</span> 2</span>
+-1942.abs <span class="output"><span class="outputmark">&rarr;</span> 1942</span>
+sam.play(aSong) <span class="output"><span class="outputmark">&rarr;</span> "duh dum, da dum de dum ..."</span></code></div>
+
+<p>Here, the thing before the period is called the <em>receiver</em>, and the name after the period is the method to be invoked. The first example asks a string for its length, and the second asks a different string to find the index of the letter &ldquo;c.&rdquo; The third line has a number calculate its absolute value. Finally, we ask Sam to play us a song.</p>
+<p>It's worth noting here a major difference between Ruby and most other languages. In (say) Java, you'd find the absolute value of some number by calling a separate function and passing in that number. You might write</p>
+
+<div><code class="block">number = Math.abs(number)     // Java code</code></div>
+<p>In Ruby, the ability to determine an absolute value is built into numbers&mdash;they take care of the details internally. You simply send the message <code>abs</code> to a number object and let it do the work.</p>
+
+<div><code class="block">number = number.abs</code></div>
+<p>The same applies to all Ruby objects: in C you'd write <code>strlen(name)</code>, while in Ruby it's <code>name.length</code>, and so on. This is part of what we mean when we say that Ruby is a genuine OO language.</p>
+
+<h2 id="somebasicruby">Some Basic Ruby</h2>
+<p>Not many people like to read heaps of boring syntax rules when they're picking up a new language. So we're going to cheat. In this section we'll hit some of the highlights, the stuff you'll just <em>have</em> to know if you're going to write Ruby programs. Later, in <a href="language.html#therubylanguage">Chapter 18</a> we'll go into all the gory details.</p>
+<p>Let's start off with a simple Ruby program. We'll write a method that returns a string, adding to that string a person's name. We'll then invoke that method a couple of times.</p>
+
+<div><code class="block">def sayGoodnight(name)
+  result = "Goodnight, " + name
+  return result
+end
+
+# Time for bed...
+puts sayGoodnight("John-Boy")
+puts sayGoodnight("Mary-Ellen")</code></div>
+<p>First, some general observations. Ruby syntax is clean. You don't need semicolons at the ends of statements as long as you put each statement on a separate line.  Ruby comments start with a <code>#</code> character and run to the end of the line. Code layout is pretty much up to you; indentation is not significant.</p>
+<p>Methods are defined with the keyword <code>def</code>, followed by the method name (in this case, &ldquo;<code class="method">sayGoodnight</code>&rdquo;) and the method's parameters between parentheses.  Ruby doesn't use braces to delimit the bodies of compound statements and definitions. Instead, you simply finish the body with the keyword <code>end</code>.  Our method's body is pretty simple. The first line concatenates the literal string &ldquo;Goodnight,&#8255;&rdquo; to the parameter <var>name</var> and assigns the result to the local variable result. The next line returns that result to the caller. Note that we didn't have to declare the variable <var>result</var>; it sprang into existence when we assigned to it.</p>
+<p>Having defined the method, we call it twice. In both cases we pass the result to the method <code class="method">puts</code>, which simply outputs its argument followed by a newline.</p>
+
+<div><code class="block">Goodnight, John-Boy
+Goodnight, Mary-Ellen</code></div>
+<p>The line &ldquo;<code>puts sayGoodnight("John-Boy")</code>&rdquo; contains two method calls, one to <code class="method">sayGoodnight</code> and the other to <code>puts</code>. Why does one call have its arguments in parentheses while the other doesn't? In this case it's purely a matter of taste. The following lines are all equivalent.</p>
+
+<div><code class="block">puts sayGoodnight "John-Boy"
+puts sayGoodnight("John-Boy")
+puts(sayGoodnight "John-Boy")
+puts(sayGoodnight("John-Boy"))</code></div>
+<p>However, life isn't always that simple, and precedence rules can make it difficult to know which argument goes with which method invocation, so we recommend using parentheses in all but the simplest cases.</p>
+<p>This example also shows some Ruby string objects. There are many ways to create a string object, but probably the most common is to use string literals: sequences of characters between single or double quotation marks. The difference between the two forms is the amount of processing Ruby does on the string while constructing the literal. In the single-quoted case, Ruby does very little. With a few exceptions, what you type into the string literal becomes the string's value.</p>
+<p>In the double-quoted case, Ruby does more work. First, it looks for substitutions&mdash;sequences that start with a backslash character&mdash;and replaces them with some binary value. The most common of these is &ldquo;<code>\n</code>&rdquo;, which is replaced with a newline character. When a string containing a newline is output, the &ldquo;<code>\n</code>&rdquo; forces a line break.</p>
+
+<div><code class="block">puts "And Goodnight,\nGrandma"</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">And Goodnight,
+Grandma</code></div>
+
+<p>The second thing that Ruby does with double-quoted strings is expression interpolation. Within the string, the sequence <code>#{<em>expression</em>}</code> is replaced by the value of <em>expression</em>. We could use this to rewrite our previous method.</p>
+
+<div><code class="block">def sayGoodnight(name)
+  result = "Goodnight, #{name}"
+  return result
+end</code></div>
+<p>When Ruby constructs this string object, it looks at the current value of <var>name</var> and substitutes it into the string. Arbitrarily complex expressions are allowed in the <code>#{...}</code> construct. As a shortcut, you don't need to supply the braces when the expression is simply a global, instance, or class variable. For more information on strings, as well as on the other Ruby standard types, see <a href="tut_stdtypes.html#standardtypes">Chapter 5</a>.</p>
+<p>Finally, we could simplify this method some more. The value returned by a Ruby method is the value of the last expression evaluated, so we can get rid of the <code>return</code> statement altogether.</p>
+
+<div><code class="block">def sayGoodnight(name)
+  "Goodnight, #{name}"
+end</code></div>
+<p>We promised that this section would be brief. We've got just one more topic to cover: Ruby names. For brevity, we'll be using some terms (such as class variable) that we aren't going to define here. However, by talking about the rules now, you'll be ahead of the game when we actually come to discuss instance variables and the like later.</p>
+<p>Ruby uses a convention to help it distinguish the usage of a name: the first characters of a name indicate how the name is used. Local variables, method parameters, and method names should all start with a lowercase letter or with an underscore. Global variables are prefixed with a dollar sign ($), while instance variables begin with an &ldquo;at&rdquo; sign (@). Class variables start with two &ldquo;at&rdquo; signs (@@). Finally, class names, module names, and constants should start with an uppercase letter. Samples of different names are given in <a href="intro.html#table_2.1">Table 2.1</a>.</p>
+<p>Following this initial character, a name can be any combination of letters, digits, and underscores (with the proviso that the character following an @ sign may not be a digit).</p>
+
+<table class="figure" id="table_2.1">
+<caption>Table 2.1 : Example variable and class names</caption>
+<thead>
+<tr>
+	<th colspan="4">Variables</th>
+	<th rowspan="2">Constants and<br>Class Names</th>
+</tr>
+<tr>
+  <th>Local</th>
+  <th>Global</th>
+  <th>Instance</th>
+  <th>Class</th>
+</tr>
+</thead><tbody>
+<tr class="firstRow">
+  <td><code>name</code></td>
+  <td><code>$debug</code></td>
+  <td><code>@name</code></td>
+  <td><code>@@total</code></td>
+  <td><code>PI</code></td>
+</tr>
+<tr>
+  <td><code>fishAndChips</code></td>
+  <td><code>$CUSTOMER</code></td>
+  <td><code>@point_1</code></td>
+  <td><code>@@symtab</code></td>
+  <td><code>FeetPerMile</code></td>
+</tr>
+<tr>
+  <td><code>x_axis</code></td>
+  <td><code>$_</code></td>
+  <td><code>@X</code></td>
+  <td><code>@@N</code></td>
+  <td><code>String</code></td>
+</tr>
+<tr>
+  <td><code>thx1138</code></td>
+  <td><code>$plan9</code></td>
+  <td><code>@_</code></td>
+  <td><code>@@x_pos</code></td>
+  <td><code>MyClass</code></td>
+</tr>
+<tr>
+  <td><code>_26</code></td>
+  <td><code>$Global</code></td>
+  <td><code>@plan9</code></td>
+  <td><code>@@SINGLE</code></td>
+  <td><code>Jazz_Song</code></td>
+</tr>
+</tbody></table>
+
+
+<h2 id="arraysandhashes">Arrays and Hashes</h2>
+<p>Ruby's arrays and hashes are indexed collections. Both store collections of objects, accessible using a key. With arrays, the key is an integer, whereas hashes support any object as a key.  Both arrays and hashes grow as needed to hold new elements.  It's more efficient to access array elements, but hashes provide more flexibility. Any particular array or hash can hold objects of differing types; you can have an array containing an integer, a string, and a floating point number, as we'll see in a minute.</p>
+<p>You can create and initialize a new array using an array literal&mdash;a set of elements between square brackets. Given an array object, you can access individual elements by supplying an index between square brackets, as the next example shows.</p>
+
+<div><code class="block">a = [ 1, 'cat', 3.14 ]   # array with three elements
+# access the first element
+a[0] <span class="output"><span class="outputmark">&rarr;</span> 1</span>
+# set the third element
+a[2] = nil
+# dump out the array
+a <span class="output"><span class="outputmark">&rarr;</span> [1, "cat", nil]</span></code></div>
+
+<p>You can create empty arrays either by using an array literal with no elements or by using the array object's constructor, <code class="class_class_method"><a href="ref_c_array.html#Array.new"><span class="class">Array</span>.<span class="method">new</span></a></code>.</p>
+
+<div><code class="block">empty1 = []
+empty2 = Array.new</code></div>
+<p>Sometimes creating arrays of words can be a pain, what with all the quotes and commas. Fortunately, there's a shortcut: <code>%w</code> does just what we want.</p>
+
+<div><code class="block">a = %w{ ant bee cat dog elk }
+a[0] <span class="output"><span class="outputmark">&rarr;</span> "ant"</span>
+a[3] <span class="output"><span class="outputmark">&rarr;</span> "dog"</span></code></div>
+
+<p>Ruby hashes are similar to arrays. A hash literal uses braces rather than square brackets. The literal must supply two objects for every entry: one for the key, the other for the value.</p>
+<p>For example, you might want to map musical instruments to their orchestral sections. You could do this with a hash.</p>
+
+<div><code class="block">instSection = {
+  'cello'     =&gt; 'string',
+  'clarinet'  =&gt; 'woodwind',
+  'drum'      =&gt; 'percussion',
+  'oboe'      =&gt; 'woodwind',
+  'trumpet'   =&gt; 'brass',
+  'violin'    =&gt; 'string'
+}</code></div>
+<p>Hashes are indexed using the same square bracket notation as arrays.</p>
+
+<div><code class="block">instSection['oboe'] <span class="output"><span class="outputmark">&rarr;</span> "woodwind"</span>
+instSection['cello'] <span class="output"><span class="outputmark">&rarr;</span> "string"</span>
+instSection['bassoon'] <span class="output"><span class="outputmark">&rarr;</span> nil</span></code></div>
+
+<p>As the last example shows, a hash by default returns <code>nil</code> when indexed by a key it doesn't contain. Normally this is convenient, as <code>nil</code> means <code class="const">false</code> when used in conditional expressions. Sometimes you'll want to change this default. For example, if you're using a hash to count the number of times each key occurs, it's convenient to have the default value be zero. This is easily done by specifying a default value when you create a new, empty hash.</p>
+
+<div><code class="block">histogram = Hash.new(0)
+histogram['key1'] <span class="output"><span class="outputmark">&rarr;</span> 0</span>
+histogram['key1'] = histogram['key1'] + 1
+histogram['key1'] <span class="output"><span class="outputmark">&rarr;</span> 1</span></code></div>
+
+<p>Array and hash objects have lots of useful methods: see the discussion in &ldquo;<a href="tut_containers.html#arrays">Containers, Blocks and Iterators</a>&rdquo;, and the reference sections for <code class="class"><a href="ref_c_array.html#Array">Array</a></code> and <code class="class"><a href="ref_c_hash.html#Hash">Hash</a></code> for details.</p>
+
+<h2 id="controlstructures">Control Structures</h2>
+<p>Ruby has all the usual control structures, such as <code>if</code> statements and <code>while</code> loops. Java, C, and Perl programmers may well get caught by the lack of braces around the bodies of these statements. Instead, Ruby uses the keyword <code>end</code> to signify the end of a body.</p>
+
+<div><code class="block">if count &gt; 10
+  puts "Try again"
+elsif tries == 3
+  puts "You lose"
+else
+  puts "Enter a number"
+end</code></div>
+<p>Similarly, <code>while</code> statements are terminated with <code>end</code>.</p>
+
+<div><code class="block">while weight &lt; 100 and numPallets &lt;= 30
+  pallet = nextPallet()
+  weight += pallet.weight
+  numPallets += 1
+end</code></div>
+<p>Ruby <em>statement modifiers</em> are a useful shortcut if the body of an <code>if</code> or <code>while</code> statement is just a single expression. Simply write the expression, followed by <code>if</code> or <code>while</code> and the condition. For example, here's a simple <code>if</code> statement.</p>
+
+<div><code class="block">if radiation &gt; 3000
+  puts "Danger, Will Robinson"
+end</code></div>
+<p>Here it is again, rewritten using a statement modifier.</p>
+
+<div><code class="block">puts "Danger, Will Robinson" if radiation &gt; 3000</code></div>
+<p>Similarly, a <code>while</code> loop such as</p>
+
+<div><code class="block">while square &lt; 1000
+   square = square*square
+end</code></div>
+<p>becomes the more concise</p>
+
+<div><code class="block">square = square*square  while square &lt; 1000</code></div>
+<p>These statement modifiers should seem familiar to Perl programmers.</p>
+
+<h2 id="regularexpressions">Regular Expressions</h2>
+<p>Most of Ruby's built-in types will be familiar to all programmers.  A majority of languages have strings, integers, floats, arrays, and so on.  However, until Ruby came along, regular expression support was generally  built into only the so-called scripting languages, such as Perl, Python, and awk. This is a shame: regular expressions, although cryptic, are a powerful tool for working with text.</p>
+<p>Entire books have been written about regular expressions (for example, <em>Mastering Regular Expressions</em> ), so we won't try to cover everything in just a short section. Instead, we'll look at just a few examples of regular expressions in action. You'll find <a href="tut_stdtypes.html#regularexpressions">full coverage of regular expressions</a> in the section on &ldquo;Standard Types&rdquo;.</p>
+<p>A regular expression is simply a way of specifying a <em>pattern</em> of characters to be matched in a string. In Ruby, you typically create a regular expression by writing a pattern between slash characters (/<em>pattern</em>/).  And, Ruby being Ruby, regular expressions are of course objects and can be manipulated as such.</p>
+<p>For example, you could write a pattern that matches a string containing the text &ldquo;Perl&rdquo; or the text &ldquo;Python&rdquo; using the following regular expression.</p>
+
+<div><code class="block">/Perl|Python/</code></div>
+<p>The forward slashes delimit the pattern, which consists of the two things we're matching, separated by a pipe character (&ldquo;<code>|</code>&rdquo;). You can use parentheses within patterns, just as you can in arithmetic expressions, so you could also have written this pattern as</p>
+
+<div><code class="block">/P(erl|ython)/</code></div>
+<p>You can also specify repetition within patterns. <code>/ab+c/</code> matches a string containing an &ldquo;a&rdquo; followed by one or more &ldquo;b&rdquo;s, followed by a &ldquo;c&rdquo;. Change the plus to an asterisk, and <code>/ab*c/</code> creates a regular expression that matches an &ldquo;a&rdquo;, zero or more &ldquo;b&rdquo;s, and a &ldquo;c&rdquo;.</p>
+<p>You can also match one of a group of characters within a pattern. Some common examples are character classes such as &ldquo;<code>\s</code>&rdquo;, which matches a whitespace character (space, tab, newline, and so on), &ldquo;<code>\d</code>&rdquo;, which matches any digit, and &ldquo;<code>\w</code>&rdquo;, which matches any character that may appear in a typical word. The single character &ldquo;.&rdquo; (a period) matches any character.</p>
+<p>We can put all this together to produce some useful regular expressions.</p>
+
+<div><code class="block">/\d\d:\d\d:\d\d/     # a time such as 12:34:56
+/Perl.*Python/       # Perl, zero or more other chars, then Python
+/Perl\s+Python/      # Perl, one or more spaces, then Python
+/Ruby (Perl|Python)/ # Ruby, a space, and either Perl or Python</code></div>
+<p>Once you have created a pattern, it seems a shame not to use it. The match operator &ldquo;<code>=~</code>&rdquo; can be used to match a string against a regular expression. If the pattern is found in the string, <code>=~</code> returns its starting position, otherwise it returns <code>nil</code>. This means you can use regular expressions as the condition in <code>if</code> and <code>while</code> statements. For example, the following code fragment writes a message if a string contains the text 'Perl' or 'Python'.</p>
+
+<div><code class="block">if line =~ /Perl|Python/
+  puts "Scripting language mentioned: #{line}"
+end</code></div>
+<p>The part of a string matched by a regular expression can also be replaced with different text using one of Ruby's substitution methods.</p>
+
+<div><code class="block">line.sub(/Perl/, 'Ruby')    # replace first 'Perl' with 'Ruby'
+line.gsub(/Python/, 'Ruby') # replace every 'Python' with 'Ruby'</code></div>
+<p>We'll have a lot more to say about regular expressions as we go through the book.</p>
+
+<h2 id="blocksanditerators">Blocks and Iterators</h2>
+<p>This section briefly describes one of Ruby's particular strengths.  We're about to look at code blocks: chunks of code that you can associate with method invocations, almost as if they were parameters. This is an incredibly powerful feature. You can use code blocks to implement callbacks (but they're simpler than Java's anonymous inner classes), to pass around chunks of code (but they're more flexible than C's function pointers), and to implement iterators.</p>
+<p>Code blocks are just chunks of code between braces or <code>do</code>...<code>end</code>.</p>
+
+<div><code class="block">{ puts "Hello" }       # this is a block
+
+do                     #
+  club.enroll(person)  # and so is this
+  person.socialize     #
+end                    #</code></div>
+<p>Once you've created a block, you can associate it with a call to a method. That method can then invoke the block one or more times using the Ruby <code>yield</code> statement.  The following example shows this in action. We define a method that calls <code>yield</code> twice. We then call it, putting a block on the same line, after the call (and after any arguments to the method). <span class="footnote">Some people like to think of   the association of a block with a method as a kind of parameter   passing. This works on one level, but it isn't really the whole   story. You might be better off thinking of the block and the method   as coroutines, which   transfer control back and forth between themselves.</span></p>
+
+<div><code class="block">def callBlock
+  yield
+  yield
+end
+
+callBlock { puts "In the block" }</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">In the block
+In the block</code></div>
+<p>See how the code in the block (<code>puts "In the block"</code>) is executed twice, once for each call to <code>yield</code>.</p>
+<p>You can provide parameters to the call to <code>yield</code>: these will be passed to the block. Within the block, you list the names of the arguments to receive these parameters between vertical bars (&ldquo;|&rdquo;).</p>
+
+<div><code class="block">def callBlock
+  yield ,
+end
+
+callBlock { |, | ... }</code></div>
+<p>Code blocks are used throughout the Ruby library to implement iterators: methods that return successive elements from some kind of collection, such as an array.</p>
+
+<div><code class="block">a = %w( ant bee cat dog elk )    # create an array
+a.each { |animal| puts animal }  # iterate over the contents</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">ant
+bee
+cat
+dog
+elk</code></div>
+<p>Let's look at how we might implement the <code class="class">Array</code> class's <code>each</code> iterator that we used in the previous example.  The <code class="method">each</code> iterator loops through every element in the array, calling <code>yield</code> for each one. In pseudo code, this might look like:</p>
+
+<div><code class="block"># within class Array...
+def each
+  for each element
+    yield(element)
+  end
+end</code></div>
+<p>You could then iterate over an array's elements by calling its <code>each</code> method and supplying a block. This block would be called for each element in turn.</p>
+
+<div><code class="block">[ 'cat', 'dog', 'horse' ].each do |animal|
+  print animal, " -- "
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">cat -- dog -- horse --</code></div>
+<p>Similarly, many looping constructs that are built into languages such as C and Java are simply method calls in Ruby, with the methods invoking the associated block zero or more times.</p>
+
+<div><code class="block">5.times {  print "*" }
+3.upto(6) {|i|  print i }
+('a'..'e').each {|char| print char }</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">*****3456abcde</code></div>
+<p>Here we ask the number 5 to call a block five times, then ask the number 3 to call a block, passing in successive values until it reaches 6. Finally, the range of characters from &ldquo;a&rdquo; to &ldquo;e&rdquo; invokes a block using the method <code class="method">each</code>.</p>
+
+<h2 id="readingandriting">Reading and 'Riting</h2>
+<p>Ruby comes with a comprehensive I/O library. However, in most of the examples in this book we'll stick to a few simple methods. We've already come across two methods that do output. <code>puts</code> writes each of its arguments, adding a newline after each. <code>print</code> also writes its arguments, but with no newline. Both can be used to write to any I/O object, but by default they write to the console.</p>
+<p>Another output method we use a lot is <code class="method">printf</code>, which prints its arguments under the control of a format string (just like <code>printf</code> in C or Perl).</p>
+
+<div><code class="block">printf "Number: %5.2f, String: %s", 1.23, "hello"</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Number:  1.23, String: hello</code></div>
+<p>In this example, the format string <code>"Number: %5.2f, String: %s"</code> tells <code class="method">printf</code> to substitute in a floating point number (allowing five characters in total, with two after the decimal point) and a string.</p>
+<p>There are many ways to read input into your program. Probably the most traditional is to use the routine <code>gets</code>, which returns the next line from your program's standard input stream.</p>
+
+<div><code class="block">line = gets
+print line</code></div>
+<p>The <code>gets</code> routine has a side effect: as well as returning the line just read, it also stores it into the global variable <var>$_</var>. This variable is special, in that it is used as the default argument in many circumstances. If you call <code>print</code> with no argument, it prints the contents of <var>$_</var>. If you write an <code>if</code> or <code>while</code> statement with just a regular expression as the condition, that expression is matched against <var>$_</var>. While viewed by some purists as a rebarbative barbarism, these abbreviations can help you write some concise programs. For example, the following program prints all lines in the input stream that contain the word &ldquo;Ruby.&rdquo;</p>
+
+<div><code class="block">while gets           # assigns line to $_
+  if /Ruby/          # matches against $_
+    print            # prints $_
+  end
+end</code></div>
+<p>The &ldquo;Ruby way&rdquo; to write this would be to use an iterator.</p>
+
+<div><code class="block">ARGF.each { |line|  print line  if line =~ /Ruby/ }</code></div>
+<p>This uses the predefined object <var>ARGF</var>, which represents the input stream that can be read by a program.</p>
+
+<h2 id="onwardandupward">Onward and Upward</h2>
+<p>That's it. We've finished our lightning-fast tour of some of the basic features of Ruby.  We've had a brief look at objects, methods, strings, containers, and regular expressions, seen some simple control structures, and looked at some rather nifty iterators. Hopefully, this chapter has given you enough ammunition to be able to attack the rest of this book.</p>
+<p>Time to move on, and up&mdash;up to a higher level. Next, we'll be looking at classes and objects, things that are at the same time both the highest-level constructs in Ruby and the essential underpinnings of the entire language.</p>
+
+
+<div id="menubot" class="menu">
+	<a href="roadmap.html" class="prev">&lt; Previous</a><a href="tut_classes.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="intro.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

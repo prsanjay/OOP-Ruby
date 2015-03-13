@@ -1,0 +1,166 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>MatchData</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_c_matchdata',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="class" id="MatchData">class <strong>MatchData</strong> &lt; Object</h1>
+
+<p><code>MatchData</code> is the type of the special variable <var>$~</var>,   and is the type of the object returned by <code class="class_instance_method"><a href="ref_c_regexp.html#Regexp.match"><span class="class">Regexp</span>#<span class="method">match</span></a></code> and   <code class="class_instance_method"><a href="ref_c_regexp.html#Regexp.last_match"><span class="class">Regexp</span>#<span class="method">last_match</span></a></code>. It   encapsulates all the results of a pattern match, results normally   accessed through the special variables <code>$&amp;</code>, <code>$'</code>,   <code>$`</code>, <code>$1</code>, <code>$2</code>, and so on.</p>
+
+<h2 class="refsubsection" id="instancemethods">instance methods</h2>
+<dl class="methodlist">
+	<dt id="MatchData._ob_cb">[ ]</dt>
+		<dd class="callseq"><i class="obj">mtch</i>[<i class="obj">i</i>]  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="callseq"><i class="obj">mtch</i>[<i class="obj">start</i>, <i class="obj">length</i>]  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="callseq"><i class="obj">mtch</i>[<i class="obj">aRange</i>]  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Match Reference&mdash;<code>MatchData</code> acts as an array, and may
+        be accessed using the normal array indexing techniques.
+        <i class="obj">mtch</i>[0] is equivalent to the special variable <var>$&amp;</var>, and
+        returns the entire matched string. <i class="obj">mtch</i>[1], <i class="obj">mtch</i>[2], and so
+        on return the
+        values of the matched backreferences (portions of the pattern
+        between parentheses).
+
+<div><code class="block">m = /(.)(.)(\d+)(\d)/.match("THX1138.")
+m[0] <span class="output"><span class="outputmark">&rarr;</span> "HX1138"</span>
+m[1, 2] <span class="output"><span class="outputmark">&rarr;</span> ["H", "X"]</span>
+m[1..3] <span class="output"><span class="outputmark">&rarr;</span> ["H", "X", "113"]</span>
+m[-3, 2] <span class="output"><span class="outputmark">&rarr;</span> ["X", "113"]</span></code></div>
+
+		</dd>
+
+	<dt id="MatchData.begin">begin</dt>
+		<dd class="callseq"><i class="obj">mtch</i>.begin( <i class="obj">n</i> )  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Returns the offset of the start of the <em>n</em>th element of the
+      match array in the string.
+
+<div><code class="block">m = /(.)(.)(\d+)(\d)/.match("THX1138.")
+m.begin(0) <span class="output"><span class="outputmark">&rarr;</span> 1</span>
+m.begin(2) <span class="output"><span class="outputmark">&rarr;</span> 2</span></code></div>
+
+		</dd>
+
+	<dt id="MatchData.end">end</dt>
+		<dd class="callseq"><i class="obj">mtch</i>.end( <i class="obj">n</i> )  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Returns the offset of the character immediately following the
+      end of the <em>n</em>th element of the match array in the string.
+
+<div><code class="block">m = /(.)(.)(\d+)(\d)/.match("THX1138.")
+m.end(0) <span class="output"><span class="outputmark">&rarr;</span> 7</span>
+m.end(2) <span class="output"><span class="outputmark">&rarr;</span> 3</span></code></div>
+
+		</dd>
+
+	<dt id="MatchData.length">length</dt>
+		<dd class="callseq"><i class="obj">mtch</i>.length  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Returns the number of elements in the match array.
+
+<div><code class="block">m = /(.)(.)(\d+)(\d)/.match("THX1138.")
+m.length <span class="output"><span class="outputmark">&rarr;</span> 5</span>
+m.size <span class="output"><span class="outputmark">&rarr;</span> 5</span></code></div>
+
+		</dd>
+
+	<dt id="MatchData.offset">offset</dt>
+		<dd class="callseq"><i class="obj">mtch</i>.offset( <i class="obj">n</i> )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns a two-element array containing the beginning and ending
+      offsets of the <em>n</em>th match.
+
+<div><code class="block">m = /(.)(.)(\d+)(\d)/.match("THX1138.")
+m.offset(0) <span class="output"><span class="outputmark">&rarr;</span> [1, 7]</span>
+m.offset(4) <span class="output"><span class="outputmark">&rarr;</span> [6, 7]</span></code></div>
+
+		</dd>
+
+	<dt id="MatchData.post_match">post_match</dt>
+		<dd class="callseq"><i class="obj">mtch</i>.post_match  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns the portion of the original string after the current
+      match. Equivalent to the special variable <var>$'</var>.
+
+<div><code class="block">m = /(.)(.)(\d+)(\d)/.match("THX1138: The Movie")
+m.post_match <span class="output"><span class="outputmark">&rarr;</span> ": The Movie"</span></code></div>
+
+		</dd>
+
+	<dt id="MatchData.pre_match">pre_match</dt>
+		<dd class="callseq"><i class="obj">mtch</i>.pre_match  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns the portion of the original string before the current
+      match. Equivalent to the special variable <var>$`</var>.
+
+<div><code class="block">m = /(.)(.)(\d+)(\d)/.match("THX1138.")
+m.pre_match <span class="output"><span class="outputmark">&rarr;</span> "T"</span></code></div>
+
+		</dd>
+
+	<dt id="MatchData.size">size</dt>
+		<dd class="callseq"><i class="obj">mtch</i>.size  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">A synonym for <code class="class_instance_method"><a href="ref_c_matchdata.html#MatchData.length"><span class="class">MatchData</span>#<span class="method">length</span></a></code>.
+
+		</dd>
+
+	<dt id="MatchData.string">string</dt>
+		<dd class="callseq"><i class="obj">mtch</i>.string  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns a frozen copy of the string passed in to <code>match</code>.
+
+<div><code class="block">m = /(.)(.)(\d+)(\d)/.match("THX1138.")
+m.string <span class="output"><span class="outputmark">&rarr;</span> "THX1138."</span></code></div>
+
+		</dd>
+
+	<dt id="MatchData.to_a">to_a</dt>
+		<dd class="callseq"><i class="obj">mtch</i>.to_a  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns the array of matches.
+
+<div><code class="block">m = /(.)(.)(\d+)(\d)/.match("THX1138.")
+m.to_a <span class="output"><span class="outputmark">&rarr;</span> ["HX1138", "H", "X", "113", "8"]</span></code></div>
+
+		</dd>
+
+	<dt id="MatchData.to_s">to_s</dt>
+		<dd class="callseq"><i class="obj">mtch</i>.to_s  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns the entire matched string.
+
+<div><code class="block">m = /(.)(.)(\d+)(\d)/.match("THX1138.")
+m.to_s <span class="output"><span class="outputmark">&rarr;</span> "HX1138"</span></code></div></dd>
+</dl>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_c_matchdata.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

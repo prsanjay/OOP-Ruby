@@ -1,0 +1,1022 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Kernel</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_m_kernel',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="module" id="Kernel">module <strong>Kernel</strong></h1>
+
+<p>The <code class="module">Kernel</code> module is included by class <code class="class">Object</code>, so its   methods are available in every Ruby object. The <code class="module">Kernel</code> instance methods are documented in class <code class="class"><a href="ref_c_object.html">Object</a></code>. This section documents the module methods.   These methods are called without a receiver and thus can be called in   functional form.</p>
+
+
+<h2 id="modulemethods">module methods</h2>
+<dl class="methodlist">
+	<dt id="Kernel.Array">Array</dt>
+		<dd class="callseq">Array( <em>arg</em> )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns <em>arg</em><code>.to_a</code>.
+
+<div><code class="block">Array(1..5) <span class="output"><span class="outputmark">&rarr;</span> [1, 2, 3, 4, 5]</span></code></div>
+
+		</dd>
+
+	<dt id="Kernel.Float">Float</dt>
+		<dd class="callseq">Float( <em>arg</em> )  &rarr; <i class="obj">aFloat</i></dd>
+		<dd class="desc">Returns <em>arg</em> converted to a float. Numeric types are converted directly, <code>nil</code> is converted to <code>0.0</code>, and the rest are converted using <em>arg</em>.to_f. 
+
+<div><code class="block">Float(1) <span class="output"><span class="outputmark">&rarr;</span> 1.0</span>
+Float(nil) <span class="output"><span class="outputmark">&rarr;</span> 0.0</span>
+Float("123.456") <span class="output"><span class="outputmark">&rarr;</span> 123.456</span></code></div>
+
+		</dd>
+
+	<dt id="Kernel.Integer">Integer</dt>
+		<dd class="callseq">Integer( <em>arg</em> )  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Converts <em>arg</em> to a <code class="class">Fixnum</code> or <code class="class">Bignum</code>. Numeric types are converted directly (with floating point numbers being truncated). If <em>arg</em> is a <code class="class">String</code>, leading radix indicators (<code>0</code>, <code>0b</code>, and <code>0x</code>) are honored. This behavior is different from that of <code class="class_instance_method"><a href="ref_c_string.html#String.to_i"><span class="class">String</span>#<span class="method">to_i</span></a></code>. 
+
+<div><code class="block">Integer(123.999) <span class="output"><span class="outputmark">&rarr;</span> 123</span>
+Integer("0x1a") <span class="output"><span class="outputmark">&rarr;</span> 26</span>
+Integer(Time.new) <span class="output"><span class="outputmark">&rarr;</span> 1023599977</span></code></div>
+
+		</dd>
+
+	<dt id="Kernel.String">String</dt>
+		<dd class="callseq">String( <em>arg</em> )  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Converts <em>arg</em> to a <code class="class">String</code> by calling its
+      <code class="method">to_s</code> method.
+
+<div><code class="block">String(self) <span class="output"><span class="outputmark">&rarr;</span> "main"</span>
+String(self.type) <span class="output"><span class="outputmark">&rarr;</span> "Object"</span>
+String(123456) <span class="output"><span class="outputmark">&rarr;</span> "123456"</span></code></div>
+
+		</dd>
+
+	<dt id="Kernel._bq">` (backquote)</dt>
+		<dd class="callseq">`<em>cmd</em>`  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns the standard output of running <em>cmd</em> in a subshell. The built-in syntax <code>%x{...}</code> described in the section &ldquo;<a href="tut_expressions.html#commandexpansion">Command Expansion</a>&rdquo; uses this method.
+
+<div><code class="block">`date` <span class="output"><span class="outputmark">&rarr;</span> "Sun Jun  9 00:19:37 CDT 2002\n"</span>
+`ls testdir`.split[1] <span class="output"><span class="outputmark">&rarr;</span> "main.rb"</span></code></div>
+
+		</dd>
+
+	<dt id="Kernel.abort">abort</dt>
+		<dd class="callseq">abort</dd>
+		<dd class="desc">Terminate execution immediately, effectively by calling
+      <code>Kernel.exit(1)</code>.
+
+		</dd>
+
+	<dt id="Kernel.at_exit">at_exit</dt>
+		<dd class="callseq">at_exit { block }  &rarr; <i class="obj">aProc</i></dd>
+		<dd class="desc">Converts <em>block</em> to a <code class="class">Proc</code> object (and therefore binds it at the point of call) and registers it for execution when the program exits. If multiple handlers are registered, they are executed in reverse order of registration.
+
+<div><code class="block">def do_at_exit(str1)
+  at_exit { print str1 }
+end
+at_exit { puts "cruel world" }
+do_at_exit("goodbye ")
+exit</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">goodbye cruel world</code></div>
+
+		</dd>
+
+	<dt id="Kernel.autoload">autoload</dt>
+		<dd class="callseq">autoload( <i class="obj">aModule</i>, <i class="obj">aFile</i> )  &rarr; <code>nil</code></dd>
+		<dd class="desc">Registers <i class="obj">aFile</i> to be loaded (using <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.require"><span class="module">Kernel</span>::<span class="method">require</span></a></code>) the first time that <i class="obj">aModule</i> (which may be a <code class="class">String</code> or a symbol) is accessed.
+
+<div><code class="block">autoload :MyModule, "/usr/local/lib/modules/my_module.rb"</code></div>
+
+		</dd>
+
+	<dt id="Kernel.binding">binding</dt>
+		<dd class="callseq">binding  &rarr; <i class="obj">aBinding</i></dd>
+		<dd class="desc">Returns a <code class="class">Binding</code> object, describing the variable and method bindings at the point of call. This object can be used when calling <code class="method">eval</code> to execute the evaluated command in this environment. Also see the description of <code class="class"><a href="ref_c_binding.html">Binding</a></code>.
+
+<div><code class="block">def getBinding(param)
+  return binding
+end
+b = getBinding("hello")
+eval "param", b <span class="output"><span class="outputmark">&rarr;</span> "hello"</span></code></div>
+
+		</dd>
+
+	<dt id="Kernel.block_given_qm">block_given?</dt>
+		<dd class="callseq">block_given?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <code class="keyword">yield</code> would execute a block
+      in the current context.
+
+<div><code class="block">def try
+  if block_given?
+    yield
+  else
+    "no block"
+  end
+end
+try <span class="output"><span class="outputmark">&rarr;</span> "no block"</span>
+try { "hello" } <span class="output"><span class="outputmark">&rarr;</span> "hello"</span>
+try do
+  "hello"
+end</code></div>
+
+		</dd>
+
+	<dt id="Kernel.callcc">callcc</dt>
+		<dd class="callseq">callcc {| cont | block }  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Generates a <code class="class">Continuation</code> object, which it passes to the associated block. Performing a <em>cont</em><code>.call</code> will cause the <code class="method">callcc</code> to return (as will falling through the end of the block). The value returned by the <code class="method">callcc</code> is the value of the block, or the value passed to <em>cont</em><code>.call</code>. See <code class="class"><a href="ref_c_continuation.html">Continuation</a></code> for more details. Also see <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.throw"><span class="module">Kernel</span>::<span class="method">throw</span></a></code> for an alternative mechanism for unwinding a call stack.</dd>
+
+	<dt id="Kernel.caller">caller</dt>
+		<dd class="callseq">caller( [<i class="obj">anInteger</i>] )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns the current execution stack&mdash;an array containing strings in the form &ldquo;<em>file:line</em>&rdquo; or &ldquo;<em>file:line: in `method'</em>&rdquo;. The optional <em>anInteger</em> parameter determines the number of initial stack entries to omit from the result.
+
+<div><code class="block">def a(skip)
+  caller(skip)
+end
+def b(skip)
+  a(skip)
+end
+def c(skip)
+  b(skip)
+end
+c(0)  <span class="output2"><span class="outputmark">&rarr;</span> ["prog:2:in `a'", "prog:5:in `b'", "prog:8:in `c'", "prog:10"]</span>
+c(1)  <span class="output2"><span class="outputmark">&rarr;</span> ["prog:5:in `b'", "prog:8:in `c'", "prog:11"]</span>
+c(2)  <span class="output2"><span class="outputmark">&rarr;</span> ["prog:8:in `c'", "prog:12"]</span>
+c(3)  <span class="output2"><span class="outputmark">&rarr;</span> ["prog:13"]</span></code></div>
+
+		</dd>
+
+	<dt id="Kernel.catch">catch</dt>
+		<dd class="callseq">catch( <em>symbol</em> ) {|  | block }  &rarr; anObject</dd>
+		<dd class="desc"><code class="method">catch</code> executes its block. If a <code class="method">throw</code> is executed, Ruby searches up its stack for a <code class="method">catch</code> block with a tag corresponding to the <code class="method">throw</code>'s <em>symbol</em>. If found, that block is terminated, and <code class="method">catch</code> returns the value given to <code class="method">throw</code>.  If <code class="method">throw</code> is not called, the block terminates normally, and the value of <code>catch</code> is the value of the last expression evaluated.  <code class="method">catch</code> expressions may be nested, and the <code class="method">throw</code> call need not be in lexical scope.
+
+<div><code class="block">def routine(n)
+  puts n
+  throw :done if n &lt;= 0
+  routine(n-1)
+end
+
+catch(:done) { routine(3) }</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">3
+2
+1
+0</code></div>
+
+		</dd>
+
+	<dt id="Kernel.chomp">chomp</dt>
+		<dd class="callseq">chomp( [<i class="obj">aString</i>] )  &rarr; $_ or <em>aString</em></dd>
+		<dd class="desc">Equivalent to <code>$_ = $_.chomp(<em>aString</em>)</code>. See <code class="class_instance_method"><a href="ref_c_string.html#String.chomp"><span class="class">String</span>#<span class="method">chomp</span></a></code>.
+
+<div><code class="block">$_ = "now\n"
+chomp <span class="output"><span class="outputmark">&rarr;</span> "now"</span>
+$_ <span class="output"><span class="outputmark">&rarr;</span> "now"</span>
+chomp "ow" <span class="output"><span class="outputmark">&rarr;</span> "n"</span>
+$_ <span class="output"><span class="outputmark">&rarr;</span> "n"</span>
+chomp "xxx" <span class="output"><span class="outputmark">&rarr;</span> "n"</span>
+$_ <span class="output"><span class="outputmark">&rarr;</span> "n"</span></code></div>
+
+		</dd>
+
+	<dt id="Kernel.chomp_oh">chomp!</dt>
+		<dd class="callseq">chomp!( [<i class="obj">aString</i>] )  &rarr; $_ or <code>nil</code></dd>
+		<dd class="desc">Equivalent to <code>$_.chomp!(<em>aString</em>)</code>. See <code class="class_instance_method"><a href="ref_c_string.html#String.chomp_oh"><span class="class">String</span>#<span class="method">chomp!</span></a></code>
+
+<div><code class="block">$_ = "now\n"
+chomp! <span class="output"><span class="outputmark">&rarr;</span> "now"</span>
+$_ <span class="output"><span class="outputmark">&rarr;</span> "now"</span>
+chomp! "x" <span class="output"><span class="outputmark">&rarr;</span> nil</span>
+$_ <span class="output"><span class="outputmark">&rarr;</span> "now"</span></code></div>
+
+		</dd>
+
+	<dt id="Kernel.chop">chop</dt>
+		<dd class="callseq">chop  &rarr; <em>aString</em></dd>
+		<dd class="desc">Equivalent to <code>($_.dup).chop!</code>, except <code>nil</code> is never returned. See <code class="class_instance_method"><a href="ref_c_string.html#String.chop_oh"><span class="class">String</span>#<span class="method">chop!</span></a></code>.
+
+<div><code class="block">a  =  "now\r\n"
+$_ = a
+chop <span class="output"><span class="outputmark">&rarr;</span> "now"</span>
+$_ <span class="output"><span class="outputmark">&rarr;</span> "now"</span>
+chop <span class="output"><span class="outputmark">&rarr;</span> "no"</span>
+chop <span class="output"><span class="outputmark">&rarr;</span> "n"</span>
+chop <span class="output"><span class="outputmark">&rarr;</span> ""</span>
+chop <span class="output"><span class="outputmark">&rarr;</span> ""</span>
+a <span class="output"><span class="outputmark">&rarr;</span> "now\r\n"</span></code></div>
+
+		</dd>
+
+	<dt id="Kernel.chop_oh">chop!</dt>
+		<dd class="callseq">chop!  &rarr; $_ or <code>nil</code></dd>
+		<dd class="desc">Equivalent to <code>$_.chop!</code>.
+
+<div><code class="block">a  = "now\r\n"
+$_ = a
+chop! <span class="output"><span class="outputmark">&rarr;</span> "now"</span>
+chop! <span class="output"><span class="outputmark">&rarr;</span> "no"</span>
+chop! <span class="output"><span class="outputmark">&rarr;</span> "n"</span>
+chop! <span class="output"><span class="outputmark">&rarr;</span> ""</span>
+chop! <span class="output"><span class="outputmark">&rarr;</span> nil</span>
+$_ <span class="output"><span class="outputmark">&rarr;</span> ""</span>
+a <span class="output"><span class="outputmark">&rarr;</span> ""</span></code></div>
+
+		</dd>
+
+	<dt id="Kernel.eval">eval</dt>
+		<dd class="callseq">eval( <em>aString</em> [, <em>aBinding</em> [<em>file</em> [<em>line</em>]]]) &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Evaluates the Ruby expression(s) in <em>aString</em>. If <em>aBinding</em> is given, the evaluation is performed in its context. The binding may be a <code class="class">Binding</code> object or a <code class="class">Proc</code> object. If the optional <em>file</em> and <em>line</em> parameters are present, they will be used when reporting syntax errors.
+
+<div><code class="block">def getBinding(str)
+  return binding
+end
+str = "hello"
+eval "str + ' Fred'"                      <span class="output2"><span class="outputmark">&rarr;</span> "hello Fred"</span>
+eval "str + ' Fred'", getBinding("bye")   <span class="output2"><span class="outputmark">&rarr;</span> "bye Fred"</span></code></div>
+
+		</dd>
+
+	<dt id="Kernel.exec">exec</dt>
+		<dd class="callseq">exec( <em>command</em> [, <em>args</em>])</dd>
+		<dd class="desc">Replaces the current process by running the given external command. If <code class="method">exec</code> is given a single argument, that argument is taken as a line that is subject to shell expansion before being executed. If multiple arguments are given, the second and subsequent arguments are passed as parameters to <em>command</em> with no shell expansion. If the first argument is a two-element array, the first element is the command to be executed, and the second argument is used as the <code>argv[0]</code> value, which may show up in process listings. In MSDOS environments, the command is executed in a subshell; otherwise, one of the <code>exec(2)</code> system calls is used, so the running command may inherit some of the environment of the original program (including open file descriptors).
+
+<div><code class="block">exec "echo *"       # echoes list of files in current directory
+# never get here
+
+exec "echo", "*"    # echoes an asterisk
+# never get here</code></div>
+
+		</dd>
+
+	<dt id="Kernel.exit">exit</dt>
+		<dd class="callseq">exit( <i class="obj">anInteger</i>=0 )</dd>
+		<dd class="desc">Initiates the termination of the Ruby script by raising the <code class="exception">SystemExit</code> exception. This exception may be caught. The optional parameter is used to return a status code to the invoking environment.
+
+<div><code class="block">begin
+  exit
+  puts "never get here"
+rescue SystemExit
+  puts "rescued a SystemExit exception"
+end
+puts "after begin block"</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">rescued a SystemExit exception
+after begin block</code></div>
+
+      <p>Just prior to termination, Ruby executes any <code>at_exit</code> functions and runs any object finalizers (see <code class="module"><a href="ref_m_objectspace.html">ObjectSpace</a></code>).</p>
+
+<div><code class="block">at_exit { puts "at_exit function" }
+ObjectSpace.define_finalizer(self,  proc { puts "in finalizer" })
+exit</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">at_exit function</code></div>
+
+		</dd>
+
+	<dt id="Kernel.exit_oh">exit!</dt>
+		<dd class="callseq">exit!( <i class="obj">anInteger</i>=-1 )</dd>
+		<dd class="desc">Similar to <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.exit"><span class="module">Kernel</span>::<span class="method">exit</span></a></code>, but exception handling,
+      <code class="method">at_exit</code> functions, and finalizers are bypassed.
+
+		</dd>
+
+	<dt id="Kernel.fail">fail</dt>
+		<dd class="callseq">fail</dd>
+		<dd class="callseq">fail( <i class="obj">aString</i> )</dd>
+		<dd class="callseq">fail( <i class="obj">anException</i> [, <i class="obj">aString</i> [<i class="obj">anArray</i>]] )</dd>
+		<dd class="desc">Synonym for <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.raise"><span class="module">Kernel</span>::<span class="method">raise</span></a></code>.
+
+		</dd>
+
+	<dt id="Kernel.fork">fork</dt>
+		<dd class="callseq">fork [{ block } ] &rarr;<i class="obj">aFixnum</i> or <code>nil</code></dd>
+		<dd class="desc">Creates a subshell. If a block is specified, that block is run in the subshell, and the subshell terminates with a status of zero. Otherwise, the <code class="method">fork</code> call returns twice, once in the parent, returning the  process id of the child, and once in the child, returning <code>nil</code>. The child process can exit using <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.exit_oh"><span class="module">Kernel</span>::<span class="method">exit!</span></a></code> to avoid running any <code class="method">at_exit</code> functions. The parent process should use <code class="module_module_method"><a href="ref_m_process.html#Process.wait"><span class="module">Process</span>::<span class="method">wait</span></a></code> to collect the termination statuses of its children; otherwise, the operating system may accumulate zombie processes.
+
+<div><code class="block">fork do
+  3.times {|i| puts "Child: #{i}" }
+end
+3.times {|i| puts "Parent: #{i}" }
+Process.wait</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Parent: 0
+Child: 0
+Parent: 1
+Child: 1
+Parent: 2
+Child: 2</code></div>
+
+		</dd>
+
+	<dt id="Kernel.format">format</dt>
+		<dd class="callseq">format( <i class="obj">aString</i> <i>[</i>, <i class="obj">anObject</i><i>]*</i> )  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Synonym for <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.sprintf"><span class="module">Kernel</span>::<span class="method">sprintf</span></a></code>.
+
+		</dd>
+
+	<dt id="Kernel.gets">gets</dt>
+		<dd class="callseq">gets( <i class="obj">aString</i>=<var>$/</var> )  &rarr; <i class="obj">aString</i> or <code>nil</code></dd>
+		<dd class="desc">Returns (and assigns to <var>$_</var>) the next line from the list of files in <var>ARGV</var> (or <var>$*</var>), or from standard input if no files are present on the command line. Returns <code>nil</code> at end of file. The optional argument specifies the record separator. The separator is included with the contents of each record. A separator of <code>nil</code> reads the entire contents, and a zero-length separator reads the input one paragraph at a time, where paragraphs are divided by two consecutive newlines. If multiple filenames are present in <var>ARGV</var>, <code class="method">gets(nil)</code> will read the contents one file at a time.
+
+<div><code class="block">ARGV &lt;&lt; "testfile"
+print while gets</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">This is line one
+This is line two
+This is line three
+And so on...</code></div>
+
+		</dd>
+
+	<dt id="Kernel.global_variables">global_variables</dt>
+		<dd class="callseq">global_variables  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns an array of the names of global variables.
+
+<div><code class="block">global_variables.grep /std/ <span class="output"><span class="outputmark">&rarr;</span> ["$stdin", "$stderr", "$stdout"]</span></code></div>
+
+		</dd>
+
+	<dt id="Kernel.gsub">gsub</dt>
+		<dd class="callseq">gsub( <i class="obj">pattern</i>, <i class="obj">replacement</i> )  &rarr; <i class="obj">aString</i></dd>
+		<dd class="callseq">gsub( <i class="obj">pattern</i> ) {|  | block } &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Equivalent to <code>$_.gsub...</code>, except that <var>$_</var> receives the modified result.
+
+<div><code class="block">$_ = "quick brown fox"
+gsub /[aeiou]/, '*' <span class="output"><span class="outputmark">&rarr;</span> "q**ck br*wn f*x"</span>
+$_ <span class="output"><span class="outputmark">&rarr;</span> "q**ck br*wn f*x"</span></code></div>
+
+		</dd>
+
+	<dt id="Kernel.gsub_oh">gsub!</dt>
+		<dd class="callseq">gsub!( <i class="obj">pattern</i>, <i class="obj">replacement</i> )  &rarr; <i class="obj">aString</i> or <code>nil</code></dd>
+		<dd class="callseq">gsub!( <i class="obj">pattern</i> ) {|  | block } &rarr; <i class="obj">aString</i> or <code>nil</code></dd>
+		<dd class="desc">Equivalent to <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.gsub"><span class="module">Kernel</span>::<span class="method">gsub</span></a></code>, except <code>nil</code> is returned if <var>$_</var> is not modified.
+
+<div><code class="block">$_ = "quick brown fox"
+gsub! /cat/, '*' <span class="output"><span class="outputmark">&rarr;</span> nil</span>
+$_ <span class="output"><span class="outputmark">&rarr;</span> "quick brown fox"</span></code></div>
+
+		</dd>
+
+	<dt id="Kernel.iterator_qm">iterator?</dt>
+		<dd class="callseq">iterator?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Synonym for <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.block_given_qm"><span class="module">Kernel</span>::<span class="method">block_given?</span></a></code>. The <code class="method">iterator?</code> method will be removed in Ruby 1.8.
+
+		</dd>
+
+	<dt id="Kernel.lambda">lambda</dt>
+		<dd class="callseq">lambda {|  | block }  &rarr; <i class="obj">aProc</i></dd>
+		<dd class="desc">Synonym for <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.proc"><span class="module">Kernel</span>::<span class="method">proc</span></a></code>.
+
+		</dd>
+
+	<dt id="Kernel.load">load</dt>
+		<dd class="callseq">load( <i class="obj">aFileName</i>, <i class="obj">wrap</i>=<code class="const">false</code> )  &rarr; <code class="const">true</code></dd>
+		<dd class="desc">Loads and executes the Ruby program in the file <i class="obj">aFileName</i>. If the filename does not resolve to an absolute path, the file is searched for in the library directories listed in <var>$:</var>. If the optional <i class="obj">wrap</i> parameter is <code class="const">true</code>, the loaded script will be executed under an anonymous module, protecting the calling program's global namespace. Any local variables in the loaded file will not be propagated to the loading environment. </dd>
+
+	<dt id="Kernel.local_variables">local_variables</dt>
+		<dd class="callseq">local_variables  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns the names of the current local variables.
+
+<div><code class="block">fred = 1
+for i in 1..10
+   # ...
+end
+local_variables <span class="output"><span class="outputmark">&rarr;</span> ["fred", "i"]</span></code></div>
+
+		</dd>
+
+	<dt id="Kernel.loop">loop</dt>
+		<dd class="callseq">loop {|  | block }</dd>
+		<dd class="desc">Repeatedly executes the block.
+
+<div><code class="block">loop {
+  print "Input: "
+  break if !gets or $_ =~ /^qQ/
+  # ...
+}</code></div>
+
+		</dd>
+
+	<dt id="Kernel.open">open</dt>
+		<dd class="callseq">open( <i class="obj">aString</i> [, <i class="obj">aMode</i> [<i class="obj">perm</i>]] ) &rarr; <i class="obj">anIO</i> or <code>nil</code></dd>
+		<dd class="callseq">open( <i class="obj">aString</i> [, <i class="obj">aMode</i> [<i class="obj">perm</i>]] ) {| anIO | block } &rarr; <code>nil</code></dd>
+		<dd class="desc"><p>Creates an <code class="class">IO</code> object connected to the given stream, file, or subprocess.</p>
+		<p>If <i class="obj">aString</i> does not start with a pipe character (&ldquo;<code>|</code>&rdquo;), treat it as the name of a file to open using the specified mode defaulting to &ldquo;<code>r</code>&rdquo; (see the <a href="ref_c_io.html#table_22.5">table of valid modes</a>). If a file is being created, its initial permissions may be set using the integer third parameter.</p>
+		<p>If a block is specified, it will be invoked with the <code class="class">File</code> object as a parameter, and the file will be automatically closed when the block terminates. The call always returns <code>nil</code> in this case.</p>
+		<p>If <i class="obj">aString</i> starts with a pipe character, a subprocess is created, connected to the caller by a pair of pipes. The returned <code class="class">IO</code> object may be used to write to the standard input and read from the standard output of this subprocess. If the command following the &ldquo;<code>|</code>&rdquo; is a single minus sign, Ruby forks, and this subprocess is connected to the parent. In the subprocess, the <code class="method">open</code> call returns <code>nil</code>. If the command is not &ldquo;<code>-</code>&rdquo;, the subprocess runs the command. If a block is associated with an <code>open("|-")</code> call, that block will be run twice&mdash;once in the parent and once in the child. The block parameter will be an <code class="class">IO</code> object in the parent and <code>nil</code> in the child. The parent's <code class="class">IO</code> object will be connected to the child's <code>$stdin</code> and <code>$stdout</code>. The subprocess will be terminated at the end of the block.</p>
+
+<div><code class="block">open("testfile") do |f|
+  print f.gets
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">This is line one</code></div>
+
+         Open a subprocess and read its output:
+
+<div><code class="block">cmd = open("|date")
+print cmd.gets
+cmd.close</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Sun Jun  9 00:19:39 CDT 2002</code></div>
+
+         Open a subprocess running the same Ruby program:
+
+<div><code class="block">f = open("|-", "w+")
+if f == nil
+  puts "in Child"
+  exit
+else
+  puts "Got: #{f.gets}"
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Got: in Child</code></div>
+
+         Open a subprocess using a block to receive the I/O object:
+
+<div><code class="block">open("|-") do |f|
+  if f == nil
+    puts "in Child"
+  else
+    puts "Got: #{f.gets}"
+  end
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Got: in Child</code></div>
+
+		</dd>
+
+	<dt id="Kernel.p">p</dt>
+		<dd class="callseq">p( <i>[</i><i class="obj">anObject</i><i>]+</i> )  &rarr; <code>nil</code></dd>
+		<dd class="desc">For each object, directly writes <code><i class="obj">anObject</i>.inspect</code> followed by the current output record separator to the program's standard output. <code class="method">p</code> bypasses the Ruby I/O libraries.
+
+<div><code class="block">p self</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">main</code></div>
+
+		</dd>
+
+	<dt id="Kernel.print">print</dt>
+		<dd class="callseq">print( <i>[</i><i class="obj">anObject</i><i>]*</i> )  &rarr; <code>nil</code></dd>
+		<dd class="desc">Prints each object in turn to <var>$defout</var>. If the output field separator (<var>$,</var>) is not <code>nil</code>, its contents will appear between each field. If the output record separator (<var>$\</var>) is not <code>nil</code>, it will be appended to the output. If no arguments are given, prints <var>$_</var>. Objects that aren't strings will be converted by calling their <code class="method">to_s</code> method.
+
+<div><code class="block">print "cat", [1,2,3], 99, "\n"
+$, = ", "
+$\ = "\n"
+print "cat", [1,2,3], 99</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">cat12399
+cat, 1, 2, 3, 99</code></div>
+
+		</dd>
+
+	<dt id="Kernel.printf">printf</dt>
+		<dd class="callseq">printf( <i class="obj">anIO</i>, <i class="obj">aString</i> <i>[</i>, <i class="obj">anObject</i><i>]*</i> )  &rarr; <code>nil</code></dd>
+		<dd class="callseq">printf( <i class="obj">aString</i> <i>[</i>, <i class="obj">anObject</i><i>]*</i> ) &rarr; <code>nil</code></dd>
+		<dd class="desc">Equivalent to:
+
+<i class="obj">anIO.</i><code>write sprintf(</code><i class="obj">aString, anObject</i><code> ...)</code><br><em>or</em><br><code>$defout.write sprintf(</code><i class="obj">aString, anObject</i><code> ...)</code>
+
+		</dd>
+
+	<dt id="Kernel.proc">proc</dt>
+		<dd class="callseq">proc { block }  &rarr; <i class="obj">aProc</i></dd>
+		<dd class="desc">Creates a new procedure object from the given block. Equivalent to <code class="class_class_method"><a href="ref_c_proc.html#Proc.new"><span class="class">Proc</span>.<span class="method">new</span></a></code>.
+
+<div><code class="block">aProc = proc { "hello" }
+aProc.call <span class="output"><span class="outputmark">&rarr;</span> "hello"</span></code></div>
+
+		</dd>
+
+	<dt id="Kernel.putc">putc</dt>
+		<dd class="callseq">putc( <i class="obj">anInteger</i> )  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Equivalent to <code>$defout.putc(</code><i class="obj">anInteger</i><code>)</code>.
+
+		</dd>
+
+	<dt id="Kernel.puts">puts</dt>
+		<dd class="callseq">puts( <i>[</i><i class="obj">args</i><i>]*</i> )  &rarr; <code>nil</code></dd>
+		<dd class="desc">Equivalent to <code>$defout.puts(</code><i class="obj">args</i><code>)</code>.
+
+		</dd>
+
+	<dt id="Kernel.raise">raise</dt>
+		<dd class="callseq">raise</dd>
+		<dd class="callseq">raise( <i class="obj">aString</i> )</dd>
+		<dd class="callseq">raise( <i class="obj">anException</i> [, <i class="obj">aString</i> [<i class="obj">anArray</i>]] )</dd>
+		<dd class="desc">With no arguments, raises the exception in <var>$!</var> or raises a <code class="exception">RuntimeError</code> if <var>$!</var> is <code>nil</code>. With a single <code class="class">String</code> argument, raises a <code class="exception">RuntimeError</code> with the string as a message. Otherwise, the first parameter should be the name of an <code class="exception">Exception</code> class (or an object that returns an <code class="exception">Exception</code> when sent <code class="method">exception</code>). The optional second parameter sets the message associated with the exception, and the third parameter is an array of callback information. Exceptions are caught by the <code>rescue</code> clause of <code>begin...end</code> blocks.
+
+<div><code class="block">raise "Failed to create socket"
+raise ArgumentError, "No parameters", caller</code></div>
+
+		</dd>
+
+	<dt id="Kernel.rand">rand</dt>
+		<dd class="callseq">rand( <i class="obj">max</i>=0 )  &rarr; <i class="obj">aNumber</i></dd>
+		<dd class="desc">Converts <i class="obj">max</i> to an integer using max<sub>1</sub> = max<code>.to_i.abs</code>. If the result is zero, returns a pseudorandom floating point number greater than or equal to 0.0 and less than 1.0. Otherwise, returns a pseudorandom integer greater than or equal to zero and less than max<sub>1</sub>. <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.srand"><span class="module">Kernel</span>::<span class="method">srand</span></a></code> may be used to ensure repeatable sequences of random numbers between different runs of the program.
+
+<div><code class="block">srand 1234 <span class="output"><span class="outputmark">&rarr;</span> 0</span>
+[ rand,  rand ] <span class="output"><span class="outputmark">&rarr;</span> [0.7408769294, 0.2145348572]</span>
+[ rand(10), rand(1000) ] <span class="output"><span class="outputmark">&rarr;</span> [3, 323]</span>
+srand 1234 <span class="output"><span class="outputmark">&rarr;</span> 1234</span>
+[ rand,  rand ] <span class="output"><span class="outputmark">&rarr;</span> [0.7408769294, 0.2145348572]</span></code></div>
+
+		</dd>
+
+	<dt id="Kernel.readline">readline</dt>
+		<dd class="callseq">readline( [<i class="obj">aString</i>=<var>$/</var>] )  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Equivalent to <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.gets"><span class="module">Kernel</span>::<span class="method">gets</span></a></code>, except <code class="method">readline</code> raises
+      <code class="exception">EOFError</code> at end of file.
+
+		</dd>
+
+	<dt id="Kernel.readlines">readlines</dt>
+		<dd class="callseq">readlines( [<i class="obj">aString</i>=<var>$/</var>] )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns an array containing the lines returned by
+      calling <code>Kernel.gets(<i class="obj">aString</i>)</code> until the end of file.
+
+		</dd>
+
+	<dt id="Kernel.require">require</dt>
+		<dd class="callseq">require( <i class="obj">aString</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Ruby tries to load the library named <i class="obj">aString</i>, returning <code class="const">true</code> if successful. If the filename does not resolve to an absolute path, it will be searched for in the directories listed in <var>$:</var>. If the file has the extension &ldquo;.rb&rdquo;, it is loaded as a source file; if the extension is &ldquo;.so&rdquo;, &ldquo;.o&rdquo;, or &ldquo;.dll&rdquo;, <span class="footnote">(Or whatever the default shared library extension is on the current platform.)</span> Ruby loads the shared library as a Ruby extension. Otherwise, Ruby tries adding &ldquo;.rb&rdquo;, &ldquo;.so&rdquo;, and so on to the name. The name of the loaded feature is added to the array in <var>$"</var>. A feature will not be loaded if it already appears in <var>$"</var>. <code class="method">require</code> returns <code class="const">true</code> if the feature was successfully loaded.
+
+<div><code class="block">require "my-library.rb"
+require "db-driver"</code></div>
+
+		</dd>
+
+	<dt id="Kernel.scan">scan</dt>
+		<dd class="callseq">scan( <i class="obj">pattern</i> )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="callseq">scan( <i class="obj">pattern</i> ) {|  | block }  &rarr; $_</dd>
+		<dd class="desc">Equivalent to calling <code>$_.scan</code>. See <code class="class_instance_method"><a href="ref_c_string.html#String.scan"><span class="class">String</span>#<span class="method">scan</span></a></code>.
+
+		</dd>
+
+	<dt id="Kernel.select">select</dt>
+		<dd class="callseq">select( <i class="obj">readArray</i> [, <i class="obj">writeArray</i> [<i class="obj">errorArray</i> [<i class="obj">timeout</i>]]] ) &rarr; <i class="obj">anArray</i> or <code>nil</code></dd>
+		<dd class="desc">Performs a low-level <code>select</code> call, which waits for data to become available from input/output devices. The first three parameters are arrays of <code class="class">IO</code> objects or <code>nil</code>. The last is a timeout in seconds, which should be an <code class="class">Integer</code> or a <code class="class">Float</code>.  The call waits for data to become available for any of the <code class="class">IO</code> objects in <i class="obj">readArray</i>, for buffers to have cleared sufficiently to enable writing to any of the devices in <i class="obj">writeArray</i>, or for an error to occur on the devices in <i class="obj">errorArray</i>. If one or more of these conditions are met, the call returns a three-element array containing arrays of the <code class="class">IO</code> objects that were ready.  Otherwise, if there is no change in status for <i class="obj">timeout</i> seconds, the call returns <code>nil</code>. If all parameters are <code>nil</code>, the current thread sleeps forever.
+
+<div><code class="block">select( [$stdin], nil, nil, 1.5 ) <span class="output"><span class="outputmark">&rarr;</span> [[#&lt;IO:0x401ba090&gt;], [], []]</span></code></div>
+
+		</dd>
+
+	<dt id="Kernel.set_trace_func">set_trace_func</dt>
+		<dd class="callseq">set_trace_func( <i class="obj">aProc</i> )  &rarr; <i class="obj">aProc</i></dd>
+		<dd class="callseq">set_trace_func( <code>nil</code> )  &rarr; <code>nil</code></dd>
+		<dd class="desc"><p>Establishes <i class="obj">aProc</i> as the handler for tracing, or disables tracing if the parameter is <code>nil</code>. <i class="obj">aProc</i> takes up to six parameters: an event name, a filename, a line number, an object id, a binding, and the name of a class. <i class="obj">aProc</i> is invoked whenever an event occurs. Events are: <code>c-call</code> (call a C-language routine), <code>c-return</code> (return from a C-language routine), <code>call</code> (call a Ruby method), <code>class</code> (start a class or module definition), <code>end</code> (finish a class or module definition), <code>line</code> (execute code on a new line), <code>raise</code> (raise an exception), and <code>return</code> (return from a Ruby method). Tracing is disabled within the context of <i class="obj">aProc</i>.</p>
+			<p>See the example in &ldquo;<a href="ospace.html#tracingyourprogramsexecution">Tracing Your Program's Execution</a>&rdquo; for more information.</p>
+		</dd>
+
+	<dt id="Kernel.singleton_method_added">singleton_method_added</dt>
+		<dd class="callseq">singleton_method_added( <i class="obj">aFixnum</i> )  &rarr; <code>nil</code></dd>
+		<dd class="desc">Invoked with a symbol id whenever a singleton method is added to a module or a class. The default implementation in <code class="module">Kernel</code> ignores this, but subclasses may override the method to provide specialized functionality.
+
+<div><code class="block">class Test
+  def Test.singleton_method_added(id)
+    puts "Added #{id.id2name} to Test"
+  end
+  def a() end
+  def Test.b() end
+end
+def Test.c() end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Added singleton_method_added to Test
+Added b to Test
+Added c to Test</code></div>
+
+		</dd>
+
+	<dt id="Kernel.sleep">sleep</dt>
+		<dd class="callseq">sleep( [<i class="obj">aNumeric</i>] )  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Suspends the current thread for <i class="obj">aNumber</i> seconds (which may be a <code class="class">Float</code> with fractional seconds). Returns the actual number of seconds slept (rounded), which may be less than that asked for if the thread was interrupted by a <code>SIGALRM</code>, or if another thread calls <code class="class_instance_method"><a href="ref_c_thread.html#Thread.run"><span class="class">Thread</span>#<span class="method">run</span></a></code>. An argument of zero causes <code class="method">sleep</code> to sleep forever.
+
+<div><code class="block">Time.new <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:19:40 CDT 2002</span>
+sleep 1.2 <span class="output"><span class="outputmark">&rarr;</span> 1</span>
+Time.new <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:19:41 CDT 2002</span>
+sleep 1.9 <span class="output"><span class="outputmark">&rarr;</span> 2</span>
+Time.new <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:19:43 CDT 2002</span></code></div>
+
+		</dd>
+
+	<dt id="Kernel.split">split</dt>
+		<dd class="callseq">split( [<i class="obj">pattern</i> [<i class="obj">limit</i>]] )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Equivalent to
+      <code>$_.split(<i class="obj">pattern</i>, <i class="obj">limit</i>)</code>. See <code class="class_instance_method"><a href="ref_c_string.html#String.split"><span class="class">String</span>#<span class="method">split</span></a></code>.</dd>
+
+	<dt id="Kernel.sprintf">sprintf</dt>
+		<dd class="callseq">sprintf( <i class="obj">aFormatString</i>  <i>[</i>, <i class="obj">arguments</i><i>]*</i> )  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc"><p>Returns the string resulting from applying  <i class="obj">aFormatString</i> to any additional arguments. Within the format string, any characters other than format sequences are copied to the result. A format sequence consists of a percent sign, followed by optional flags, width, and precision indicators, then terminated with a field type character. The field type controls how the corresponding <code class="method">sprintf</code> argument is to be interpreted, while the flags modify that interpretation. The flag characters are shown in <a href="ref_m_kernel.html#table_23.1">Table 23.1</a>, and the field type characters are listed in <a href="ref_m_kernel.html#table_23.2">Table 23.2</a>.</p>
+		 <p>The field width is an optional integer, followed optionally by a period and a precision. The width specifies the minimum number of characters that will be written to the result for this field. For numeric fields, the precision controls the number of decimal places displayed. For string fields, the precision determines the maximum number of characters to be copied from the string. (Thus, the format sequence <code>%10.10s</code> will always contribute exactly ten characters to the result.)</p>
+
+			<table id="table_23.1">
+				<caption>Table 23.1 : <code class="method">sprintf</code> flag characters</caption>
+					<thead><tr>
+	<th>Flag</th>
+	<th>Applies to</th>
+<th>Meaning</th>
+					</tr></thead>
+				<tr class="firstRow">
+					<td><code>&#8255;</code> (space)</td>
+					<td>bdeEfgGioxXu</td>
+					<td>Leave a space at the start of positive numbers.</td>
+				</tr>
+				<tr>
+					<td><code>#</code></td>
+					<td>beEfgGoxX</td>
+					<td>Use an alternative format. For the conversions `o', `x', `X', and `b', prefix the result with
+					  &ldquo;0&rdquo;, &ldquo;0x&rdquo;, &ldquo;0X&rdquo;, and &ldquo;0b&rdquo;, respectively. For `e',
+					  `E', `f', `g', and 'G', force a decimal point to be added,
+					  even if no digits follow. For `g' and 'G', do not remove
+					  trailing zeros.</td>
+				</tr>
+				<tr>
+					<td><code>+</code></td>
+					<td>bdeEfgGioxXu</td>
+					<td>Add a leading plus sign to positive numbers.</td>
+				</tr>
+				<tr>
+					<td><code>-</code></td>
+					<td>all</td>
+					<td>Left-justify the result of this conversion.</td>
+				</tr>
+				<tr>
+					<td><code>0</code> (zero)</td>
+					<td>all</td>
+					<td>Pad with zeros, not spaces.</td>
+				</tr>
+				<tr>
+					<td><code>*</code></td>
+					<td>all</td>
+					<td>Use the next argument as the field width. If negative, left-justify the result. If the asterisk is
+					  followed by a number and a dollar sign, use
+					  the indicated argument as the width.</td>
+				</tr>
+			</table>
+
+      
+    <table id="table_23.2">
+        <caption>Table 23.2 : <code class="method">sprintf</code> field types</caption>
+	<thead><tr>
+	<th>Field</th>
+	<th>Conversion</th>
+</tr></thead>
+	<tr class="firstRow">
+		<td>b</td>
+		<td>Convert argument as a binary number.</td>
+	</tr>
+	<tr>
+		<td>c</td>
+		<td>Argument is the numeric code for a single character.</td>
+	</tr>
+	<tr>
+		<td>d</td>
+		<td>Convert argument as a decimal number.</td>
+	</tr>
+	<tr>
+		<td>E</td>
+		<td>Equivalent to `e', but uses an uppercase E to indicate the exponent.</td>
+	</tr>
+	<tr>
+		<td>e</td>
+		<td>Convert floating point argument into exponential notation  with one digit before the decimal point. The precision
+          determines the number of fractional digits (defaulting to six).</td>
+	</tr>
+	<tr>
+		<td>f</td>
+		<td>Convert floating point argument as <code>[&#8255;-]ddd.ddd</code>,  where the precision determines the number of digits after
+          the decimal point.</td>
+	</tr>
+	<tr>
+		<td>G</td>
+		<td>Equivalent to `g', but use an uppercase `E' in exponent  form.</td>
+	</tr>
+	<tr>
+		<td>g</td>
+		<td>Convert a floating point number using exponential form if the exponent is less than -4 or greater than or
+          equal to the precision, or in <code>d.dddd</code> form otherwise.</td>
+	</tr>
+	<tr>
+		<td>i</td>
+		<td>Identical to `d'.</td>
+	</tr>
+	<tr>
+		<td>o</td>
+		<td>Convert argument as an octal number.</td>
+	</tr>
+	<tr>
+		<td>s</td>
+		<td>Argument is a string to be substituted. If the format sequence contains a precision, at most that many characters
+          will be copied.</td>
+	</tr>
+	<tr>
+		<td>u</td>
+		<td>Treat argument as an unsigned decimal number.</td>
+	</tr>
+	<tr>
+		<td>X</td>
+		<td>Convert argument as a hexadecimal number using uppercase letters.</td>
+	</tr>
+	<tr>
+		<td>x</td>
+		<td>Convert argument as a hexadecimal number.</td>
+	</tr>
+</table>
+
+<div><code class="block">sprintf("%d %04x", 123, 123) <span class="output"><span class="outputmark">&rarr;</span> "123&#8255;007b"</span>
+sprintf("%08b '%4s'", 123, 123) <span class="output"><span class="outputmark">&rarr;</span> "01111011&#8255;'&#8255;123'"</span>
+sprintf("%*2$s %d", "hello", 10) <span class="output"><span class="outputmark">&rarr;</span> "&#8255;&#8255;&#8255;&#8255;&#8255;hello&#8255;10"</span>
+sprintf("%*2$s %d", "hello", -10) <span class="output"><span class="outputmark">&rarr;</span> "hello&#8255;&#8255;&#8255;&#8255;&#8255;&#8255;-10"</span>
+sprintf("%+g:% g:%-g", 1.23, 1.23, 1.23) <span class="output"><span class="outputmark">&rarr;</span> "+1.23:&#8255;1.23:1.23"</span></code></div>
+
+		</dd>
+
+	<dt id="Kernel.srand">srand</dt>
+		<dd class="callseq">srand( [<i class="obj">aNumber</i>] )  &rarr; <i class="obj">oldSeed</i></dd>
+		<dd class="desc">Seeds the pseudorandom number generator to the value of <i class="obj">aNumber</i>.<code class="method">to_i.abs</code>. If <i class="obj">aNumber</i> is omitted or zero, seeds the generator using a combination of the time, the process id, and a sequence number. (This is also the behavior if <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.rand"><span class="module">Kernel</span>::<span class="method">rand</span></a></code> is called without previously calling <code class="method">srand</code>, but without the sequence.) By setting the seed to a known value, scripts can be made deterministic during testing. The previous seed value is returned. Also see <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.rand"><span class="module">Kernel</span>::<span class="method">rand</span></a></code>.</dd>
+
+	<dt id="Kernel.sub">sub</dt>
+		<dd class="callseq">sub( <i class="obj">pattern</i>, <i class="obj">replacement</i> )  &rarr; $_</dd>
+		<dd class="callseq">sub( <i class="obj">pattern</i> ) { <i class="obj">block</i> } &rarr; $_</dd>
+		<dd class="desc">Equivalent to <code>$_.sub(<i class="obj">args</i>)</code>, except that <var>$_</var>
+      will be updated if substitution occurs.
+
+		</dd>
+
+	<dt id="Kernel.sub_oh">sub!</dt>
+		<dd class="callseq">sub!( <i class="obj">pattern</i>, <i class="obj">replacement</i> )  &rarr; $_ or <code>nil</code></dd>
+		<dd class="callseq">sub!( <i class="obj">pattern</i> ) { <i class="obj">block</i> } &rarr; $_ or <code>nil</code></dd>
+		<dd class="desc">Equivalent to <code>$_.sub!(<i class="obj">args</i>)</code>.
+
+		</dd>
+
+	<dt id="Kernel.syscall">syscall</dt>
+		<dd class="callseq">syscall( <i class="obj">aFixnum</i> <i>[</i>, <i class="obj">args</i><i>]*</i> ) &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Calls the operating system function identified by <i class="obj">aFixnum</i>,
+      passing in the arguments, which must be either <code class="class">String</code> objects, or
+      <code class="class">Integer</code> objects that ultimately fit within a native <code>long</code>.
+      Up to nine parameters may be passed (14 on the
+      Atari-ST). The function identified
+      by <i class="obj">Fixnum</i> is system dependent. On some Unix systems, the
+      numbers may be obtained from a header file called
+      <code>syscall.h</code>.
+
+<div><code class="block">syscall 4, 1, "hello\n", 6   # '4' is write(2) on our box</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">hello</code></div>
+
+		</dd>
+
+	<dt id="Kernel.system">system</dt>
+		<dd class="callseq">system( <i class="obj">aCmd</i> <i>[</i>, <i class="obj">args</i><i>]*</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Executes <i class="obj">aCmd</i> in a subshell, returning <code class="const">true</code> if the command was found and ran successfully, <code class="const">false</code> otherwise. A detailed error code is available in <var>$?</var>. The arguments are processed in the same way as for <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.exec"><span class="module">Kernel</span>::<span class="method">exec</span></a></code>.
+
+<div><code class="block">system("echo *")
+system("echo", "*")</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">config.h main.rb
+*</code></div>
+
+		</dd>
+
+	<dt id="Kernel.test">test</dt>
+		<dd class="callseq">test(<i class="obj">aCmd</i>, <i class="obj">file1</i> <i>[</i>, <i class="obj">file2</i><i>]</i> )  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc"><p>Uses the integer <i class="obj">aCmd</i> to perform various tests on <i class="obj">file1</i> (<a href="ref_m_kernel.html#table_23.3">Table 23.3</a>) or on <i class="obj">file1</i> and <i class="obj">file2</i> (<a href="ref_m_kernel.html#table_23.4">Table 23.4</a>).</p>
+      
+			<table id="table_23.3">
+				<caption>Table 23.3 : File tests with a single argument</caption>
+				<thead><tr>
+	<th>Integer</th>
+	<th>Description</th>
+<th>Returns</th>
+				</tr></thead>
+				<tr class="firstRow">
+					<td>?A</td>
+					<td>Last access time for <i class="obj">file1</i></td>
+					<td>Time</td>
+				</tr>
+				<tr>
+					<td>?b</td>
+					<td>True if <i class="obj">file1</i> is a block device</td>
+					<td style="white-space:nowrap"><code class="const">true</code> or <code class="const">false</code></td>
+				</tr>
+				<tr>
+					<td>?c</td>
+					<td>True if <i class="obj">file1</i> is a character device</td>
+					<td><code class="const">true</code> or <code class="const">false</code></td>
+				</tr>
+				<tr>
+					<td>?C</td>
+					<td>Last change time for <i class="obj">file1</i></td>
+					<td>Time</td>
+				</tr>
+				<tr>
+					<td>?d</td>
+					<td>True if <i class="obj">file1</i> exists and is a directory</td>
+					<td><code class="const">true</code> or <code class="const">false</code></td>
+				</tr>
+				<tr>
+					<td>?e</td>
+					<td>True if <i class="obj">file1</i> exists</td>
+					<td><code class="const">true</code> or <code class="const">false</code></td>
+				</tr>
+				<tr>
+					<td>?f</td>
+					<td>True if <i class="obj">file1</i> exists and is a regular file</td>
+					<td><code class="const">true</code> or <code class="const">false</code></td>
+				</tr>
+				<tr>
+					<td>?g</td>
+					<td>True if <i class="obj">file1</i> has the <code>setgid</code> bit set (false under NT)</td>
+					<td><code class="const">true</code> or <code class="const">false</code></td>
+				</tr>
+				<tr>
+					<td>?G</td>
+					<td>True if <i class="obj">file1</i> exists and has a group ownership equal to the caller's group</td>
+					<td><code class="const">true</code> or <code class="const">false</code></td>
+				</tr>
+				<tr>
+					<td>?k</td>
+					<td>True if <i class="obj">file1</i> exists and has the sticky bit set</td>
+					<td><code class="const">true</code> or <code class="const">false</code></td>
+				</tr>
+				<tr>
+					<td>?l</td>
+					<td>True if <i class="obj">file1</i> exists and is a symbolic link</td>
+					<td><code class="const">true</code> or <code class="const">false</code></td>
+				</tr>
+				<tr>
+					<td>?M</td>
+					<td>Last modification time for <i class="obj">file1</i></td>
+					<td>Time</td>
+				</tr>
+				<tr>
+					<td>?o</td>
+					<td>True if <i class="obj">file1</i> exists and is owned by the caller's effective uid</td>
+					<td><code class="const">true</code> or <code class="const">false</code></td>
+				</tr>
+				<tr>
+					<td>?O</td>
+					<td>True if <i class="obj">file1</i> exists and is owned by the caller's real uid</td>
+					<td><code class="const">true</code> or <code class="const">false</code></td>
+				</tr>
+				<tr>
+					<td>?p</td>
+					<td>True if <i class="obj">file1</i> exists and is a fifo</td>
+					<td><code class="const">true</code> or <code class="const">false</code></td>
+				</tr>
+				<tr>
+					<td>?r</td>
+					<td>True if file is readable by the effective uid/gid of the caller</td>
+					<td><code class="const">true</code> or <code class="const">false</code></td>
+				</tr>
+				<tr>
+					<td>?R</td>
+					<td>True if file is readable by the real uid/gid of the caller</td>
+					<td><code class="const">true</code> or <code class="const">false</code></td>
+				</tr>
+				<tr>
+					<td>?s</td>
+					<td>If <i class="obj">file1</i> has nonzero size, return the size, otherwise return <code>nil</code></td>
+					<td>Integer or <code>nil</code></td>
+				</tr>
+				<tr>
+					<td>?S</td>
+					<td>True if <i class="obj">file1</i> exists and is a socket</td>
+					<td><code class="const">true</code> or <code class="const">false</code></td>
+				</tr>
+				<tr>
+					<td>?u</td>
+					<td>True if <i class="obj">file1</i> has the setuid bit set</td>
+					<td><code class="const">true</code> or <code class="const">false</code></td>
+				</tr>
+				<tr>
+					<td>?w</td>
+					<td>True if <i class="obj">file1</i> exists and is writable by the effective uid/gid</td>
+					<td><code class="const">true</code> or <code class="const">false</code></td>
+				</tr>
+				<tr>
+					<td>?W</td>
+					<td>True if <i class="obj">file1</i> exists and is writable by the real uid/gid</td>
+					<td><code class="const">true</code> or <code class="const">false</code></td>
+				</tr>
+				<tr>
+					<td>?x</td>
+					<td>True if <i class="obj">file1</i> exists and is executable by the effective uid/gid</td>
+					<td><code class="const">true</code> or <code class="const">false</code></td>
+				</tr>
+				<tr>
+					<td>?X</td>
+					<td>True if <i class="obj">file1</i> exists and is executable by the real uid/gid</td>
+					<td><code class="const">true</code> or <code class="const">false</code></td>
+				</tr>
+				<tr>
+					<td>?z</td>
+					<td>True if <i class="obj">file1</i> exists and has a zero length</td>
+					<td><code class="const">true</code> or <code class="const">false</code></td>
+				</tr>
+			</table>
+
+			<table id="table_23.4">
+				<caption>Table 23.4 : File tests with two arguments</caption>
+				<thead><tr>
+	<th>Integer</th>
+	<th>Description</th>
+</tr></thead>
+				<tr class="firstRow">
+					<td>?-</td>
+					<td>True if <i class="obj">file1</i> is a hard link to <i class="obj">file2</i></td>
+				</tr>
+				<tr>
+					<td>?=</td>
+					<td>True if the modification times of <i class="obj">file1</i> and <i class="obj">file2</i> are equal</td>
+				</tr>
+				<tr>
+					<td>?&lt;</td>
+					<td>True if the modification time of <i class="obj">file1</i> is prior to that of <i class="obj">file2</i></td>
+				</tr>
+				<tr>
+					<td>?&gt;</td>
+					<td>True if the modification time of <i class="obj">file1</i> is after that of <i class="obj">file2</i></td>
+				</tr>
+			</table>
+
+		</dd>
+
+	<dt id="Kernel.throw">throw</dt>
+		<dd class="callseq">throw( <i class="obj">aSymbol</i> [, <i class="obj">anObject</i>] )</dd>
+		<dd class="desc">Transfers control to the end of the active <code class="method">catch</code> block waiting for <i class="obj">aSymbol</i>. Raises <code class="exception">NameError</code> if there is no <code class="method">catch</code> block for the symbol. The optional second parameter supplies a return value for the <code class="method">catch</code> block, which otherwise defaults to <code>nil</code>. For examples, see <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.catch"><span class="module">Kernel</span>::<span class="method">catch</span></a></code>.</dd>
+
+	<dt id="Kernel.trace_var">trace_var</dt>
+		<dd class="callseq">trace_var( <i class="obj">aSymbol</i>, <i class="obj">aCmd</i> )  &rarr; <code>nil</code></dd>
+		<dd class="callseq">trace_var( <i class="obj">aSymbol</i> ) {| val | block }  &rarr; <code>nil</code></dd>
+		<dd class="desc">Controls tracing of assignments to global variables. The parameter <i class="obj">aSymbol</i> identifies the variable (as either a string name or a symbol identifier). <i class="obj">cmd</i> (which may be a string or a <code class="class">Proc</code> object) or block is executed whenever the variable is assigned. The block or <code class="class">Proc</code> object receives the variable's new value as a parameter. Also see <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.untrace_var"><span class="module">Kernel</span>::<span class="method">untrace_var</span></a></code>.
+
+<div><code class="block">trace_var :$_, proc {|v| puts "$_ is now '#{v}'" }
+$_ = "hello"
+$_ = ' there'</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">$_ is now 'hello'
+$_ is now ' there'</code></div>
+
+		</dd>
+
+	<dt id="Kernel.trap">trap</dt>
+		<dd class="callseq">trap( <i class="obj">signal</i>, <i class="obj">cmd</i> )  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="callseq">trap( <i class="obj">signal</i> ) {|  | block }  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc"><p>Specifies the handling of signals. The first parameter is a signal name (a string such as &ldquo;SIGALRM&rdquo;, &ldquo;SIGUSR1&rdquo;, and so on) or a signal number. The characters &ldquo;SIG&rdquo; may be omitted from the signal name. The command or block specifies code to be run when the signal is raised. If the command is the string &ldquo;IGNORE&rdquo; or &ldquo;SIG_IGN&rdquo;, the signal will be ignored. If the command is &ldquo;DEFAULT&rdquo; or &ldquo;SIG_DFL&rdquo;, the operating system's default handler will be invoked. If the command is &ldquo;EXIT&rdquo;, the script will be terminated by the signal. Otherwise, the given command or block will be run.</p>
+		<p>The special signal name &ldquo;EXIT&rdquo; or signal number zero will be invoked just prior to program termination.</p>
+		<p><code class="method">trap</code> returns the previous handler for the given signal.</p>
+
+<div><code class="block">trap 0, proc { puts "Terminating: #{$$}" }
+trap("CLD") { puts "Child died" }
+fork &amp;&amp; Process.wait</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Terminating: 1425
+Child died
+Terminating: 1424</code></div>
+
+		</dd>
+
+	<dt id="Kernel.untrace_var">untrace_var</dt>
+		<dd class="callseq">untrace_var( <i class="obj">aSymbol</i> [, <i class="obj">aCmd</i>] )  &rarr; <i class="obj">anArray</i> or <code>nil</code></dd>
+		<dd class="desc">Removes tracing for the specified command on the given global variable and returns <code>nil</code>. If no command is specified, removes all tracing for that variable and returns an array containing the commands actually removed.</dd>
+</dl>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_m_kernel.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

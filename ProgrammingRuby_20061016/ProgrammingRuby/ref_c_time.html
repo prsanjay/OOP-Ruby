@@ -1,0 +1,521 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Time</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_c_time',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="class" id="Time">class <strong>Time</strong> &lt; Object</h1>
+
+<p><code class="class">Time</code> is an abstraction of dates and times.  Time is stored   internally as the number of seconds and microseconds since the <em>epoch</em>, January 1, 1970 00:00 UTC. Also see the library modules <code class="module">Date</code> and <code class="module">ParseDate</code>, documented beginning on pages 439 and 453, respectively.</p>
+
+<p>The <code class="class">Time</code> class treats GMT (Greenwich Mean Time) and UTC (Coordinated Universal Time) <span class="footnote">(Yes, UTC really does stand for Coordinated Universal Time. There was a committee involved.)</span> as equivalent. GMT is the older way of referring to these baseline times but persists in the names of calls on Posix systems.</p>
+
+<p>All times are stored with some number of microseconds. Be aware of this fact when comparing times with each other&mdash;times that are apparently equal when displayed may be different when compared.</p>
+
+<h2>mixins</h2>
+<dl>
+	<dt><code class="module"><a href="ref_m_comparable.html#Comparable">Comparable</a></code></dt>
+	<dd><code class="module_instance_method"><a href="ref_m_comparable.html#Comparable._lt">&lt;</a></code>, <code class="module_instance_method"><a href="ref_m_comparable.html#Comparable._lt_eq">&lt;=</a></code>, <code class="module_instance_method"><a href="ref_m_comparable.html#Comparable.eqeq">==</a></code>, <code class="module_instance_method"><a href="ref_m_comparable.html#Comparable._gt_eq">&gt;=</a></code>, <code class="module_instance_method"><a href="ref_m_comparable.html#Comparable._gt">&gt;</a></code>, <code class="module_instance_method"><a href="ref_m_comparable.html#Comparable.between">between?</a></code></dd>
+</dl>
+
+
+<h2 class="refsubsection" id="classmethods">class methods</h2>
+<dl class="methodlist">
+	<dt id="Time.at">at</dt>
+		<dd class="callseq">Time.at( <i class="obj">aTime</i> )  &rarr; <i class="obj">aTime</i> </dd>
+		<dd class="callseq">Time.at( <i class="obj">seconds</i> [, <i class="obj">microseconds</i>] )   &rarr; <i class="obj">aTime</i></dd>
+		<dd class="desc">Creates a new time object with the value given by <i class="obj">aTime</i>, or the given number of <i class="obj">seconds</i> (and optional <i class="obj">microseconds</i>) from epoch.
+
+<div><code class="block">Time.at(0) <span class="output"><span class="outputmark">&rarr;</span> Wed Dec 31 18:00:00 CST 1969</span>
+Time.at(946702800) <span class="output"><span class="outputmark">&rarr;</span> Fri Dec 31 23:00:00 CST 1999</span></code></div>
+
+		</dd>
+
+	<dt id="Time.gm">gm</dt>
+		<dd class="callseq">Time.gm( <i class="obj">year [, month, day, hour, min, sec, usec]</i> )  &rarr; <i class="obj">aTime</i> </dd>
+		<dd class="callseq">Time.gm( <i class="obj">sec, min, hour, day, month, year, wday, yday, isdst, tz</i> ) &rarr; <i class="obj">aTime</i></dd>
+		<dd class="desc">Creates a time based on given values, interpreted as UTC (GMT).  The year must be specified. Other values default to the minimum value for that field (and may be <code>nil</code> or omitted).  Months may be specified by numbers from 1 to 12, or by the three-letter English month names. Hours are specified on a 24-hour clock (0..23). Raises an <code class="exception">ArgumentError</code> if any values are out of range.  Will also accept ten arguments in the order output by <code class="class_instance_method"><a href="ref_c_time.html#Time.to_a"><span class="class">Time</span>#<span class="method">to_a</span></a></code>.
+
+<div><code class="block">Time.gm(2000,"jan",1,20,15,1) <span class="output"><span class="outputmark">&rarr;</span> Sat Jan 01 20:15:01 UTC 2000</span></code></div>
+
+		</dd>
+
+	<dt id="Time.local">local</dt>
+		<dd class="callseq">Time.local( <i class="obj">year [, month, day, hour, min, sec, usec]</i> )  &rarr; <i class="obj">aTime</i> </dd>
+		<dd class="callseq">Time.local( <i class="obj">sec, min, hour, day, month, year, wday, yday, isdst, tz</i> ) &rarr; <i class="obj">aTime</i></dd>
+		<dd class="desc">Same as <code class="class_class_method"><a href="ref_c_time.html#Time.gm"><span class="class">Time</span>.<span class="method">gm</span></a></code>, but interprets the values in the local time zone.
+
+<div><code class="block">Time.local(2000,"jan",1,20,15,1) <span class="output"><span class="outputmark">&rarr;</span> Sat Jan 01 20:15:01 CST 2000</span></code></div>
+
+		</dd>
+
+	<dt id="Time.mktime">mktime</dt>
+		<dd class="callseq">Time.mktime( <i class="obj">year, month, day, hour, min, sec, usec</i> ) &rarr; <i class="obj">aTime</i></dd>
+		<dd class="desc">Synonym for <code class="class_class_method"><a href="ref_c_time.html#Time.local"><span class="class">Time</span>.<span class="method">local</span></a></code>.
+
+		</dd>
+
+	<dt id="Time.new">new</dt>
+		<dd class="callseq">Time.new  &rarr; <i class="obj">aTime</i></dd>
+		<dd class="desc">Returns a <code class="class">Time</code> object initialized to the current system time. <b>Note:</b> The object created will be created using the resolution available on your system clock, and so may include fractional seconds.
+
+<div><code class="block">a = Time.new <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:19:20 CDT 2002</span>
+b = Time.new <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:19:20 CDT 2002</span>
+a == b <span class="output"><span class="outputmark">&rarr;</span> false</span>
+"%.6f" % a.to_f <span class="output"><span class="outputmark">&rarr;</span> "1023599960.526217"</span>
+"%.6f" % b.to_f <span class="output"><span class="outputmark">&rarr;</span> "1023599960.526838"</span></code></div>
+
+		</dd>
+
+	<dt id="Time.now">now</dt>
+		<dd class="callseq">Time.now  &rarr; <i class="obj">aTime</i></dd>
+		<dd class="desc">Synonym for <code class="class_class_method"><a href="ref_c_time.html#Time.new"><span class="class">Time</span>.<span class="method">new</span></a></code>.
+
+		</dd>
+
+	<dt id="Time.times">times</dt>
+		<dd class="callseq">Time.times  &rarr; <i class="obj">aStructTms</i></dd>
+		<dd class="desc">Returns a <code>Tms</code> structure (see <code class="class"><a href="ref_c_struct__tms.html">Struct::Tms</a></code>) that contains user and system CPU times for this process.
+
+<div><code class="block">t = Time.times
+[ t.utime, t.stime ] <span class="output"><span class="outputmark">&rarr;</span> [0.04, 0.0]</span></code></div>
+
+		</dd>
+
+	<dt id="Time.utc">utc</dt>
+		<dd class="callseq">Time.utc( <i class="obj">year [, month, day, hour, min, sec, usec]</i> )  &rarr; <i class="obj">aTime</i> </dd>
+		<dd class="callseq">Time.utc( <i class="obj">sec, min, hour, day, month, year, wday, yday, isdst, tz</i> ) &rarr; <i class="obj">aTime</i></dd>
+		<dd class="desc">Synonym for <code class="class_class_method"><a href="ref_c_time.html#Time.gm"><span class="class">Time</span>.<span class="method">gm</span></a></code>.
+
+<div><code class="block">Time.utc(2000,"jan",1,20,15,1) <span class="output"><span class="outputmark">&rarr;</span> Sat Jan 01 20:15:01 UTC 2000</span></code></div>
+
+		</dd>
+</dl>
+
+<h2 class="refsubsection" id="instancemethods">instance methods</h2>
+<dl class="methodlist">
+	<dt id="Time._pl">+</dt>
+		<dd class="callseq"><i class="obj">time</i> + <i class="obj">aNumeric</i>   &rarr; <i class="obj">aTime</i></dd>
+		<dd class="desc">Addition&mdash;Adds some number of seconds (possibly fractional) to <i class="obj">time</i>
+      and returns that value as a new time.
+
+<div><code class="block">t = Time.now <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:19:20 CDT 2002</span>
+t + (60 * 60 * 24) <span class="output"><span class="outputmark">&rarr;</span> Mon Jun 10 00:19:20 CDT 2002</span></code></div>
+
+		</dd>
+
+	<dt id="Time._mi_mi">-</dt>
+		<dd class="callseq"><i class="obj">time</i> <code>-</code> <i class="obj">aTime</i>  &rarr; <i class="obj">aFloat</i> </dd>
+		<dd class="callseq"><i class="obj">time</i> <code>-</code> <i class="obj">aNumeric</i>  &rarr; <i class="obj">aTime</i></dd>
+		<dd class="desc">Difference&mdash;Returns a new time that represents the difference between two times, or subtracts the given number of seconds in <i class="obj">aNumeric</i> from <i class="obj">time</i>.
+
+<div><code class="block">t = Time.now <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:19:20 CDT 2002</span>
+t2 = t + 2592000 <span class="output"><span class="outputmark">&rarr;</span> Tue Jul 09 00:19:20 CDT 2002</span>
+t2 - t <span class="output"><span class="outputmark">&rarr;</span> 2592000.0</span>
+t2 - 2592000 <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:19:20 CDT 2002</span></code></div>
+
+		</dd>
+
+	<dt id="Time._lt_eq_lt">&lt;=&gt;</dt>
+		<dd class="callseq"><i class="obj">time</i> &lt;=&gt; <i class="obj">anOtherTime</i>  &rarr; -1, 0, +1 </dd>
+		<dd class="callseq"><i class="obj">time</i> &lt;=&gt; <i class="obj">aNumeric</i> &rarr; -1, 0, +1</dd>
+		<dd class="desc">Comparison&mdash;Compares <i class="obj">time</i> with <i class="obj">anOtherTime</i> or with
+      <i class="obj">aNumeric</i>, which is the number of seconds (possibly
+      fractional) since epoch.
+
+<div><code class="block">t = Time.now <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:19:20 CDT 2002</span>
+t2 = t + 2592000 <span class="output"><span class="outputmark">&rarr;</span> Tue Jul 09 00:19:20 CDT 2002</span>
+t &lt;=&gt; t2 <span class="output"><span class="outputmark">&rarr;</span> -1</span>
+t2 &lt;=&gt; t <span class="output"><span class="outputmark">&rarr;</span> 1</span>
+t &lt;=&gt; t <span class="output"><span class="outputmark">&rarr;</span> 0</span></code></div>
+
+		</dd>
+
+	<dt id="Time.asctime">asctime</dt>
+		<dd class="callseq"><i class="obj">time</i>.asctime  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns a canonical string representation of <i class="obj">time</i>.
+
+<div><code class="block">Time.now.asctime <span class="output"><span class="outputmark">&rarr;</span> "Sun Jun  9 00:19:21 2002"</span></code></div>
+
+		</dd>
+
+	<dt id="Time.ctime">ctime</dt>
+		<dd class="callseq"><i class="obj">time</i>.ctime  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><a href="ref_c_time.html#Time.asctime"><span class="class">Time</span>#<span class="method">asctime</span></a></code>.
+
+		</dd>
+
+	<dt id="Time.day">day</dt>
+		<dd class="callseq"><i class="obj">time</i>.day  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns the day of the month (1..n) for <i class="obj">time</i>.
+
+<div><code class="block">t = Time.now <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:19:21 CDT 2002</span>
+t.day <span class="output"><span class="outputmark">&rarr;</span> 9</span></code></div>
+
+		</dd>
+
+	<dt id="Time.gmt_qm">gmt?</dt>
+		<dd class="callseq"><i class="obj">time</i>.gmt?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">time</i> represents a time in UTC (GMT).
+
+<div><code class="block">t = Time.now <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:19:21 CDT 2002</span>
+t.gmt? <span class="output"><span class="outputmark">&rarr;</span> false</span>
+t = Time.gm(2000,"jan",1,20,15,1) <span class="output"><span class="outputmark">&rarr;</span> Sat Jan 01 20:15:01 UTC 2000</span>
+t.gmt? <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="Time.gmtime">gmtime</dt>
+		<dd class="callseq"><i class="obj">time</i>.gmtime  &rarr; <i class="obj">time</i></dd>
+		<dd class="desc">Converts <i class="obj">time</i> to UTC (GMT), modifying the receiver.
+
+<div><code class="block">t = Time.now <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:19:21 CDT 2002</span>
+t.gmt? <span class="output"><span class="outputmark">&rarr;</span> false</span>
+t.gmtime <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 05:19:21 UTC 2002</span>
+t.gmt? <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="Time.hour">hour</dt>
+		<dd class="callseq"><i class="obj">time</i>.hour  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns the hour of the day (0..23) for <i class="obj">time</i>.
+
+<div><code class="block">t = Time.now <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:19:21 CDT 2002</span>
+t.hour <span class="output"><span class="outputmark">&rarr;</span> 0</span></code></div>
+
+		</dd>
+
+	<dt id="Time.isdst">isdst</dt>
+		<dd class="callseq"><i class="obj">time</i>.isdst  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">time</i> occurs during Daylight Saving
+      Time in its time zone.
+
+<div><code class="block">t  = Time.local(2000, 7, 1) <span class="output"><span class="outputmark">&rarr;</span> Sat Jul 01 00:00:00 CDT 2000</span>
+t.isdst <span class="output"><span class="outputmark">&rarr;</span> true</span>
+t2 = Time.local(2000, 1, 1) <span class="output"><span class="outputmark">&rarr;</span> Sat Jan 01 00:00:00 CST 2000</span>
+t2.isdst <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+		</dd>
+
+	<dt id="Time.localtime">localtime</dt>
+		<dd class="callseq"><i class="obj">time</i>.localtime  &rarr; <i class="obj">time</i></dd>
+		<dd class="desc">Converts <i class="obj">time</i> to local time (using the local time zone in
+      effect for this process) modifying the receiver.
+
+<div><code class="block">t = Time.gm(2000, "jan", 1, 20, 15, 1)
+t.gmt? <span class="output"><span class="outputmark">&rarr;</span> true</span>
+t.localtime <span class="output"><span class="outputmark">&rarr;</span> Sat Jan 01 14:15:01 CST 2000</span>
+t.gmt? <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+		</dd>
+
+	<dt id="Time.mday">mday</dt>
+		<dd class="callseq"><i class="obj">time</i>.mday  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><a href="ref_c_time.html#Time.day"><span class="class">Time</span>#<span class="method">day</span></a></code>.
+
+		</dd>
+
+	<dt id="Time.min">min</dt>
+		<dd class="callseq"><i class="obj">time</i>.min  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns the minute of the hour (0..59) for <i class="obj">time</i>.
+
+<div><code class="block">t = Time.now <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:19:21 CDT 2002</span>
+t.min <span class="output"><span class="outputmark">&rarr;</span> 19</span></code></div>
+
+		</dd>
+
+	<dt id="Time.mon">mon</dt>
+		<dd class="callseq"><i class="obj">time</i>.mon  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns the month of the year (1..12) for <i class="obj">time</i>.
+
+<div><code class="block">t = Time.now <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:19:21 CDT 2002</span>
+t.mon <span class="output"><span class="outputmark">&rarr;</span> 6</span></code></div>
+
+		</dd>
+
+	<dt id="Time.month">month</dt>
+		<dd class="callseq"><i class="obj">time</i>.month  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><a href="ref_c_time.html#Time.mon"><span class="class">Time</span>#<span class="method">mon</span></a></code>.
+
+		</dd>
+
+	<dt id="Time.sec">sec</dt>
+		<dd class="callseq"><i class="obj">time</i>.sec  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns the second of the minute (0..60) for <i class="obj">time</i>. <span class="footnote">(Yes, seconds really can range from zero to 60. This allows the system to inject leap seconds every now and then to correct for the fact that years are not really a convenient number of hours long.)</span>
+
+<div><code class="block">t = Time.now <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:19:21 CDT 2002</span>
+t.sec <span class="output"><span class="outputmark">&rarr;</span> 21</span></code></div>
+
+		</dd>
+
+	<dt id="Time.strftime">strftime</dt>
+		<dd class="callseq"><i class="obj">time</i>.strftime( <i class="obj">aString</i> )  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Formats <i class="obj">time</i> according to the directives in the given format string.  See <a href="ref_c_time.html#table_22.9">Table 22.9</a> for the available values. Any text not listed as a directive will be passed through to the output string.
+
+<div><code class="block">t = Time.now
+t.strftime("Printed on %m/%d/%Y") <span class="output"><span class="outputmark">&rarr;</span> "Printed on 06/09/2002"</span>
+t.strftime("at %I:%M%p") <span class="output"><span class="outputmark">&rarr;</span> "at 12:19AM"</span></code></div>
+
+    
+<table id="table_22.9">
+	<caption>Table 22.9 : <code class="class_instance_method"><a href="ref_c_time.html#Time.strftime"><span class="class">Time</span>#<span class="method">strftime</span></a></code> directives</caption>
+	<thead><tr>
+	<th>Format</th>
+	<th>Meaning</th>
+</tr></thead>
+	<tr class="firstRow">
+		<td>%a</td>
+		<td>The abbreviated weekday name (&ldquo;Sun&rdquo;)</td>
+	</tr>
+	<tr>
+		<td>%A</td>
+		<td>The  full  weekday  name (&ldquo;Sunday&rdquo;)</td>
+	</tr>
+	<tr>
+		<td>%b</td>
+		<td>The abbreviated month name (&ldquo;Jan&rdquo;)</td>
+	</tr>
+	<tr>
+		<td>%B</td>
+		<td>The  full  month  name (&ldquo;January&rdquo;)</td>
+	</tr>
+	<tr>
+		<td>%c</td>
+		<td>The preferred local date and time representation</td>
+	</tr>
+	<tr>
+		<td>%d</td>
+		<td>Day of the month (01..31)</td>
+	</tr>
+	<tr>
+		<td>%H</td>
+		<td>Hour of the day, 24-hour clock (00..23)</td>
+	</tr>
+	<tr>
+		<td>%I</td>
+		<td>Hour of the day, 12-hour clock (01..12)</td>
+	</tr>
+	<tr>
+		<td>%j</td>
+		<td>Day of the year (001..366)</td>
+	</tr>
+	<tr>
+		<td>%m</td>
+		<td>Month of the year (01..12)</td>
+	</tr>
+	<tr>
+		<td>%M</td>
+		<td>Minute of the hour (00..59)</td>
+	</tr>
+	<tr>
+		<td>%p</td>
+		<td>Meridian indicator (&ldquo;AM&rdquo;  or  &ldquo;PM&rdquo;)</td>
+	</tr>
+	<tr>
+		<td>%S</td>
+		<td>Second of the minute (00..60)</td>
+	</tr>
+	<tr>
+		<td>%U</td>
+		<td>Week  number  of the current year, starting with the first Sunday as the first
+              day of the first week (00..53)</td>
+	</tr>
+	<tr>
+		<td>%W</td>
+		<td>Week  number  of the current year, starting with the first Monday as the first
+              day of the first week (00..53)</td>
+	</tr>
+	<tr>
+		<td>%w</td>
+		<td>Day of the week (Sunday is 0, 0..6)</td>
+	</tr>
+	<tr>
+		<td>%x</td>
+		<td>Preferred representation for the date alone, no time</td>
+	</tr>
+	<tr>
+		<td>%X</td>
+		<td>Preferred representation for the time alone, no date</td>
+	</tr>
+	<tr>
+		<td>%y</td>
+		<td>Year without a century (00..99)</td>
+	</tr>
+	<tr>
+		<td>%Y</td>
+		<td>Year with century</td>
+	</tr>
+	<tr>
+		<td>%Z</td>
+		<td>Time zone name</td>
+	</tr>
+	<tr>
+		<td>%%</td>
+		<td>Literal &ldquo;%&rdquo; character</td>
+	</tr>
+</table>
+
+		</dd>
+
+	<dt id="Time.to_a">to_a</dt>
+		<dd class="callseq"><i class="obj">time</i>.to_a  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns a ten-element <i class="obj">anArray</i> of values for <i class="obj">time</i>: {<code>[ sec, min, hour, day, month, year, wday, yday, isdst, zone ]</code>}.  See the individual methods for an explanation of the valid ranges of each value. The ten elements can be passed directly to   <code class="class_class_method"><a href="ref_c_time.html#Time.utc"><span class="class">Time</span>.<span class="method">utc</span></a></code> or <code class="class_class_method"><a href="ref_c_time.html#Time.local"><span class="class">Time</span>.<span class="method">local</span></a></code> to create a new <code class="class">Time</code>.
+
+<div><code class="block">now = Time.now <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:19:21 CDT 2002</span>
+t = now.to_a <span class="output"><span class="outputmark">&rarr;</span> [21, 19, 0, 9, 6, 2002, 0, 160, true, "CDT"]</span></code></div>
+
+		</dd>
+
+	<dt id="Time.to_f">to_f</dt>
+		<dd class="callseq"><i class="obj">time</i>.to_f  &rarr; <i class="obj">aFloat</i></dd>
+		<dd class="desc">Returns the value of <i class="obj">time</i> as a floating point number of
+      seconds since epoch.
+
+<div><code class="block">t = Time.now
+"%10.5f" % t.to_f <span class="output"><span class="outputmark">&rarr;</span> "1023599961.93824"</span>
+t.to_i <span class="output"><span class="outputmark">&rarr;</span> 1023599961</span></code></div>
+
+		</dd>
+
+	<dt id="Time.to_i">to_i</dt>
+		<dd class="callseq"><i class="obj">time</i>.to_i  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Returns the value of <i class="obj">time</i> as an integer number of
+      seconds since epoch.
+
+<div><code class="block">t = Time.now
+"%10.5f" % t.to_f <span class="output"><span class="outputmark">&rarr;</span> "1023599962.01627"</span>
+t.to_i <span class="output"><span class="outputmark">&rarr;</span> 1023599962</span></code></div>
+
+		</dd>
+
+	<dt id="Time.to_s">to_s</dt>
+		<dd class="callseq"><i class="obj">time</i>.to_s  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns a string representing <i class="obj">time</i>.  Equivalent to calling
+      <code class="class_instance_method"><a href="ref_c_time.html#Time.strftime"><span class="class">Time</span>#<span class="method">strftime</span></a></code> with a format string of
+        &ldquo;<code>%a</code> <code>%b</code> <code>%d</code> <code>%H:%M:%S</code> <code>%Z</code> <code>%Y</code>&rdquo;.
+
+<div><code class="block">Time.now.to_s <span class="output"><span class="outputmark">&rarr;</span> "Sun Jun 09 00:19:22 CDT 2002"</span></code></div>
+
+		</dd>
+
+	<dt id="Time.tv_sec">tv_sec</dt>
+		<dd class="callseq"><i class="obj">time</i>.tv_sec  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><a href="ref_c_time.html#Time.to_i"><span class="class">Time</span>#<span class="method">to_i</span></a></code>.
+
+		</dd>
+
+	<dt id="Time.tv_usec">tv_usec</dt>
+		<dd class="callseq"><i class="obj">time</i>.tv_usec  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><a href="ref_c_time.html#Time.usec"><span class="class">Time</span>#<span class="method">usec</span></a></code>.
+
+		</dd>
+
+	<dt id="Time.usec">usec</dt>
+		<dd class="callseq"><i class="obj">time</i>.usec  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Returns just the number of microseconds for <i class="obj">time</i>.
+
+<div><code class="block">t = Time.now <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:19:22 CDT 2002</span>
+"%10.6f" % t.to_f <span class="output"><span class="outputmark">&rarr;</span> "1023599962.174522"</span>
+t.usec <span class="output"><span class="outputmark">&rarr;</span> 174522</span></code></div>
+
+		</dd>
+
+	<dt id="Time.utc">utc</dt>
+		<dd class="callseq"><i class="obj">time</i>.utc  &rarr; <i class="obj">time</i></dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><a href="ref_c_time.html#Time.gmtime"><span class="class">Time</span>#<span class="method">gmtime</span></a></code>.
+
+<div><code class="block">t = Time.now <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:19:22 CDT 2002</span>
+t.utc? <span class="output"><span class="outputmark">&rarr;</span> false</span>
+t.utc <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 05:19:22 UTC 2002</span>
+t.utc? <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="Time.utc_qm">utc?</dt>
+		<dd class="callseq"><i class="obj">time</i>.utc?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">time</i> represents a time in UTC (GMT).
+
+<div><code class="block">t = Time.now <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:19:22 CDT 2002</span>
+t.utc? <span class="output"><span class="outputmark">&rarr;</span> false</span>
+t = Time.gm(2000,"jan",1,20,15,1) <span class="output"><span class="outputmark">&rarr;</span> Sat Jan 01 20:15:01 UTC 2000</span>
+t.utc? <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="Time.wday">wday</dt>
+		<dd class="callseq"><i class="obj">time</i>.wday  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns an integer representing the day of the week, 0..6,
+      with Sunday == 0.
+
+<div><code class="block">t = Time.now <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:19:22 CDT 2002</span>
+t.wday <span class="output"><span class="outputmark">&rarr;</span> 0</span></code></div>
+
+		</dd>
+
+	<dt id="Time.yday">yday</dt>
+		<dd class="callseq"><i class="obj">time</i>.yday  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns an integer representing the day of the year, 1..366.
+
+<div><code class="block">t = Time.now <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:19:22 CDT 2002</span>
+t.yday <span class="output"><span class="outputmark">&rarr;</span> 160</span></code></div>
+
+		</dd>
+
+	<dt id="Time.year">year</dt>
+		<dd class="callseq"><i class="obj">time</i>.year  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns the year for <i class="obj">time</i> (including the century).
+
+<div><code class="block">t = Time.now <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:19:22 CDT 2002</span>
+t.year <span class="output"><span class="outputmark">&rarr;</span> 2002</span></code></div>
+
+		</dd>
+
+	<dt id="Time.zone">zone</dt>
+		<dd class="callseq"><i class="obj">time</i>.zone  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns the name of the time zone used for <i class="obj">time</i>.
+
+<div><code class="block">t = Time.gm(2000, "jan", 1, 20, 15, 1)
+t.zone <span class="output"><span class="outputmark">&rarr;</span> "GMT"</span>
+t = Time.local(2000, "jan", 1, 20, 15, 1)
+t.zone <span class="output"><span class="outputmark">&rarr;</span> "CST"</span></code></div></dd>
+</dl>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_c_time.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

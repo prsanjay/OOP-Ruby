@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Integer</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_c_integer',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="class" id="Integer">class <strong>Integer</strong> &lt; Numeric</h1>
+
+<p><strong>Subclasses:</strong> Bignum, Fixnum</p>
+
+<p><code class="class">Integer</code> is the basis for the two concrete classes that hold   whole numbers, <code class="class">Bignum</code> and <code class="class">Fixnum</code>.</p>
+
+<h2 class="refsubsection" id="instancemethods">instance methods</h2>
+<dl class="methodlist">
+	<dt id="Integer.chr">chr</dt>
+		<dd class="callseq"><i class="obj">int</i>.chr  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns a string containing the ASCII character represented by
+      the receiver's value.
+
+<div><code class="block">65.chr <span class="output"><span class="outputmark">&rarr;</span> "A"</span>
+?a.chr <span class="output"><span class="outputmark">&rarr;</span> "a"</span>
+230.chr <span class="output"><span class="outputmark">&rarr;</span> "\346"</span></code></div>
+
+		</dd>
+
+	<dt id="Integer.downto">downto</dt>
+		<dd class="callseq"><i class="obj">int</i>.downto( <i class="obj">anInteger</i> ) {| i | block }  &rarr; <i class="obj">int</i></dd>
+		<dd class="desc">Iterates <em>block</em>, passing decreasing values
+      from <i class="obj">int</i> down to and including <i class="obj">anInteger</i>.
+
+<div><code class="block">5.downto(1) { |n| print n, ".. " }
+print "  Liftoff!\n"</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">5.. 4.. 3.. 2.. 1..   Liftoff!</code></div>
+
+		</dd>
+
+	<dt id="Integer.integer_qm">integer?</dt>
+		<dd class="callseq"><i class="obj">int</i>.integer?  &rarr; <code class="const">true</code></dd>
+		<dd class="desc">Always returns <code class="const">true</code>.
+
+		</dd>
+
+	<dt id="Integer.next">next</dt>
+		<dd class="callseq"><i class="obj">int</i>.next  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Returns the <code class="class">Integer</code> equal to <i class="obj">int</i> + 1.
+
+<div><code class="block">1.next <span class="output"><span class="outputmark">&rarr;</span> 2</span>
+(-1).next <span class="output"><span class="outputmark">&rarr;</span> 0</span></code></div>
+
+		</dd>
+
+	<dt id="Integer.step">step</dt>
+		<dd class="callseq"><i class="obj">int</i>.step( <i class="obj">endNum</i>, <i class="obj">step</i> ) {| i | block }  &rarr; <i class="obj">int</i></dd>
+		<dd class="desc">Invokes <em>block</em> with the sequence of numbers starting at
+      <i class="obj">int</i>,
+      incremented by <i class="obj">step</i> on each call. The loop
+      finishes when the value to be passed to the block is greater
+      than <i class="obj">endNum</i> (if <i class="obj">step</i> is positive) or less than
+      <i class="obj">endNum</i> (if <i class="obj">step</i> is negative).
+
+<div><code class="block">1.step(10, 2) { |i| print i, " " }</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">1 3 5 7 9</code></div>
+
+		</dd>
+
+	<dt id="Integer.succ">succ</dt>
+		<dd class="callseq"><i class="obj">int</i>.succ  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><a href="ref_c_integer.html#Integer.next"><span class="class">Integer</span>#<span class="method">next</span></a></code>.
+
+		</dd>
+
+	<dt id="Integer.times">times</dt>
+		<dd class="callseq"><i class="obj">int</i>.times {| i | block }  &rarr; <i class="obj">int</i></dd>
+		<dd class="desc">Iterates block <i class="obj">int</i> times, passing in values from zero to
+      <i class="obj">int</i> - 1.
+
+<div><code class="block">5.times do |i|
+  print i, " "
+end
+print "\n"</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">0 1 2 3 4</code></div>
+
+		</dd>
+
+	<dt id="Integer.upto">upto</dt>
+		<dd class="callseq"><i class="obj">int</i>.upto( <i class="obj">anInteger</i> ) {| i | block }  &rarr; <i class="obj">int</i></dd>
+		<dd class="desc">Iterates <em>block</em>, passing in integer values from
+      <i class="obj">int</i> up to and including <i class="obj">anInteger</i>.
+
+<div><code class="block">5.upto(10) { |i| print i, " " }</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">5 6 7 8 9 10</code></div></dd>
+</dl>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_c_integer.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

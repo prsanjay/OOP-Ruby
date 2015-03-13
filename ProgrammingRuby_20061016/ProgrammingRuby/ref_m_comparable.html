@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Comparable</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_m_comparable',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="module" id="Comparable">module <strong>Comparable</strong></h1>
+
+<p><strong>Relies on:</strong> <code>&lt;=&gt;</code></p>
+
+<p>The <code class="module">Comparable</code> mixin is used by classes whose objects may be ordered.  The class must define the <code>&lt;=&gt;</code>   operator, which compares the receiver against another object, returning -1, 0, or +1 depending on whether the receiver is less than, equal to, or greater than the other object.  <code class="module">Comparable</code> uses <code>&lt;=&gt;</code> to implement the conventional comparison operators (<code>&lt;</code>, <code>&lt;=</code>, <code>==</code>, <code>&gt;=</code>, and <code>&gt;</code>) and the method <code class="method">between?</code>.</p>
+
+<div><code class="block">class SizeMatters
+  include Comparable
+  attr :str
+  def &lt;=&gt;(anOther)
+    str.size &lt;=&gt; anOther.str.size
+  end
+  def initialize(str)
+    @str = str
+  end
+  def inspect
+    @str
+  end
+end
+
+s1 = SizeMatters.new("Z")
+s2 = SizeMatters.new("YY")
+s3 = SizeMatters.new("XXX")
+s4 = SizeMatters.new("WWWW")
+s5 = SizeMatters.new("VVVVV")
+
+s1 &lt; s2 <span class="output"><span class="outputmark">&rarr;</span> true</span>
+s4.between?(s1, s3) <span class="output"><span class="outputmark">&rarr;</span> false</span>
+s4.between?(s3, s5) <span class="output"><span class="outputmark">&rarr;</span> true</span>
+[ s3, s2, s5, s4, s1 ].sort <span class="output"><span class="outputmark">&rarr;</span> [Z, YY, XXX, WWWW, VVVVV]</span></code></div>
+
+<h2 class="refsubsection" id="instancemethods">instance methods</h2>
+<dl class="methodlist">
+	<dt id="Comparisons">Comparisons</dt>
+		<dd class="callseq"><i class="obj">anObject</i> &lt;  <i class="obj">otherObject</i>  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="callseq"><i class="obj">anObject</i> &lt;= <i class="obj">otherObject</i>  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="callseq"><i class="obj">anObject</i> == <i class="obj">otherObject</i>  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="callseq"><i class="obj">anObject</i> &gt;= <i class="obj">otherObject</i>  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="callseq"><i class="obj">anObject</i> &gt;  <i class="obj">otherObject</i>  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Compares two objects based on the receiver's <code class="method">&lt;=&gt;</code> method.
+
+		</dd>
+
+	<dt id="Comparable.between_qm">between?</dt>
+		<dd class="callseq"><i class="obj">anObject</i>.between?( <i class="obj">min</i>, <i class="obj">max</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">false</code> if <i class="obj">anObject</i> <code>&lt;=&gt;</code> <i class="obj">min</i> is less than
+      zero or if <i class="obj">anObject</i> <code>&lt;=&gt;</code> <i class="obj">max</i> is greater than zero,
+      <code class="const">true</code> otherwise.
+
+<div><code class="block">3.between?(1, 5) <span class="output"><span class="outputmark">&rarr;</span> true</span>
+6.between?(1, 5) <span class="output"><span class="outputmark">&rarr;</span> false</span>
+'cat'.between?('ant', 'dog') <span class="output"><span class="outputmark">&rarr;</span> true</span>
+'gnu'.between?('ant', 'dog') <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div></dd>
+</dl>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_m_comparable.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

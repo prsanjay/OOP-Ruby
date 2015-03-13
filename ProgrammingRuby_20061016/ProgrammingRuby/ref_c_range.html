@@ -1,0 +1,172 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Range</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_c_range',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="class" id="Range">class <strong>Range</strong> &lt; Object</h1>
+
+<p>A <code class="class">Range</code> represents an interval&mdash;a set of values with a start   and an end. Ranges may be constructed using the   <em>s</em><code>..</code><em>e</em> and <em>s</em><code>...</code><em>e</em> literals, or   with <code class="class_class_method"><a href="ref_c_range.html#Range.new"><span class="class">Range</span>.<span class="method">new</span></a></code>. Ranges constructed using <code>..</code> run from the   start to the end inclusively. Those created using <code>...</code> exclude the    end value.  When used as an iterator, ranges return each value in   the sequence.</p>
+
+<div><code class="block">(-1..-5).to_a <span class="output"><span class="outputmark">&rarr;</span> []</span>
+(-5..-1).to_a <span class="output"><span class="outputmark">&rarr;</span> [-5, -4, -3, -2, -1]</span>
+('a'..'e').to_a <span class="output"><span class="outputmark">&rarr;</span> ["a", "b", "c", "d", "e"]</span>
+('a'...'e').to_a <span class="output"><span class="outputmark">&rarr;</span> ["a", "b", "c", "d"]</span></code></div>
+
+<p>Ranges can be constructed using objects of any type, as long as the objects can be compared using their <code>&lt;=&gt;</code> operator and they support the <code class="method">succ</code> method to return the next object in sequence.</p>
+
+<div><code class="block">class Xs                # represent a string of 'x's
+  include Comparable
+  attr :length
+  def initialize(n)
+    @length = n
+  end
+  def succ
+    Xs.new(@length + 1)
+  end
+  def &lt;=&gt;(other)
+    raise TypeError unless other.kind_of? Xs
+    @length &lt;=&gt; other.length
+  end
+  def inspect
+    'x' * @length
+  end
+end
+
+r = Xs.new(3)..Xs.new(6) <span class="output"><span class="outputmark">&rarr;</span> xxx..xxxxxx</span>
+r.to_a <span class="output"><span class="outputmark">&rarr;</span> [xxx, xxxx, xxxxx, xxxxxx]</span>
+r.member?(Xs.new(5)) <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+<h2>mixins</h2>
+<dl>
+	<dt><code class="module"><a href="ref_m_enumerable.html#Enumerable">Enumerable</a></code></dt>
+	<dd><code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.collect">collect</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.detect">detect</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.each_with_index">each_with_index</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.entries">entries</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.find">find</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.find_all">find_all</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.grep">grep</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.include">include?</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.map">map</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.max">max</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.member">member?</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.min">min</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.reject">reject</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.select">select</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.sort">sort</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.to_a">to_a</a></code></dd>
+</dl>
+
+
+<h2 class="refsubsection" id="classmethods">class methods</h2>
+<dl class="methodlist">
+	<dt id="Range.new">new</dt>
+		<dd class="callseq">Range.new( <i class="obj">start</i>, <i class="obj">end</i>, <i class="obj">exclusive</i><code>=false</code> ) &rarr; <i class="obj">aRange</i></dd>
+		<dd class="desc">Constructs a range using the given <i class="obj">start</i> and <i class="obj">end</i>. If the third parameter is omitted or is <code class="const">false</code>, the range will include the end object; otherwise, it will be excluded.</dd>
+</dl>
+
+
+<h2 class="refsubsection" id="instancemethods">instance methods</h2>
+<dl class="methodlist">
+	<dt id="Range._eq_eq_eq">===</dt>
+		<dd class="callseq"><i class="obj">rng</i> === <i class="obj">anObject</i>  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">anObject</i> is an element of <i class="obj">rng</i>,
+      <code class="const">false</code> otherwise. Conveniently, <code>===</code> is the comparison
+      operator used by <code class="keyword">case</code> statements.
+
+<div><code class="block">case 79
+when 1..50   then   print "low\n"
+when 51..75  then   print "medium\n"
+when 76..100 then   print "high\n"
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">high</code></div>
+
+		</dd>
+
+	<dt id="Range.begin">begin</dt>
+		<dd class="callseq"><i class="obj">rng</i>.begin  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Returns the first object of <i class="obj">rng</i>.
+
+		</dd>
+
+	<dt id="Range.each">each</dt>
+		<dd class="callseq"><i class="obj">rng</i>.each {| i | block }  &rarr; <i class="obj">rng</i></dd>
+		<dd class="desc">Iterates over the elements <i class="obj">rng</i>, passing each in turn to the
+      block.
+
+<div><code class="block">(10..15).each do |n|
+   print n, ' '
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">10 11 12 13 14 15</code></div>
+
+		</dd>
+
+	<dt id="Range.end">end</dt>
+		<dd class="callseq"><i class="obj">rng</i>.end  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Returns the object that defines the end of <i class="obj">rng</i>. See also
+      <code class="class_instance_method"><a href="ref_c_range.html#Range.length"><span class="class">Range</span>#<span class="method">length</span></a></code>.
+
+<div><code class="block">(1..10).end <span class="output"><span class="outputmark">&rarr;</span> 10</span>
+(1...10).end <span class="output"><span class="outputmark">&rarr;</span> 10</span></code></div>
+
+		</dd>
+
+	<dt id="Range.exclude_end_qm">exclude_end?</dt>
+		<dd class="callseq"><i class="obj">rng</i>.exclude_end?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">rng</i> excludes its end value.
+
+		</dd>
+
+	<dt id="Range.first">first</dt>
+		<dd class="callseq"><i class="obj">rng</i>.first  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Returns the first object in <i class="obj">rng</i>.
+
+		</dd>
+
+	<dt id="Range.last">last</dt>
+		<dd class="callseq"><i class="obj">rng</i>.last  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><a href="ref_c_range.html#Range.end"><span class="class">Range</span>#<span class="method">end</span></a></code>.
+
+		</dd>
+
+	<dt id="Range.length">length</dt>
+		<dd class="callseq"><i class="obj">rng</i>.length  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Returns the number of objects in <i class="obj">rng</i>.
+
+<div><code class="block">(1..10).length <span class="output"><span class="outputmark">&rarr;</span> 10</span>
+(1...10).length <span class="output"><span class="outputmark">&rarr;</span> 9</span></code></div>
+
+		</dd>
+
+	<dt id="Range.size">size</dt>
+		<dd class="callseq"><i class="obj">rng</i>.size  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><a href="ref_c_range.html#Range.length"><span class="class">Range</span>#<span class="method">length</span></a></code>.</dd>
+</dl>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_c_range.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

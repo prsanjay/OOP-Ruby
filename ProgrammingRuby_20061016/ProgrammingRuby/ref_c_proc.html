@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Proc</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_c_proc',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="class" id="Proc">class <strong>Proc</strong> &lt; Object</h1>
+
+<p><code>Proc</code> objects are blocks of code that have been bound to a set   of local variables. Once bound, the code may be called in different   contexts and still access those variables.</p>
+
+<div><code class="block">def genTimes(factor)
+  return Proc.new {|n| n*factor }
+end
+
+times3 = genTimes(3)
+times5 = genTimes(5)
+
+times3.call(12) <span class="output"><span class="outputmark">&rarr;</span> 36</span>
+times5.call(5) <span class="output"><span class="outputmark">&rarr;</span> 25</span>
+times3.call(times5.call(4)) <span class="output"><span class="outputmark">&rarr;</span> 60</span></code></div>
+
+
+<h2 class="refsubsection" id="classmethods">class methods</h2>
+<dl class="methodlist">
+	<dt id="Proc.new">new</dt>
+		<dd class="callseq">Proc.new [{|  | block } ] &rarr; <i class="obj">aProc</i></dd>
+		<dd class="desc">Creates a new <code>Proc</code> object, bound to the current context. It
+      may be called without a block only within a method with an
+      attached block, in which case that block is converted to the
+      <code class="class">Proc</code> object.
+
+<div><code class="block">def procFrom
+  Proc.new
+end
+aProc = procFrom { "hello" }
+aProc.call <span class="output"><span class="outputmark">&rarr;</span> "hello"</span></code></div>
+
+		</dd>
+</dl>
+
+<h2 class="refsubsection" id="instancemethods">instance methods</h2>
+<dl class="methodlist">
+	<dt id="Proc._ob_cb">[ ]</dt>
+		<dd class="callseq"><i class="obj">prc</i>[ <i>[</i><i class="obj">params</i><i>]*</i> ]  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Synonym for <code>Proc.call</code>.
+
+		</dd>
+
+	<dt id="Proc.arity">arity</dt>
+		<dd class="callseq"><i class="obj">prc</i>.arity  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Returns the number of arguments required by the block. If the
+      block takes no arguments, returns -1. If it takes one argument,
+      returns -2. Otherwise, returns a positive argument count unless
+      the last argument is prefixed with *, in which case the argument
+      count is negated. The number of required arguments is
+      <i class="obj">anInteger</i> for positive values, and
+      <code>(</code><i class="obj">anInteger</i><code>+1).abs</code> otherwise.
+
+<div><code class="block">Proc.new {||}.arity <span class="output"><span class="outputmark">&rarr;</span> 0</span>
+Proc.new {|a|}.arity <span class="output"><span class="outputmark">&rarr;</span> -1</span>
+Proc.new {|a,b|}.arity <span class="output"><span class="outputmark">&rarr;</span> 2</span>
+Proc.new {|a,b,c|}.arity <span class="output"><span class="outputmark">&rarr;</span> 3</span>
+Proc.new {|*a|}.arity <span class="output"><span class="outputmark">&rarr;</span> -1</span>
+Proc.new {|a,*b|}.arity <span class="output"><span class="outputmark">&rarr;</span> -2</span></code></div>
+
+		</dd>
+
+	<dt id="Proc.call">call</dt>
+		<dd class="callseq"><i class="obj">prc</i>.call( <i>[</i><i class="obj">params</i><i>]*</i> )  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Invokes the block, setting the block's parameters to the values
+      in <i class="obj">params</i> using the same rules as used by parallel
+      assignment. Returns the value of the last expression evaluated
+      in the block.
+
+<div><code class="block">aProc = Proc.new {|a, *b| b.collect {|i| i*a }}
+aProc.call(9, 1, 2, 3) <span class="output"><span class="outputmark">&rarr;</span> [9, 18, 27]</span>
+aProc[9, 1, 2, 3] <span class="output"><span class="outputmark">&rarr;</span> [9, 18, 27]</span></code></div></dd>
+</dl>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_c_proc.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

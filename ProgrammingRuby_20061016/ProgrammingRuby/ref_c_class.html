@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Class</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_c_class',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="class" id="Class">class <strong>Class</strong> &lt; Module</h1>
+
+<p>Classes in Ruby are first-class objects&mdash;each is an instance of   class <code class="class">Class</code>.    When a new class is created (typically using <code>class Name ... end</code>), an object of type <code class="class">Class</code> is created and assigned to a global constant (<code>Name</code> in this case). When <code>Name.new</code> is called to create a new object, the <code class="method">new</code> method in <code class="class">Class</code> is run by default. This can be demonstrated by overriding <code class="method">new</code> in <code class="class">Class</code>:</p>
+
+<div><code class="block">class Class
+   alias oldNew  new
+   def new(*args)
+     print "Creating a new ", self.name, "\n"
+     oldNew(*args)
+   end
+ end
+
+ class Name
+ end
+
+ n = Name.new</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Creating a new Name</code></div>
+
+<h2 class="refsubsection" id="classmethods">class methods</h2>
+<dl class="methodlist">
+	<dt id="Class.inherited">inherited</dt>
+		<dd class="callseq"><i class="obj">aClass</i>.inherited( <i class="obj">aSubClass</i> )</dd>
+		<dd class="desc">This is a singleton method (per class) invoked by Ruby when a subclass of <i class="obj">aClass</i> is created. The new subclass is passed as a parameter.
+
+<div><code class="block">class Top
+  def Top.inherited(sub)
+    print "New subclass: ", sub, "\n"
+  end
+end
+
+class Middle &lt; Top
+end
+
+class Bottom &lt; Middle
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">New subclass: Middle
+New subclass: Bottom</code></div>
+
+		</dd>
+
+	<dt id="Class.new">new</dt>
+		<dd class="callseq">Class.new( <i class="obj">aSuperClass</i>=<code class="class">Object</code> )  &rarr; <i class="obj">aClass</i></dd>
+		<dd class="desc">Creates a new anonymous (unnamed) class with the given superclass (or <code class="class">Object</code> if no parameter is given).</dd>
+</dl>
+	
+<h2 class="refsubsection" id="instancemethods">instance methods</h2>
+<dl class="methodlist">
+	<dt id="Class.new">new</dt>
+		<dd class="callseq"><i class="obj">aClass</i>.new( <i>[</i><i class="obj">args</i><i>]*</i> )  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Creates a new object of <i class="obj">aClass</i>'s class, then invokes that object's <code class="method">initialize</code> method, passing it <i class="obj">args</i>.</dd>
+
+	<dt id="Class.superclass">superclass</dt>
+		<dd class="callseq"><i class="obj">aClass</i>.superclass  &rarr; <i class="obj">aSuperClass</i> or <code>nil</code></dd>
+		<dd class="desc">Returns the superclass of <i class="obj">aClass</i>, or <code class="const">nil</code>.
+
+<div><code class="block">Class.superclass <span class="output"><span class="outputmark">&rarr;</span> Module</span>
+Object.superclass <span class="output"><span class="outputmark">&rarr;</span> nil</span></code></div></dd>
+</dl>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_c_class.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

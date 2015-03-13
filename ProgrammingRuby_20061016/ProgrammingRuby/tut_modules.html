@@ -1,0 +1,256 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Modules</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	<a href="tut_exceptions.html" class="prev">&lt; Previous</a><a href="tut_io.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'tut_modules',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+<h1 id="modules">Modules</h1>
+<p>Modules are a way of grouping together methods, classes, and constants. Modules give you two major benefits:</p>
+<ol>
+	<li>Modules provide a namespace and prevent name clashes.</li>
+	<li> Modules implement the mixin facility.</li>
+</ol>
+
+<h2 id="namespaces">Namespaces</h2>
+<p>As you start to write bigger and bigger Ruby programs, you'll naturally find yourself producing chunks of reusable code&mdash;libraries of related routines that are generally applicable. You'll want to break this code out into separate files so the contents can be shared among different Ruby programs.</p>
+<p>Often this code will be organized into classes, so you'll probably stick a class (or a set of interrelated classes) into a file.</p>
+<p>However, there are times when you want to group things together that don't naturally form a class.</p>
+<p>An initial approach might be to put all these things into a file and simply load that file into any program that needs it. This is the way the C language works. However, there's a problem. Say you write a set of trigonometry functions <code class="method">sin</code>, <code class="method">cos</code>, and so on. You stuff them all into a file, <code>trig.rb</code>, for future generations to enjoy. Meanwhile, Sally is working on a simulation of good and evil, and codes up a set of her own useful routines, including <code>beGood</code> and <code class="method">sin</code>, and sticks them into <code>action.rb</code>. Joe, who wants to write a program to find out how many angels can dance on the head of a pin, needs to load both <code>trig.rb</code> and <code>action.rb</code> into his program. But both define a method called <code>sin</code>. Bad news.</p>
+<p>The answer is the module mechanism. Modules define a namespace, a sandbox in which your methods and constants can play without having to worry about being stepped on by other methods and constants. The trig functions can go into one module:</p>
+
+<div><code class="block">module Trig
+  PI = 3.141592654
+  def Trig.sin(x)
+   # ..
+  end
+  def Trig.cos(x)
+   # ..
+  end
+end</code></div>
+<p>and the good and bad action methods can go into another:</p>
+
+<div><code class="block">module Action
+  VERY_BAD = 0
+  BAD      = 1
+  def Action.sin(badness)
+    # ...
+  end
+end</code></div>
+<p>Module constants are named just like class constants, with an initial uppercase letter. The method definitions look similar, too: these module methods are defined just like class methods.</p>
+<p>If a third program wants to use these modules, it can simply load up the two files (using the Ruby <code class="keyword">require</code> statement, which we discuss in &ldquo;<a href="tut_modules.html#includingotherfiles">Including Other Files</a>&rdquo;) and reference the qualified names.</p>
+
+<div><code class="block">require "trig"
+require "action"
+
+y = Trig.sin(Trig::PI/4)
+wrongdoing = Action.sin(Action::VERY_BAD)</code></div>
+<p>As with class methods, you call a module method by preceding its name with the module's name and a period, and you reference a constant using the module name and two colons.</p>
+
+<h2 id="mixins">Mixins</h2>
+<p>Modules have another, wonderful use. At a stroke, they pretty much eliminate the need for multiple inheritance, providing a facility called a <em>mixin</em>.</p>
+<p>In the previous section's examples, we defined module methods, methods whose names were prefixed by the module name. If this made you think of class methods, your next thought might well be &ldquo;what happens if I define instance methods within a module?&rdquo; Good question. A module can't have instances, because a module isn't a class. However, you can <em>include</em> a module within a class definition. When this happens, all the module's instance methods are suddenly available as methods in the class as well. They get <em>mixed in</em>. In fact, mixed-in modules effectively behave as superclasses.</p>
+
+<div><code class="block">module Debug
+  def whoAmI?
+    "#{self.type.name} (\##{self.id}): #{self.to_s}"
+  end
+end
+class Phonograph
+  include Debug
+  # ...
+end
+class EightTrack
+  include Debug
+  # ...
+end
+ph = Phonograph.new("West End Blues")
+et = EightTrack.new("Surrealistic Pillow")
+
+ph.whoAmI? <span class="output" style="width:35em"><span class="outputmark">&rarr;</span> "Phonograph (#537766170): West End Blues"</span>
+et.whoAmI? <span class="output" style="width:35em"><span class="outputmark">&rarr;</span> "EightTrack (#537765860): Surrealistic Pillow"</span></code></div>
+
+
+<p>By including the <code class="module">Debug</code> module, both <code class="class">Phonograph</code> and <code class="class">EightTrack</code> gain access to the <code class="method">whoAmI?</code> instance method.</p>
+<p>A couple of points about the <code class="keyword">include</code> statement before we go on. First, it has nothing to do with files. C programmers use a preprocessor directive called <code>#include</code> to insert the contents of one file into another during compilation. The Ruby <code class="keyword">include</code> statement simply makes a reference to a named module. If that module is in a separate file, you must use <code class="keyword">require</code> to drag that file in before using <code class="keyword">include</code>. Second, a Ruby <code class="keyword">include</code> does not simply copy the module's instance methods into the class. Instead, it makes a reference from the class to the included module. If multiple classes include that module, they'll all point to the same thing. If you change the definition of a method within a module, even while your program is running, all classes that include that module will exhibit the new behavior. <span class="footnote">(Of course, we're speaking only   of methods here. Instance variables are always per-object, for   example.)</span></p>
+<p>Mixins give you a wonderfully controlled way of adding functionality to classes. However, their true power comes out when the code in the mixin starts to interact with code in the class that uses it. Let's take the standard Ruby mixin <code class="module">Comparable</code> as an example. The <code class="module">Comparable</code> mixin can be used to add the comparison operators (<code>&lt;</code>, <code>&lt;=</code>, <code>==</code>, <code>&gt;=</code>, and <code>&gt;</code>), as well as the method <code class="method">between?</code>, to a class. For this to work, <code class="module">Comparable</code> assumes that any class that uses it defines the operator <code>&lt;=&gt;</code>. So, as a class writer, you define the one method, <code>&lt;=&gt;</code>, include <code class="module">Comparable</code>, and get six comparison functions for free. Let's try this with our <code class="class">Song</code> class, by making the songs comparable based on their duration. All we have to do is include the <code class="module">Comparable</code> module and implement the comparison operator <code>&lt;=&gt;</code>.</p>
+
+<div><code class="block">class Song
+  include Comparable
+  def &lt;=&gt;(other)
+    self.duration &lt;=&gt; other.duration
+  end
+end</code></div>
+<p>We can check that the results are sensible with a few test songs.</p>
+
+<div><code class="block">song1 = Song.new("My Way",  "Sinatra", 225)
+song2 = Song.new("Bicylops", "Fleck",  260)
+
+song1 &lt;=&gt; song2 <span class="output"><span class="outputmark">&rarr;</span> -1</span>
+song1  &lt;  song2 <span class="output"><span class="outputmark">&rarr;</span> true</span>
+song1 ==  song1 <span class="output"><span class="outputmark">&rarr;</span> true</span>
+song1  &gt;  song2 <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+
+<p>Finally, back in &ldquo;<a href="tut_containers.html#rubycomparedwithcandjava">Ruby Compared with C++ and Java</a>&rdquo; we showed an implementation of Smalltalk's <code>inject</code> function, implementing it within class <code class="class">Array</code>. We promised then that we'd make it more generally applicable. What better way than making it a mixin module?</p>
+
+<div><code class="block">module Inject
+  def inject(n)
+     each do |value|
+       n = yield(n, value)
+     end
+     n
+  end
+  def sum(initial = 0)
+    inject(initial) { |n, value| n + value }
+  end
+  def product(initial = 1)
+    inject(initial) { |n, value| n * value }
+  end
+end</code></div>
+<p>We can then test this by mixing it into some built-in classes.</p>
+
+<div><code class="block">class Array
+  include Inject
+end
+[ 1, 2, 3, 4, 5 ].sum <span class="output"><span class="outputmark">&rarr;</span> 15</span>
+[ 1, 2, 3, 4, 5 ].product <span class="output"><span class="outputmark">&rarr;</span> 120</span></code></div>
+
+
+
+<div><code class="block">class Range
+  include Inject
+end
+(1..5).sum <span class="output"><span class="outputmark">&rarr;</span> 15</span>
+(1..5).product <span class="output"><span class="outputmark">&rarr;</span> 120</span>
+('a'..'m').sum("Letters: ") <span class="output"><span class="outputmark">&rarr;</span> "Letters: abcdefghijklm"</span></code></div>
+
+
+<p>For a more extensive example of a mixin, have a look at the documentation for the <code class="module"><a href="ref_m_enumerable.html">Enumerable</a></code> module.</p>
+
+<h3 id="instancevariablesinmixins">Instance Variables in Mixins</h3>
+<p>People coming to Ruby from C++ often ask us, &ldquo;What happens to instance variables in a mixin? In C++, I have to jump through some hoops to control how variables are shared in a multiple-inheritance hierarchy. How does Ruby handle this?&rdquo;</p>
+<p>Well, for starters, it's not really a fair question, we tell them. Remember how instance variables work in Ruby: the first mention of an &ldquo;@&rdquo;-prefixed variable creates the instance variable <em>in the   current object,</em> <var>self</var>.</p>
+<p>For a mixin, this means that the module that you mix into your client class (the mixee?) may create instance variables in the client object and may use <code class="method">attr</code> and friends to define accessors for these instance variables.  For instance:</p>
+
+<div><code class="block">module Notes
+  attr  :concertA
+  def tuning(amt)
+    @concertA = 440.0 + amt
+  end
+end
+
+class Trumpet
+  include Notes
+  def initialize(tune)
+    tuning(tune)
+    puts "Instance method returns #{concertA}"
+    puts "Instance variable is #{@concertA}"
+  end
+end
+
+# The piano is a little flat, so we'll match it
+Trumpet.new(-5.3)</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Instance method returns 434.7
+Instance variable is 434.7</code></div>
+<p>Not only do we have access to the methods defined in the mixin, but we get access to the necessary instance variables as well.  There's a risk here, of course, that different mixins may use an instance variable with the same name and create a collision:</p>
+
+<div><code class="block">module MajorScales
+  def majorNum
+    @numNotes = 7 if @numNotes.nil?
+    @numNotes # Return 7
+  end
+end
+
+module PentatonicScales
+  def pentaNum
+    @numNotes = 5 if @numNotes.nil?
+    @numNotes # Return 5?
+  end
+end
+
+class ScaleDemo
+  include MajorScales
+  include PentatonicScales
+  def initialize
+    puts majorNum # Should be 7
+    puts pentaNum # Should be 5
+  end
+end
+
+ScaleDemo.new</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">7
+7</code></div>
+<p>The two bits of code that we mix in both use an instance variable named <var>@numNotes</var>.  Unfortunately, the result is probably not what the author intended.</p>
+<p>For the most part, mixin modules don't try to carry their own instance data around&mdash;they use accessors to retrieve data from the client object.  But if you need to create a mixin that has to have its own state, ensure that the instance variables have unique names to distinguish them from any other mixins in the system (perhaps by using the module's name as part of the variable name).</p>
+
+<h2 id="iteratorsandtheenumerablemodule">Iterators and the Enumerable Module</h2>
+<p>You've probably noticed that the Ruby collection classes support a large number of operations that do various things with the collection: traverse it, sort it, and so on. You may be thinking, &ldquo;Gee, it'd sure be nice if <em>my</em> class could support all these neat-o features, too!&rdquo; (If you actually thought that, it's probably time to stop watching reruns of 1960s television shows.)</p>
+<p>Well, your classes <em>can</em> support all these neat-o features, thanks to the magic of mixins and module <code class="module">Enumerable</code>. All you have to do is write an iterator called <code class="method">each</code>, which returns the elements of your collection in turn. Mix in <code class="module">Enumerable</code>, and suddenly your class supports things such as <code class="method">map</code>, <code class="method">include?</code>, and <code class="method">find_all?</code>. If the objects in your collection implement meaningful ordering semantics using the <code class="method">&lt;=&gt;</code> method, you'll also get <code class="method">min</code>, <code class="method">max</code>, and <code class="method">sort</code>.</p>
+
+<h2 id="includingotherfiles">Including Other Files</h2>
+<p>Because Ruby makes it easy to write good, modular code, you'll often find yourself producing small files containing some chunk of self-contained functionality&mdash;an interface to <em>x</em>, an algorithm to do <em>y</em>, and so on. Typically, you'll organize these files as class or module libraries.</p>
+<p>Having produced these files, you'll want to incorporate them into your new programs. Ruby has two statements that do this.</p>
+
+<div><code class="block">load "filename.rb"
+
+require "filename"</code></div>
+<p>The <code class="method">load</code> method includes the named Ruby source file every time the method is executed, whereas <code class="method">require</code> loads any given file only once. <code class="method">require</code> has additional functionality: it can load shared binary libraries. Both routines accept relative and absolute paths. If given a relative path (or just a plain name), they'll search every directory in the current load path (<var>$:</var>, discussed in &ldquo;<a href="rubyworld.html#whererubyfindsitsmodules">Where Ruby Finds Its Modules</a>&rdquo;) for the file.</p>
+<p>Files loaded using <code class="keyword">load</code> and <code class="keyword">require</code> can, of course, include other files, which include other files, and so on.  What might <em>not</em> be obvious is that <code class="keyword">require</code> is an executable statement&mdash;it may be inside an <code class="keyword">if</code> statement, or it may include a string that was just built.  The search path can be altered at runtime as well.  Just add the directory you want to the string <var>$:</var>.</p>
+<p>Since <code class="method">load</code> will include the source unconditionally, you can use it to reload a source file that may have changed since the program began:</p>
+
+<div><code class="block">5.times do |i|
+   File.open("temp.rb","w") { |f|
+     f.puts "module Temp\ndef Temp.var() #{i}; end\nend"
+   }
+   load "temp.rb"
+   puts Temp.var
+ end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">0
+1
+2
+3
+4</code></div>
+
+
+
+<div id="menubot" class="menu">
+	<a href="tut_exceptions.html" class="prev">&lt; Previous</a><a href="tut_io.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="tut_modules.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

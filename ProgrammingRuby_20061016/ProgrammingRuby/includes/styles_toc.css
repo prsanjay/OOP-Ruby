@@ -1,0 +1,31 @@
+body	{ margin:0; padding:0; font-family:Tahoma,Verdana,sans-serif; font-size:75%; background-color:white; color:black }
+
+a:hover	{ text-decoration:underline; color:#05d; background-color:#def }
+
+ul	{ margin:0; padding:0; margin-bottom:0.6em }
+li	{ list-style-type:none; margin:0.4em 0 0.5em 0; padding:0; font-weight:bold; line-height:100%; position:relative }
+li li	{ font-weight:normal; color:#666 }
+li img	{ position:absolute; left:-13px; top:0 }
+li a	{ font-weight:normal; text-decoration:none }
+
+ul	{ padding-left:15px }
+ul ul ul ul	{ font-family:Times,'Times New Roman'; font-style:italic }
+
+img	{ vertical-align:middle; height:13px; width:13px }
+img.link	{ cursor:pointer; cursor:hand }
+
+li ul	{ display:none }
+li.open ul	{ display:block }
+
+#index	{ margin-top:6em; margin-right:0.8em }
+#toc	{ margin-top:2em; margin-right:0.8em }
+#jump	{ display:block; position:fixed; top:0; background-color:#333; xxwidth:100%; text-align:center; z-index:100; padding:0.2em 0.5em; vertical-align:middle }
+#jump a:link,#jump a:visited	{ font-weight:bold; text-decoration:none; color:#ccc; padding:0 0.2em }
+#jump a:hover	{ color:white; background-color:#666 }
+
+@media print{
+	#index,#toc	{ margin-top:0 }
+	#jump	{ display:none }
+}
+
+#a,#b,#c,#d,#e,#f,#g,#h,#i,#j,#k,#l,#m,#n,#o,#p,#q,#r,#s,#t,#u,#v,#w,#x,#y,#z	{ padding-top:2em ! important }

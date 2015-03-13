@@ -1,0 +1,248 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>FileTest</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_m_fileTest',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="module" id="FileTest">module <strong>FileTest</strong></h1>
+
+<p><code class="module">FileTest</code> implements file test operations similar to those used   in <code class="class">File::Stat</code>.</p>
+
+<h2 class="refsubsection" id="instancemethods">instance methods</h2>
+<dl class="methodlist">
+	<dt id="FileTest.blockdev_qm">blockdev?</dt>
+		<dd class="callseq">FileTest.blockdev?( <i class="obj">aString</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the named file is a block device, <code class="const">false</code>
+      if it isn't or
+      if the operating system doesn't support this feature.
+
+<div><code class="block">FileTest.blockdev?( "testfile" ) <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+		</dd>
+
+	<dt id="FileTest.chardev_qm">chardev?</dt>
+		<dd class="callseq">FileTest.chardev?( <i class="obj">aString</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the named file is a character device, <code class="const">false</code>
+      if it isn't or
+      if the operating system doesn't support this feature.
+
+<div><code class="block">FileTest.chardev?( "/dev/tty" ) <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="FileTest.directory_qm">directory?</dt>
+		<dd class="callseq">FileTest.directory?( <i class="obj">aString</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if this named file is a directory, <code class="const">false</code>
+      otherwise.
+
+<div><code class="block">FileTest.directory?( "." ) <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="FileTest.executable_qm">executable?</dt>
+		<dd class="callseq">FileTest.executable?( <i class="obj">aString</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the named file is executable.
+      The tests are made using the effective
+      owner of the process.
+
+<div><code class="block">FileTest.executable?( "testfile" ) <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+		</dd>
+
+	<dt id="FileTest.executable_real_qm">executable_real?</dt>
+		<dd class="callseq">FileTest.executable_real?( <i class="obj">aString</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Same as <code class="module_instance_method"><a href="ref_m_filetest.html#FileTestexecutable_qm"><span class="module">FileTest</span>#<span class="method">executable?</span></a></code>, but tests using the real owner of the
+      process.
+
+		</dd>
+
+	<dt id="FileTest.exist_qm">exist?</dt>
+		<dd class="callseq">FileTest.exist? ( <i class="obj">aString</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the named file exists.
+
+<div><code class="block">FileTest.exist?( "testfile" ) <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="FileTest.exists_qm">exists?</dt>
+		<dd class="callseq">FileTest.exists? ( <i class="obj">aString</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Synonym for <code class="module_module_method"><a href="ref_m_filetest.html#FileTestexist_qm"><span class="module">FileTest</span>::<span class="method">exist?</span></a></code>.
+
+		</dd>
+
+	<dt id="FileTest.file_qm">file?</dt>
+		<dd class="callseq">FileTest.file?( <i class="obj">aString</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the named file is a regular file (not a device
+     file, pipe, socket, etc.).
+
+<div><code class="block">FileTest.file?( "testfile" ) <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="FileTest.grpowned_qm">grpowned?</dt>
+		<dd class="callseq">FileTest.grpowned?( <i class="obj">aString</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the effective group id of the process is the same
+      as the group id of the named file.
+      On Windows NT, returns <code class="const">false</code>.
+
+<div><code class="block">FileTest.grpowned?( "/etc/passwd" ) <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+		</dd>
+
+	<dt id="FileTest.owned_qm">owned?</dt>
+		<dd class="callseq">FileTest.owned?( <i class="obj">aString</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the effective user id of the process is the same
+      as the owner of the named file.
+
+<div><code class="block">FileTest.owned?( "/etc/passwd" ) <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+		</dd>
+
+	<dt id="FileTest.pipe_qm">pipe?</dt>
+		<dd class="callseq">FileTest.pipe?( <i class="obj">aString</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the operating system supports pipes and
+      the named file is a pipe, <code class="const">false</code> otherwise.
+
+<div><code class="block">FileTest.pipe?( "testfile" ) <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+		</dd>
+
+	<dt id="FileTest.readable_qm">readable?</dt>
+		<dd class="callseq">FileTest.readable?( <i class="obj">aString</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the named file is readable by the effective
+      user id of this process.
+
+<div><code class="block">FileTest.readable?( "testfile" ) <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="FileTest.readable_real_qm">readable_real?</dt>
+		<dd class="callseq">FileTest.readable_real?( <i class="obj">aString</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the named file is readable by the real
+      user id of this process.
+
+<div><code class="block">FileTest.readable_real?( "testfile" ) <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="FileTest.setgid_qm">setgid?</dt>
+		<dd class="callseq">FileTest.setgid?( <i class="obj">aString</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the named file's set-group-id
+      permission bit is set, and <code class="const">false</code> if it isn't or
+      if the operating system doesn't support this feature.
+
+<div><code class="block">FileTest.setgid?( "/usr/sbin/lpc" ) <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="FileTest.setuid_qm">setuid?</dt>
+		<dd class="callseq">FileTest.setuid?( <i class="obj">aString</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the named  file's set-user-id
+      permission bit is set, and <code class="const">false</code> if it isn't or
+      if the operating system doesn't support this feature.
+
+<div><code class="block">FileTest.setuid?( "/bin/su" ) <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="FileTest.size">size</dt>
+		<dd class="callseq">FileTest.size( <i class="obj">aString</i> )  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Returns the size of the named file in bytes.
+
+<div><code class="block">FileTest.size( "testfile" ) <span class="output"><span class="outputmark">&rarr;</span> 66</span></code></div>
+
+		</dd>
+
+	<dt id="FileTest.size_qm">size?</dt>
+		<dd class="callseq">FileTest.size?( <i class="obj">aString</i> )  &rarr; <i class="obj">aFixnum</i> or <code>nil</code></dd>
+		<dd class="desc">Returns <code>nil</code> if the named file is of zero length; otherwise,
+      returns a nonzero <i class="obj">aFixnum</i>.
+
+<div><code class="block">FileTest.size?( "testfile" ) <span class="output"><span class="outputmark">&rarr;</span> 66</span>
+FileTest.size?( "/dev/zero" ) <span class="output"><span class="outputmark">&rarr;</span> nil</span></code></div>
+
+		</dd>
+
+	<dt id="FileTest.socket_qm">socket?</dt>
+		<dd class="callseq">FileTest.socket?( <i class="obj">aString</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the named file is a socket, <code class="const">false</code> if
+      it isn't or
+      if the operating system doesn't support this feature.
+
+		</dd>
+
+	<dt id="FileTest.sticky_qm">sticky?</dt>
+		<dd class="callseq">FileTest.sticky?( <i class="obj">aString</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the named file has its sticky bit set,
+      <code class="const">false</code> if it doesn't or if the operating system doesn't
+      support this feature.
+
+		</dd>
+
+	<dt id="FileTest.symlink_qm">symlink?</dt>
+		<dd class="callseq">FileTest.symlink?( <i class="obj">aString</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the named file is a symbolic link,
+      <code class="const">false</code> if it isn't or if the operating system doesn't
+      support this feature.
+
+		</dd>
+
+	<dt id="FileTest.writable_qm">writable?</dt>
+		<dd class="callseq">FileTest.writable?( <i class="obj">aString</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the named file is writable by the effective
+      user id of this process.
+
+		</dd>
+
+	<dt id="FileTest.writable_real_qm">writable_real?</dt>
+		<dd class="callseq">FileTest.writable_real?( <i class="obj">aString</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the named file is writable by the real
+      user id of this process.
+
+		</dd>
+
+	<dt id="FileTest.zero_qm">zero?</dt>
+		<dd class="callseq">FileTest.zero?( <i class="obj">aString</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the named file is of zero length, <code class="const">false</code>
+      otherwise.</dd>
+</dl>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_m_fileTest.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

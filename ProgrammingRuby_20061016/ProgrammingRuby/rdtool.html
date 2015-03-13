@@ -1,0 +1,238 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>When Trouble Strikes</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	<a href="lib_windows.html" class="prev">&lt; Previous</a><a href="irb.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'rdtool',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 id="embeddeddocumentation">Embedded Documentation</h1>
+
+<div class="figure" id="figure_a.1">Figure A.1 not available...</div>
+
+<div class="figure" id="figure_a.2">Figure A.2 not available...</div>
+
+<p>So you've written a masterpiece, a class in a class of its own, and you'd like to share it with the world. But, being a responsible developer, you feel the need to document your creation. What do you do?  The simplest solution is to use Ruby's built-in documentation format, RD, and <code>rdtool</code>, a Ruby utility suite that converts this documentation into a variety of output formats.</p>
+
+<p><code>rdtool</code> scans a file for <code>=begin</code> and <code>=end</code> pairs, and extracts the text between them all. This text is assumed to be documentation in RD format. The text is then processed according to a simple set of rules:</p>
+
+<ul>
+<li>Lines of text flush to the left margin are converted to paragraphs.</li>
+<li>Lines starting with one to four equals signs are headings. &ldquo;=&rdquo; is a first-level heading, &ldquo;==&rdquo; a second-level heading, and so on. &ldquo;+&rdquo; and &ldquo;++&rdquo; can be used to signal fifth- and sixth-level headings if you really want to go that deep.
+
+<div><code class="block">= Top Level Heading
+== Second Level Heading
+...</code></div></li>
+<li>Lines in which the first nonspace is an asterisk indicate the beginnings of bullet lists. Continuation lines for each bullet item should line up with the text on the first line. Lists may be nested.
+
+<div><code class="block">This is normal text
+* start of a
+  multiline bullet item
+* and another
+  * nested item
+  * second nested
+* third item at top level</code></div></li>
+<li>Lines where the first nonspace characters are digits between parentheses indicate numbered lists. The actual digits used are ignored. Again, lists may be nested.
+
+<div><code class="block">(1) A numbered item
+    * subitem in a bulleted list
+    * subitem
+(2) Second numbered item
+(9) This will actually be labeled '3.'</code></div></li>
+<li>Lines starting with a colon indicate labeled lists. The text on the colon line is the label. The immediately following text (which may not be indented less than the label) is the descriptive text. Again, each type of list may be nested.
+
+<div><code class="block">: red
+  when the light is red, you
+  must stop
+: amber
+  the amber light means that things are about to change. Either:
+  * step on the gas, or
+  * slam on the brakes
+: green
+  green means GO</code></div></li>
+	<li>Lines starting with three minus signs are a special kind of labeled list, when the labels are method names and signatures. The source in <a href="rdtool.html#figure_a.1">Figure A.1</a> shows a handful of these in action.</li>
+</ul>
+
+<p>Indented text that isn't part of a list is set verbatim (such as the stuff under &ldquo;Synopsis&rdquo; in Figures A.1 and A.2).</p>
+
+<h2 id="inlineformatting">Inline Formatting</h2>
+
+<p>Within blocks of text and headings, you can use special <em>inline sequences</em> to control text formatting. All sequences are nested within a set of double parentheses.</p>
+
+<table>
+<thead><tr>
+<th>Sequence</th>
+  <th>Example</th>
+  <th>Intended Use</th>
+</tr></thead>
+<tr class="firstRow">
+  <td>((*emphasis*))</td>
+  <td><em>emphasis</em></td>
+  <td>Emphasis (normally italic)</td>
+</tr>
+<tr>
+  <td>(({code stuff}))</td>
+  <td><code>code stuff</code></td>
+  <td>Code</td>
+</tr>
+<tr>
+  <td>((|variable|))</td>
+  <td><em>variable</em></td>
+  <td>Variable name</td>
+</tr>
+<tr>
+  <td>((%type me%))</td>
+  <td><code>type me</code></td>
+  <td>Keyboard input</td>
+</tr>
+<tr>
+  <td>((:index term:))</td>
+  <td>index term</td>
+  <td>Something to be indexed</td>
+</tr>
+<tr>
+  <td>((&lt;reference&gt;))</td>
+  <td><u>reference</u></td>
+  <td>Hyperlink reference</td>
+</tr>
+<tr>
+  <td>((-footnote-))</td>
+  <td>text.<sup>4</sup></td>
+  <td>Footnote text. A reference is placed inline, and the text of the footnote appears at the bottom of the page.</td>
+</tr>
+<tr>
+  <td>(('verb'))</td>
+  <td>verb</td>
+  <td>Verbatim text</td>
+</tr>
+</table>
+
+<h2 id="crossreferences">Cross References</h2>
+
+<p>The content of headings, the labels of labeled lists, and the names of methods are automatically made into potential cross reference targets. You make links to these targets from elsewhere in the document by citing their contents in the <code>((&lt;...&gt;))</code> construct.</p>
+
+<div><code class="block">= Synopsis
+...
+See ((&lt;Return Codes&gt;)) for details.
+..
+== Instance Methods
+
+&mdash; Tempfile.open( filename )
+    Opens the file...
+
+== Return Codes
+..
+The method ((&lt;Tempfile.open&gt;)) raises an (({IOException}))...</code></div>
+
+
+
+<p>If a reference starts with &ldquo;URL:&rdquo;, <code>rdtool</code> attempts to format it as an external hyperlink.</p>
+
+<p>The reference  <code>((&lt;display part|label&gt;))</code> generates a link to <code>label</code> but places the text &ldquo;display part&rdquo; in the output document. This is used in the description section of the example in <a href="rdtool.html#figure_a.1">Figure A.1</a> to generate references to the method names:</p>
+
+<div><code class="block">perspective, apart from the unusual ((&lt;(({new}))|Tempfile.new&gt;)),
+...</code></div>
+
+
+
+<p>This construct displays the word &ldquo;new&rdquo; in code font but uses it as a hyperlink to the method <code>Tempfile.new</code>.</p>
+
+<h2 id="methodnames">Method Names</h2>
+
+<p><code>rdtool</code> makes certain assumptions about the format of method names. Class or module methods should appear as <code>Class.method</code>, instance methods as <code>Class#method</code>, and class or module constants as <code>Class::Const</code>.</p>
+
+<div><code class="block">&mdash; Tempfile::IOWRITE
+    Open the file write-only.
+    ...
+&mdash; Tempfile.new( filename )
+    Constructs a temporary file in the given directory. The file
+    ...
+&mdash; Tempfile#open
+    Reopens ((|aTempfile|)) using mode &ldquo;r+&rdquo;, which allows reading
+    ..</code></div>
+
+
+
+<h2 id="includingotherfiles">Including Other Files</h2>
+
+<p>The contents of <em>filename</em> will be inserted  wherever the document contains</p>
+
+<div class="syntax"><code class="block">&lt;&lt;&lt; <i class="nt">filename</i></code></div>
+
+<p>If the file is specified with an <code>.rd</code> or <code>.rb</code> extension, it will be interpreted as RD documentation.</p>
+
+<p>If the filename has no extension, <code>rdtool</code> will look for a file with an extension that matches the type of output being produced (<code>.html</code> for HTML files, <code>.man</code> for man files, and so on) and interpolate that file's contents in the <code>output</code> stream. Thus, a line such as:</p>
+
+<div><code class="block">&lt;&lt;&lt; header</code></div>
+
+
+
+<p>could be used to add an output-dependent header to a document.</p>
+
+<h2 id="usingrdtool">Using rdtool</h2>
+
+<p>RD documentation can be included directly in a Ruby source program or written into a separate file (which by convention will have the extension <code>.rd</code>). These files are processed using the <code>rd2</code> command to produce appropriately formatted output.</p>
+
+<div class="syntax"><code class="block">rd2  <i>[</i><i class="nt">options</i><i>]</i> <i class="nt">inputfile</i> <i>[</i>&gt;<i class="nt">outputfile</i><i>]</i></code></div>
+
+<p>Some common options include:</p>
+
+<table>
+<tr class="firstRow">
+  <td><code>-r</code><em>format</em></td>
+  <td>Select an output format. <code>-rrd/rd2html-lib.rb</code> produces HTML output (the default). <code>-rrd/rd2man-lib.rb</code> produces Unix man page output.</td>
+</tr>
+<tr>
+  <td><code>-o</code><em>name</em></td>
+  <td>Set the base part of the output filename.</td>
+</tr>
+<tr>
+  <td><code>--help</code></td>
+  <td>List the full set of options.</td>
+</tr>
+</table>
+
+<h2 id="mandatorydisclaimer">Mandatory Disclaimer</h2>
+
+<p>As we are writingthis, RD and <code>rdtool</code> are undergoing continuous development. It is likely that some of the details we give here will be out of date (or just plain wrong) by the time you read this.</p>
+
+<p>Included with the<code>rdtool</code> distribution is the file <code>README.rd</code>. We suggest you do so, as it will give you the current scoop on producing Ruby documentation.</p>
+
+
+<div id="menubot" class="menu">
+	<a href="lib_windows.html" class="prev">&lt; Previous</a><a href="irb.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="rdtool.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

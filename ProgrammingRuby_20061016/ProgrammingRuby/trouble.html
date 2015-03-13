@@ -1,0 +1,368 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>When Trouble Strikes</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	<a href="tut_threads.html" class="prev">&lt; Previous</a><a href="rubyworld.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'trouble',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+<h1 id="whentroublestrikes">When Trouble Strikes</h1>
+<p>Sad to say, it is possible to write buggy programs using Ruby.  Sorry about that.</p>
+<p>But not to worry!  Ruby has several features that will help debug your programs.  We'll look at these features, and then we'll show some common mistakes you can make in Ruby and how to fix them.</p>
+
+<h2 id="rubydebugger">Ruby Debugger</h2>
+<p>Ruby comes with a debugger, which is conveniently built into the base system.  You can run the debugger by invoking the interpreter with the <code>-r debug</code> option, along with any other Ruby options and the name of your script:</p>
+
+<div class="syntax"><code class="block">ruby -r debug <i class="opt">[</i><i class="opt">options</i><i class="opt">]</i> <i class="opt">[</i><i class="opt">programfile</i><i class="opt">]</i> <i class="opt">[</i><i class="opt">arguments</i><i class="opt">]</i></code></div>
+
+<p>The debugger supports the usual range of features you'd expect, including the ability to set breakpoints, to step into and step over method calls, and to display stack frames and variables.</p>
+<p>It can also list the instance methods defined for a particular object or class, and allows you to list and control separate threads within Ruby.  <a href="trouble.html#table_debuggercommands">Table 12.1</a> lists all of the commands that are available under the debugger.</p>
+<p>If your Ruby has <code>readline</code> support enabled, you can use cursor keys to move back and forth in command history and use line editing commands to amend previous input.</p>
+<p>To give you an idea of what the Ruby debugger is like, here is a sample session.</p>
+
+<div><code class="block">% <b>ruby -rdebug t.rb</b>
+Debug.rb
+Emacs support available.
+t.rb:1:def fact(n)
+(rdb:1) <b>list 1-9</b>
+[1, 10] in t.rb
+=&gt; 1  def fact(n)
+   2    if n &lt;= 0
+   3      1
+   4    else
+   5      n * fact(n-1)
+   6    end
+   7  end
+   8
+   9  p fact(5)
+(rdb:1) <b>b 2</b>
+Set breakpoint 1 at t.rb:2
+(rdb:1) <b>c</b>
+breakpoint 1, fact at t.rb:2
+t.rb:2:  if n &lt;= 0
+(rdb:1) <b>disp n</b>
+  1: n = 5
+(rdb:1) <b>del 1</b>
+(rdb:1) <b>watch n==1</b>
+Set watchpoint 2
+(rdb:1) <b>c</b>
+watchpoint 2, fact at t.rb:fact
+t.rb:1:def fact(n)
+1: n = 1
+(rdb:1) <b>where</b>
+--&gt; #1  t.rb:1:in `fact'
+    #2  t.rb:5:in `fact'
+    #3  t.rb:5:in `fact'
+    #4  t.rb:5:in `fact'
+    #5  t.rb:5:in `fact'
+    #6  t.rb:9
+(rdb:1) <b>del 2</b>
+(rdb:1) <b>c</b>
+120</code></div>
+
+<h2 id="interactiveruby">Interactive Ruby</h2>
+<p>If you want to play with Ruby, there is a facility called Interactive Ruby&mdash;irb, for short. irb is essentially a Ruby &ldquo;shell&rdquo; similar in concept to an operating system shell (complete with job control). It provides an environment where you can &ldquo;play around&rdquo; with the language in real time.  You launch irb at the command prompt:</p>
+
+<div class="syntax"><code class="block">irb <i class="opt">[</i><i class="opt">irb-options</i><i class="opt">]</i> <i class="opt">[</i><i class="opt">ruby_script</i><i class="opt">]</i> <i class="opt">[</i><i class="opt">options</i><i class="opt">]</i></code></div>
+<p>irb will display the value of each expression as you complete it. For instance:</p>
+
+<div><code class="block">% irb
+irb(main):001:0&gt; <b>a = 1 +</b>
+irb(main):002:0* <b>2 * 3 /</b>
+irb(main):003:0* <b>4 % 5</b>
+2
+irb(main):004:0&gt; <b>2+2</b>
+4
+irb(main):005:0&gt; <b>def test</b>
+irb(main):006:1&gt; <b>puts "Hello, world!"</b>
+irb(main):007:1&gt; <b>end</b>
+nil
+irb(main):008:0&gt; <b>test</b>
+Hello, world!
+nil
+irb(main):009:0&gt;</code></div>
+
+<p>irb also allows you to create subsessions, each one of which may have its own context.  For example, you can create a subsession with the same (top-level) context as the original session, or create a subsession in the context of a particular class or instance.  The sample session shown in <a href="trouble.html#figure_12.1">Figure 12.1</a> is a bit longer, but shows how you can create subsessions and switch between them.</p>
+
+<div class="figure">Figure 12.1 not available...</div>
+
+<p>For a full description of all the commands that irb supports, see the its reference, &ldquo;<a href="irb.html">Interactive Ruby Shell</a>.&rdquo;</p>
+<p>As with the debugger, if your version of Ruby was built with GNU Readline support, you can use arrow keys (as with Emacs) or vi-style key bindings to edit individual lines or to go back and reexecute or edit a previous line&mdash;just like a command shell.</p>
+<p>irb is a great learning tool: it's very handy if you want to try out an idea quickly and see if it works.</p>
+
+<h3 id="editorsupport">Editor Support</h3>
+<p>Ruby is designed to read a program in one pass; this means you can pipe an entire program to Ruby's standard input and it will work just fine.</p>
+<p>We can take advantage of this feature to run Ruby code from inside an editor.  In Emacs, for instance, you can select a region of Ruby text and use the command <code>Meta-|</code> to execute Ruby.  The Ruby interpreter will use the selected region as standard input and output will go to a buffer named &ldquo;<code>*Shell Command Output*</code>.&rdquo;  This feature has come in quite handy for us while writing this book&mdash;just select a few lines of Ruby in the middle of a paragraph and try it out!</p>
+<p>You can do something similar in the vi editor using &ldquo;<code>:!ruby</code>&rdquo; which <em>replaces</em> the program text with its output, or &ldquo;<code>:w&#8255;!ruby</code>&rdquo;, which displays the output without affecting the buffer. Other editors have similar features.</p>
+<p>While we are on the subject, this would probably be a good place to mention that there is a Ruby mode for Emacs included in the distribution as <code>misc/ruby-mode.el</code>.  There are also several syntax-highlighting modules for vim (an enhanced version of the vi editor), jed, and other editors available on the net as well. Check the Ruby FAQ for current locations and availability.</p>
+
+<h2 id="butitdoesntwork">But It Doesn't Work!</h2>
+<p>So you've read through enough of the book, you start to write your very own Ruby program, and it doesn't work.  Here's a list of common gotchas and other tips.</p>
+<ul>
+<li>Attribute setter not being called. Within an object, Ruby will parse <code>setter=</code> as an assignment to a local variable, not as a method call. Use <code>self.setter=</code> to indicate the method call.</li>
+<li>A parse error at the last line of the source often indicates a missing <code class="keyword">end</code> keyword.</li>
+<li>Make sure that the type of the object you are using is what you think it is. If in doubt, use <code class="class_instance_method"><a href="ref_c_object.html#Object.type"><span class="class">Object</span>#<span class="method">type</span></a></code> to check the type of an object.</li>
+<li>Make sure that your methods start with a lowercase letter and that classes and constants start with an uppercase letter.</li>
+<li>If you happen to forget a &ldquo;,&rdquo; in an argument list&mdash;especially to print&mdash;you can produce some very odd error messages.</li>
+<li>Block parameters are actually local variables. If an existing local of the same name exists when the block executes, that variable will be modified by the call to the block. This may or may not be a good thing.</li>
+<li>Watch out for precedence, especially when using <code>{}</code> instead of <code class="keyword">do</code>/<code class="keyword">end</code>.</li>
+<li>Make sure that the open parenthesis of a method's parameter list butts up against the end of the method name with no intervening spaces.</li>
+<li>Output written to a terminal may be buffered. This means that you may not see a message you write immediately. In addition, if you write messages to both <code>$stdout</code> and <code>$stderr</code>, the output may not appear in the order you were expecting. Always use nonbuffered I/O (set <code>sync=true</code>) for debug messages.</li>
+<li>If numbers don't come out right, perhaps they're strings. Text read from a file will be a <code class="class">String</code>, and will not be automatically converted to a number by Ruby. A call to <code>to_i</code> will work wonders. A common mistake Perl programmers make is: 
+<div><code class="block">while gets
+  num1, num2 = split /,/
+  # ...
+end</code></div></li>
+<li>Unintended aliasing&mdash;if you are using an object as the key of a hash, make sure it doesn't change its hash value (or arrange to call <code class="class_instance_method"><a href="ref_c_hash.html#Hash.rehash"><span class="class">Hash</span>#<span class="method">rehash</span></a></code> if it does).</li>
+<li>Use <code class="keyword">trace_var</code> to watch when a variable changes value.</li>
+<li>Use the debugger.</li>
+<li>Use <code class="class_instance_method"><a href="ref_c_object.html#Object.freeze"><span class="class">Object</span>#<span class="method">freeze</span></a></code>. If you suspect that some unknown portion of code is setting a variable to a bogus value, try freezing the variable. The culprit will then be caught during the attempt to modify the variable. </li></ul> <p>There's one major technique that makes writing Ruby code both easier and more fun. <em>Develop your applications incrementally.</em> Write a few lines of code, then run them. Write a few more, then run those. One of the major benefits of an untyped language is that things don't have to be complete before you use them.</p>
+
+<h2 id="butitstooslow">But It's Too Slow!</h2>
+<p>Ruby is an interpreted, high-level language, and as such it may not perform as fast as a lower-level language such as C. In this section, we'll list some basic things you can do to improve performance; also have a look in the index under <em>Performance</em> for other pointers.</p>
+
+<h3 id="createlocalsoutsideblocks">Create Locals Outside Blocks</h3>
+<p>Try defining the variables used in a block before the block executes. When iterating over a very large set of elements, you can improve execution speed somewhat by predeclaring any iterator variables. In the first example below, Ruby has to create new <code>x</code> and <code>y</code> variables on each iteration, but in the second version it doesn't. We'll use the <code>benchmark</code> package from the Ruby Application Archive to compare the loops:</p>
+
+<div><code class="block">require "benchmark"
+include Benchmark
+n = 1000000
+bm(12) do |test|
+  test.report("normal:")    do
+    n.times do |x|
+      y = x + 1
+    end
+  end
+  test.report("predefine:") do
+    x = y = 0
+    n.times do |x|
+      y = x + 1
+    end
+  end
+end</code></div>
+
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">                  user     system      total        real
+normal:       2.450000   0.020000   2.470000 (  2.468109)
+predefine:    2.140000   0.020000   2.160000 (  2.155307)</code></div>
+
+<h3 id="usetheprofiler">Use the Profiler</h3>
+<p>Ruby comes with a <a href="lib_standard.html#profile">code profiler</a>. In and of itself, that isn't too surprising, but when you realize that the profiler is written in just about 50 lines of Ruby, that makes for a pretty impressive language.</p>
+<p>You can add profiling to your code using the command-line option <code class="cmdopt">-r</code><code> profile</code>, or from within the code using <code>require   "profile"</code>. For example:</p>
+
+<div><code class="block">require "profile"
+class Peter
+  def initialize(amt)
+    @value = amt
+  end
+
+  def rob(amt)
+    @value -= amt
+    amt
+  end
+end
+
+class Paul
+  def initialize
+    @value = 0
+  end
+
+  def pay(amt)
+    @value += amt
+    amt
+  end
+end
+
+peter = Peter.new(1000)
+paul = Paul.new
+1000.times do
+  paul.pay(peter.rob(10))
+end</code></div>
+
+<p>Run this, and you'll get something like the following.</p>
+<div><code class="block"> time   seconds   seconds    calls  ms/call  ms/call  name
+ 32.14     0.27      0.27        1   270.00   840.00  Fixnum#times
+ 30.95     0.53      0.26     1000     0.26     0.27  Paul#pay
+ 29.76     0.78      0.25     1000     0.25     0.30  Peter#rob
+  5.95     0.83      0.05     1000     0.05     0.05  Fixnum#-
+  1.19     0.84      0.01     1000     0.01     0.01  Fixnum#+
+  0.00     0.84      0.00        1     0.00     0.00  Paul#initialize
+  0.00     0.84      0.00        2     0.00     0.00  Class#inherited
+  0.00     0.84      0.00        4     0.00     0.00  Module#method_added
+  0.00     0.84      0.00        1     0.00     0.00  Peter#initialize
+  0.00     0.84      0.00        1     0.00   840.00  #toplevel
+  0.00     0.84      0.00        2     0.00     0.00  Class#new</code></div>
+<p>With the profiler, you can quickly identify and fix bottlenecks.
+Remember to check the code without the profiler afterward,
+though&mdash;sometimes the slowdown the profiler introduces can mask other
+problems.</p>
+<p>Ruby is a wonderfully transparent and expressive language, but it does not relieve the programmer of the need to apply common sense: creating unnecessary objects, performing unneeded work, and creating generally bloated code are wasteful in any language.</p>
+
+<table class="figure" id="table_debuggercommands">
+<caption>Table 12.1 : Debugger commands</caption>
+<tr class="firstRow">
+  <td><code>b[reak] [file:]line</code></td>
+  <td>Set breakpoint at given line in <code class="obj">file</code> (default current file).</td>
+</tr>
+<tr>
+  <td><code>b[reak] [file:]name</code></td>
+  <td>Set breakpoint at <code class="obj">method</code> in <code class="obj">file</code>.</td>
+</tr>
+<tr>
+  <td><code>b[reak]</code></td>
+  <td>Display breakpoints and watchpoints.</td>
+</tr>
+<tr>
+  <td><code>wat[ch] expr</code></td>
+  <td>Break when expression becomes true.</td>
+</tr>
+<tr>
+  <td><code>del[ete] [nnn]</code></td>
+  <td>Delete breakpoint <code class="obj">nnn</code> (default all).</td>
+</tr>
+<tr>
+  <td><code>disp[lay] expr</code></td>
+  <td>Display value of <code class="obj">nnn</code> every time debugger gets control.</td>
+</tr>
+<tr>
+  <td><code>disp[lay]</code></td>
+  <td>Show current displays.</td>
+</tr>
+<tr>
+  <td><code>undisp[lay] [nnn]</code></td>
+  <td>Remove display (default all).</td>
+</tr>
+<tr>
+  <td><code>c[ont]</code></td>
+  <td>Continue execution.</td>
+</tr>
+<tr>
+  <td><code>s[tep]  nnn=1</code></td>
+  <td>Execute next <code class="obj">nnn</code> lines, stepping into methods.</td>
+</tr>
+<tr>
+  <td><code>n[ext]  nnn=1</code></td>
+  <td>Execute next <code class="obj">nnn</code> lines, stepping over methods.</td>
+</tr>
+<tr>
+  <td><code>fi[nish]</code></td>
+  <td>Finish execution of the current function.</td>
+</tr>
+<tr>
+  <td><code>q[uit]</code></td>
+  <td>Exit the debugger.</td>
+</tr>
+<tr>
+  <td><code>w[here]</code></td>
+  <td>Display current stack frame.</td>
+</tr>
+<tr>
+  <td><code>f[rame]</code></td>
+  <td>Synonym for <code>where</code>.</td>
+</tr>
+<tr>
+  <td><code>l[ist] [start--end]</code></td>
+  <td>List source lines from start to end.</td>
+</tr>
+<tr>
+  <td><code>up nnn=1</code></td>
+  <td>Move up <code class="obj">nnn</code> levels in the stack frame.</td>
+</tr>
+<tr>
+  <td><code>down nnn=1</code></td>
+  <td>Move down <code class="obj">nnn</code> levels in the stack frame.</td>
+</tr>
+<tr>
+  <td><code>v[ar] g[lobal]</code></td>
+  <td>Display global variables.</td>
+</tr>
+<tr>
+  <td><code>v[ar] l[ocal]</code></td>
+  <td>Display local variables.</td>
+</tr>
+<tr>
+  <td><code>v[ar] i[stance] <code class="obj">obj</code></code></td>
+  <td>Display instance variables of <code class="obj">obj</code>.</td>
+</tr>
+<tr>
+  <td><code>v[ar] c[onst] Name</code></td>
+  <td>Display constants in class or module name.</td>
+</tr>
+<tr>
+  <td><code>m[ethod] i[nstance] <code class="obj">obj</code></code></td>
+  <td>Display instance methods of
+                                    <code class="obj">obj</code>.</td>
+</tr>
+<tr>
+  <td><code>m[ethod] Name</code></td>
+  <td>Display instance methods of the class or module name.</td>
+</tr>
+<tr>
+  <td><code>th[read] l[ist]</code></td>
+  <td>List all threads.</td>
+</tr>
+<tr>
+  <td><code>th[read] [c[ur[rent]]]</code></td>
+  <td>Display status of current thread.</td>
+</tr>
+<tr>
+  <td><code>th[read] [c[ur[rent]]] nnn</code></td>
+  <td>Make thread <code class="obj">nnn</code> current and
+                                   stop it.</td>
+</tr>
+<tr>
+  <td><code>th[read] stop nnn</code></td>
+  <td>Make thread <code class="obj">nnn</code> current and stop it.</td>
+</tr>
+<tr>
+  <td><code>th[read] resume nnn</code></td>
+  <td>Resume thread <code class="obj">nnn</code>.</td>
+</tr>
+<tr>
+  <td><code>[p] expr</code></td>
+  <td>Evaluate <code class="obj">expr</code> in the current context. <code class="obj">expr</code> may
+               include assignment to variables and method invocations.</td>
+</tr>
+<tr>
+  <td><code><code class="obj">empty</code></code></td>
+  <td>A null command repeats the last command.</td>
+</tr>
+</table>
+
+
+<div id="menubot" class="menu">
+	<a href="tut_threads.html" class="prev">&lt; Previous</a><a href="rubyworld.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="trouble.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>
