@@ -1,0 +1,996 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Extending Ruby</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	<a href="win32.html" class="prev">&lt; Previous</a><a href="language.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ext_ruby',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+<h1 id="extendingruby">Extending Ruby</h1>
+
+<p>It is easy to extend Ruby with new features by writing code in Ruby. Once you start adding in low-level code written in C, however, the possibilities are endless.</p>
+<p>Extending Ruby with C is pretty easy. For instance, suppose we are building a custom Internet-ready jukebox for the Sunset Diner and Grill. It will play MP3 audio files from a hard disk or audio CDs from a CD jukebox. We want to be able to control the jukebox hardware from a Ruby program. The hardware vendor gave us a C header file and a binary library to use; our job is to construct a Ruby object that makes the appropriate C function calls.</p>
+<p>But before we can get Ruby and C to work together, we need to see what the Ruby world looks like from the C side. <span class="footnote">(Much of the information in this chapter is taken from the <code>README.EXT</code> file that is included in the distribution. If you are planning on writing a Ruby extension, you may want to refer to that file for more details as well as the latest changes.)</span></p>
+
+<h2 id="rubyobjectsinc">Ruby Objects in C</h2>
+<p>The first thing we need to look at is how to represent and access Ruby datatypes from within C. Everything in Ruby is an object, and all variables are references to objects. In C, this means that the type of all Ruby variables is <code>VALUE</code>, which is either a pointer to a Ruby object or an immediate value (such as <code>Fixnum</code>).</p>
+<p>This is how Ruby implements object-oriented code in C: a Ruby object is an allocated structure in memory that contains a table of instance variables and information about the class. The class itself is another object (an allocated structure in memory) that contains a table of the methods defined for that class. On this foundation hangs all of Ruby.</p>
+
+<h3 id="valuesasapointer"><code>VALUE</code> as a Pointer</h3>
+<p>When <code>VALUE</code> is a pointer, it is a pointer to one of the defined Ruby object structures&mdash;you can't have a <code>VALUE</code> that points to an arbitrary structure. The structures for each built-in class are defined in &ldquo;<code>ruby.h</code>&rdquo; and are named <code>R</code><em>Classname</em>, as in <code>RString</code> and <code>RArray</code>.</p>
+<p>You can check to see what type of structure is used for a particular <code>VALUE</code> in a number of ways. The macro <code>TYPE(</code><em>obj</em><code>)</code> will return a constant representing the C type of the given object: <code>T_OBJECT</code>, <code>T_STRING</code>, and so on. Constants for the built-in classes are defined in &ldquo;<code>ruby.h</code>&rdquo;. Note that the <em>type</em> we are referring to here is an implementation detail&mdash;it is not the same as the class of an object.</p>
+<p>If you want to ensure that a value pointer points to a particular structure, you can use the macro <code>Check_Type</code>, which will raise a <code class="exception">TypeError</code> exception if <em>value</em> is not of the expected <em>type</em> (which is one of the constants <code>T_STRING</code>, <code>T_FLOAT</code>, and so on):</p>
+
+<div><code class="block">Check_Type(VALUE <em>value</em>, int <em>type</em>)</code></div>
+<p>If speed is an issue, there are faster macros that check specifically for the immediate values <code>Fixnum</code> and <code>nil</code>.</p>
+
+<div><code class="block">FIXNUM_P(<em>value</em>) <span class="returnvalue">non-zero if value is a Fixnum</span>
+NIL_P(<em>value</em>)    <span class="returnvalue">non-zero if value is nil</span>
+RTEST(<em>value</em>)    <span class="returnvalue">non-zero if value is neither nil nor false</span></code></div>
+<p>Again, note that we are talking about &ldquo;type&rdquo; as the C structure that represents a particular built-in type. The class of an object is a different beast entirely. The class objects for the built-in classes are stored in C global variables named <code>rb_c</code><em>Classname</em> (for instance, <code>rb_cObject</code>); modules are named <code>rb_m</code><em>Modulename</em>.</p>
+<p>It wouldn't be advisable to mess with the data in these structures directly, however&mdash;you may look, but don't touch unless you are fond of debuggers. You should normally use only the supplied C functions to manipulate Ruby data (we'll talk more about this in just a moment).</p>
+<p>However, in the interests of efficiency you may need to dig into these structures to obtain data. In order to dereference members of these C structures, you have to cast the generic <code>VALUE</code> to the proper structure type. <code>ruby.h</code> contains a number of macros that perform the proper casting for you, allowing you to dereference structure members easily. These macros are named <code>R<em>CLASSNAME</em></code>, as in <code>RSTRING</code> or <code>RARRAY</code>. For example:</p>
+
+<div><code class="block">VALUE str, arr;
+RSTRING(str)-&gt;len <span class="returnvalue">length of the Ruby string</span>
+RSTRING(str)-&gt;ptr <span class="returnvalue">pointer to string storage</span>
+RARRAY(arr)-&gt;len  <span class="returnvalue">length of the Ruby array</span>
+RARRAY(arr)-&gt;capa <span class="returnvalue">capacity of the Ruby array</span>
+RARRAY(arr)-&gt;ptr  <span class="returnvalue">pointer to array storage</span></code></div>
+
+<h3 id="valueasanimmediateobject"><code>VALUE</code> as an Immediate Object</h3>
+<p>As we said above, immediate values are not pointers: <code>Fixnum</code>, <code>Symbol</code>, <code>true</code>, <code>false</code>, and <code>nil</code> are stored directly in <code>VALUE</code>.</p>
+<p><code>Fixnum</code> values are stored as 31-bit numbers <span class="footnote">(Or 63-bit on wider CPU architectures.)</span> that are formed by shifting the original number left 1 bit and then setting the least significant bit (bit 0) to &ldquo;1.&rdquo;  When <code>VALUE</code> is used as a pointer to a specific Ruby structure, it is guaranteed always to have an LSB of zero; the other immediate values also have LSBs of zero. Thus, a simple bit test can tell you whether or not you have a <code>Fixnum</code>.</p>
+<p>There are several useful conversion macros for numbers as well as other standard datatypes shown in <a href="ext_ruby.html#table_17.1">Table 17.1</a>.</p>
+<p>The other immediate values (<code class="keyword">true</code>, <code class="keyword">false</code>, and <code>nil</code>) are represented in C as the constants <code class="keyword">Qtrue</code>, <code class="keyword">Qfalse</code>, and <code class="keyword">Qnil</code>, respectively. You can test <code>VALUE</code> variables against these constants directly, or use the conversion macros (which perform the proper casting).</p>
+
+<h2 id="writingrubyinc">Writing Ruby in C</h2>
+<p>One of the joys of Ruby is that you can write Ruby programs almost directly in C. That is, you can use the same methods and the same logic, but with slightly different syntax to accommodate C. For instance, here is a small, fairly boring test class written in Ruby.</p>
+
+<div><code class="block">class Test
+  def initialize
+    @arr = Array.new
+  end
+  def add(anObject)
+    @arr.push(anObject)
+  end
+end</code></div>
+<p>The equivalent code in C should look somewhat familiar.</p>
+
+<div><code class="block">#include "ruby.h"
+
+static VALUE t_init(VALUE self)
+{
+  VALUE arr;
+
+  arr = rb_ary_new();
+  rb_iv_set(self, "@arr", arr);
+  return self;
+}
+
+static VALUE t_add(VALUE self, VALUE anObject)
+{
+  VALUE arr;
+
+  arr = rb_iv_get(self, "@arr");
+  rb_ary_push(arr, anObject);
+  return arr;
+}
+
+VALUE cTest;
+
+void Init_Test() {
+  cTest = rb_define_class("Test", rb_cObject);
+  rb_define_method(cTest, "initialize", t_init, 0);
+  rb_define_method(cTest, "add", t_add, 1);
+}</code></div>
+<p>Let's go through this example in detail, as it illustrates many of the important concepts in this chapter. First off, we need to include the header file &ldquo;<code>ruby.h</code>&rdquo; to obtain the necessary definitions.</p>
+<p>Now look at the last function, <code>Init_Test</code>. Every class or module defines a C global function named <code>Init_</code><em>Name</em>. This function will be called when the interpreter first loads the extension <em>Name</em> (or on startup for statically linked extensions). It is used to initialize the extension and to insinuate it into the Ruby environment. In this case, we define a new class named <code>Test</code>, which is a subclass of <code>Object</code> (represented by the external symbol <code>rb_cObject</code>; see &ldquo;<code>ruby.h</code>&rdquo; for others).</p>
+<p>Next we set up <code>add</code> and <code>initialize</code> as two instance methods for class <code>Test</code>. The calls to <code>rb_define_method</code> establish a binding between the Ruby method name and the C function that will implement it, so a call to the <code>add</code> method in Ruby will call the C function <code>t_add</code> with one argument.</p>
+<p>Similarly, when <code>new</code> is called for this class, Ruby will construct a basic object and then call <code>initialize</code>, which we have defined here to call the C function <code>t_init</code> with no (Ruby) arguments.</p>
+<p>Now go back and look at the definition of <code>initialize</code>. Even though we said it took no arguments, there's a parameter here!  In addition to any Ruby arguments, every method is passed an initial <code>VALUE</code> argument that contains the receiver for this method (the equivalent of <code class="const">self</code> in Ruby code).</p>
+<p>The first thing we'll do in <code>initialize</code> is create a Ruby array and set the instance variable <code>@arr</code> to point to it. Just as you would expect if you were writing Ruby source, referencing an instance variable that doesn't exist creates it.</p>
+<p>Finally, the function <code>t_add</code> gets the instance variable <code>@arr</code> from the current object and calls <code class="class_instance_method"><a href="ref_c_array.html#Array.push"><span class="class">Array</span>#<span class="method">push</span></a></code> to push the passed value onto that array. When accessing instance variables in this way, the <code>@</code>-prefix is mandatory&mdash;otherwise the variable is created, but cannot be referenced from Ruby.</p>
+<p>Despite the extra, clunky syntax that C imposes, you're still writing in Ruby&mdash;you can manipulate objects using all of the method calls you've come to know and love, with the added advantage of being able to craft tight, fast code when needed.</p>
+<p><b>WARNING:</b> Every C function that is callable from Ruby <em>must</em> return a <code>VALUE</code>, even if it's just <code class="const">Qnil</code>. Otherwise, a core dump (or GPF) will be the likely result.</p>
+<p>We can use the C version of the code in Ruby simply by <code class="keyword">require</code>-ing it dynamically at runtime (on most platforms).</p>
+
+<div><code class="block">require "code/ext/Test"
+t = Test.new
+t.add("Bill Chase")</code></div>
+
+<table class="figure" id="table_17.1">
+<caption>Table 17.1 : C Datatypes to Ruby Objects</caption>
+<tbody>
+<tr class="firstRow">
+  <td>INT2NUM(<em>int</em>)</td>
+  <td><span class="returnvalue"><em>Fixnum</em> or <em>Bignum</em></span></td>
+</tr>
+<tr>
+  <td>INT2FIX(<em>int</em>)</td>
+  <td><span class="returnvalue"><em>Fixnum</em></span> (faster)</td>
+</tr>
+<tr>
+  <td>INT2NUM(<em>long</em> or <em>int</em>)</td>
+  <td><span class="returnvalue"><em>Fixnum</em> or <em>Bignum</em></span></td>
+</tr>
+<tr>
+  <td>INT2FIX(<em>long</em> or <em>int</em>)</td>
+  <td><span class="returnvalue"><em>Fixnum</em></span> (faster)</td>
+</tr>
+<tr>
+  <td>CHR2FIX(<em>char</em>)</td>
+  <td><span class="returnvalue"><em>Fixnum</em></span></td>
+</tr>
+<tr>
+  <td>rb_str_new2(<em>char *</em>)</td>
+  <td><span class="returnvalue"><em>String</em></span></td>
+</tr>
+<tr>
+  <td>rb_float_new(<em>double</em>)</td>
+  <td><span class="returnvalue"><em>Float</em></span></td>
+</tr></tbody></table>
+
+<table class="figure">
+<caption>Ruby Objects to C Datatypes</caption>
+<tbody>
+<tr class="firstRow">
+  <td>int</td>
+  <td>NUM2INT(<em>Numeric</em>)</td>
+  <td>(Includes type check)</td>
+</tr>
+<tr>
+  <td>int</td>
+  <td>FIX2INT(<em>Fixnum</em>)</td>
+  <td>(Faster)</td>
+</tr>
+<tr>
+  <td>unsigned int</td>
+  <td>NUM2UINT(<em>Numeric</em>)</td>
+  <td>(Includes type check)</td>
+</tr>
+<tr>
+  <td>unsigned int</td>
+  <td>FIX2UINT(<em>Fixnum</em>)</td>
+  <td>(Includes type check)</td>
+</tr>
+<tr>
+  <td>long</td>
+  <td>NUM2LONG(<em>Numeric</em>)</td>
+  <td>(Includes type check)</td>
+</tr>
+<tr>
+  <td>long</td>
+  <td>FIX2LONG(<em>Fixnum</em>)</td>
+  <td>(Faster)</td>
+</tr>
+<tr>
+  <td>unsigned long</td>
+  <td>NUM2ULONG(<em>Numeric</em>)</td>
+  <td>(Includes type check)</td>
+</tr>
+<tr>
+  <td>char</td>
+  <td>NUM2CHR(<em>Numeric</em> or <em>String</em>)</td>
+  <td>(Includes type check)</td>
+</tr>
+<tr>
+  <td>char *</td>
+  <td>STR2CSTR(<em>String</em>)</td>
+  <td></td>
+</tr>
+<tr>
+  <td>char *</td>
+  <td>rb_str2cstr(<em>String</em>, int *length)</td>
+  <td>Returns length as well</td>
+</tr>
+<tr>
+  <td>double</td>
+  <td>NUM2DBL(<em>Numeric</em>)</td>
+  <td></td>
+</tr></tbody>
+</table>
+
+
+<h3 id="evaluatingrubyexpressionsinc">Evaluating Ruby Expressions in C</h3>
+<p>If you are in the middle of some C code and you want to run an arbitrary Ruby expression without writing a bunch of C, you can always use the C version of <code>eval</code>. Suppose you have a collection of objects that need to have a flag cleared.</p>
+
+<div><code class="block">rb_eval_string("anObject.each{|x| x.clearFlag }");</code></div>
+<p>Full descriptions of these and other commonly used C functions begin <code>eval</code>-ing an entire string) you can use</p>
+
+<div><code class="block">rb_funcall(receiver, method_id, argc, ...)</code></div>
+<p>Full descriptions of these and other commonly used C functions begin in the section &ldquo;<a href="ext_ruby.html#rubyclanguageapi">Ruby C Language API</a>&rdquo;.</p>
+
+<h2 id="sharingdatabetweenrubyandc">Sharing Data Between Ruby and C</h2>
+<p>We've covered enough of the basics now to return to our jukebox example&mdash;interfacing C code with Ruby and sharing data and behavior between the two worlds.</p>
+
+<h3 id="directlysharingvariables">Directly Sharing Variables</h3>
+<p>Although you could maintain a C version of some variable along with a separate Ruby version of that variable, and struggle to keep the two in sync, <span class="footnote">(a clear violation of the <em>DRY</em>&mdash;Don't Repeat Yourself&mdash;principle described in our book <em>The Pragmatic Programmer</em>)</span> it would be much better to share a variable directly between Ruby and C. You can share global variables by creating a Ruby object on the C side and then binding its address to a Ruby global variable. In this case, the $ prefix is optional, but it helps clarify that this is a global variable.</p>
+
+<div><code class="block">VALUE hardware_list;
+hardware_list = rb_ary_new();
+rb_define_variable("$hardware", &amp;hardware_list);
+...
+rb_ary_push(hardware_list, rb_str_new2("DVD"));
+rb_ary_push(hardware_list, rb_str_new2("CDPlayer1"));
+rb_ary_push(hardware_list, rb_str_new2("CDPlayer2"));</code></div>
+<p>The Ruby side can then access the C variable <code>hardware_list</code> as <code>$hardware</code>:</p>
+
+<div><code class="block">$hardware <span class="output"><span class="outputmark">&rarr;</span> ["DVD", "CDPlayer1", "CDPlayer2"]</span></code></div>
+
+<p>You can also create <em>hooked</em> variables that will call a specified function when the variable is accessed, and <em>virtual</em> variables that only call the hooks&mdash;no actual variable is involved. See the <a href="ext_ruby.html#rubyclanguageapi">API section</a> for details.</p>
+<p>If you create a Ruby object from C and store it in a C global variable <em>without</em> exporting it to Ruby, you must at least tell the garbage collector about it, lest ye be reaped inadvertently:</p>
+
+<div><code class="block">VALUE obj;
+obj = rb_ary_new();
+rb_global_variable(obj);</code></div>
+
+<h3 id="wrappingcstructures">Wrapping C Structures</h3>
+<p>Now on to the <em>really</em> fun stuff. We've got the vendor's library that controls the audio CD jukebox units, and we're ready to wire it into Ruby. The vendor's header file looks like this:</p>
+<div><code class="block">typedef struct _cdjb {
+  int statusf;
+  int request;
+  void *data;
+  char pending;
+  int unit_id;
+  void *stats;
+} CDJukebox;
+
+// Allocate a new CDPlayer structure and bring it online
+CDJukebox *CDPlayerNew(int unit_id);
+
+// Deallocate when done (and take offline)
+void CDPlayerDispose(CDJukebox *rec);
+
+// Seek to a disc, track and notify progress
+void CDPlayerSeek(CDJukebox *rec,
+                  int disc,
+                  int track,
+                  void (*done)(CDJukebox *rec, int percent));
+// ... others...
+// Report a statistic
+double CDPlayerAvgSeekTime(CDJukebox *rec);</code></div>
+<p>This vendor has its act together; while the vendor might not admit it, the code is written with an object-oriented flavor. We don't know what all those fields mean within the <code>CDJukeBox</code> structure, but that's okay&mdash;we can treat it as an opaque pile of bits. The vendor's code knows what to do with it, we just have to carry it around.</p>
+<p>Anytime you have a C-only structure that you would like to handle as a Ruby object, you should wrap it in a special, internal Ruby class called <code>DATA</code> (type <code>T_DATA</code>). There are two macros to do this wrapping, and one to retrieve your structure back out again.</p>
+
+<div class="figure important">
+<h4 id="cdatatypewrapping">C Datatype Wrapping</h4>
+	<dl>
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">Data_Wrap_Struct</span>(<span class="functionparams">VALUE class, void (*mark)(), void (*free)(), void *ptr</span>)</code></dt>
+		<dd>Wraps the given C datatype <em>ptr</em>, registers the two garbage collection routines (see below), and returns a VALUE pointer to a genuine Ruby object. The C type of the resulting object is <code>T_DATA</code> and its Ruby class is <em>class</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">Data_Make_Struct</span>(<span class="functionparams">VALUE class, <em>c-type</em>, void (*mark)(), void (*free)(), <em>c-type *</em></span>)</code></dt>
+		<dd>Allocates a structure of the indicated type first, then proceeds as <code>Data_Wrap_Struct</code>. <em>c-type</em> is the name of the C datatype that you're wrapping, not a variable of that type.</dd>
+
+		<dt><code><span class="functionreturntype"></span> <span class="functionname">Data_Get_Struct</span>(<span class="functionparams">VALUE obj,<em>c-type</em>,<em>c-type *</em></span>)</code></dt>
+		<dd>Returns the original pointer. This macro is a type-safe wrapper around the macro <code>DATA_PTR(obj)</code>, which evaluates the pointer.</dd>
+	</dl>
+</div>
+
+<p>The object created by <code>Data_Wrap_Struct</code> is a normal Ruby object, except that it has an additional C datatype that can't be accessed from Ruby. As you can see in <a href="ext_ruby.html#figure_17.1">Figure 17.1</a>, this C datatype is separate from any instance variables that the object contains. But since it's a separate thing, how do you get rid of it when the garbage collector claims this object?  What if you have to release some resource (close some file, clean up some lock or IPC mechanism, and so on)?</p>
+
+<div class="figure">Figure not available...</div>
+
+<p>In order to participate in Ruby's mark-and-sweep garbage collection process, you need to define a routine to free your structure, and possibly a routine to mark any references from your structure to other structures. Both routines take a <code>void</code> pointer, a reference to your structure. The <em>mark</em> routine will be called by the garbage collector during its &ldquo;mark&rdquo; phase. If your structure references other Ruby objects, then your mark function needs to identify these objects using <code>rb_gc_mark(<em>value</em>)</code>. If the structure doesn't reference other Ruby objects, you can simply pass <code>0</code> as a function pointer.</p>
+<p>When the object needs to be disposed of, the garbage collector will call the <em>free</em> routine to free it. If you have allocated any memory yourself (for instance, by using <code>Data_Make_Struct</code>), you'll need to pass a free function&mdash;even if it's just the standard C library's <code>free</code> routine. For complex structures that you have allocated, your free function may need to traverse the structure to free all the allocated memory.</p>
+<p>First a simple example, without any special handling. Given the structure definition</p>
+
+<div><code class="block">typedef struct mp3info {
+  char *title;
+  char *artist;
+  int genre;
+} MP3Info;</code></div>
+<p>we can create a structure, populate it, and wrap it as an object. <span class="footnote">(We cheat a bit in this example. Our <code>MP3Info</code> structure has a couple of <code>char</code> pointers in it. In our code we initialize them from two static strings. This means that we don't have to free these strings when the <code>MP3Info</code> structure is freed. If we'd allocated these strings dynamically, we'd have to write a free method to dispose of them.)</span></p>
+
+<div><code class="block">MP3Info *p;
+VALUE info;
+
+p = ALLOC(MP3Info);
+p-&gt;artist = "Maynard Ferguson";
+p-&gt;title = "Chameleon";
+...
+info = Data_Wrap_Struct(cTest, 0, free, p);</code></div>
+<p><code>info</code> is a <code>VALUE</code> type, a genuine Ruby object of class <code>Test</code> (represented in C by the built-in type <code>T_DATA</code>). You can push it onto an array, hold a reference to it in an object, and so on. At some later point in the code, we may want to access this structure again, given the <code>VALUE</code>:</p>
+
+<div><code class="block">VALUE doit(VALUE info) {
+  MP3Info *p;
+  Data_Get_Struct(info, MP3Info, p);
+  ...
+  p-&gt;artist    <span class="returnvalue">"Maynard Ferguson"</span>
+  p-&gt;title     <span class="returnvalue">"Chameleon"</span>
+  ...
+}</code></div>
+<p>In order to follow convention, however, you may need a few more things: support for an <code class="method">initialize</code> method, and a &ldquo;C-constructor.&rdquo;  If you were writing Ruby source, you'd allocate and initialize an object by calling <code class="method">new</code>. In C extensions, the corresponding call is <code>Data_Make_Struct</code>. However, although this allocates memory for the object, it does <em>not</em> automatically call an <code class="keyword">initialize</code> method; you need to do that yourself:</p>
+
+<div><code class="block">info = Data_Make_Struct(cTest, MP3Info, 0, free, one);
+rb_obj_call_init(info, argc, argv);</code></div>
+<p>This has the benefit of allowing subclasses in Ruby to override or augment the basic <code class="keyword">initialize</code> in your class. Within <code class="keyword">initialize</code>, it is allowable (but not necessarily advisable) to alter the existing data pointer, which may be accessed directly with <code>DATA_PTR(obj)</code>.</p>
+<p>And finally, you may want to define a &ldquo;C-constructor&rdquo;&mdash;that is, a globally available C function that will create the object in one convenient call. You can use this function within your own code or allow other extension libraries to use it. All of the built-in classes support this idea with functions such as <code>rb_str_new</code>, <code>rb_ary_new</code>, and so on. We can make our own:</p>
+
+<div><code class="block">VALUE mp3_info_new() {
+  VALUE info;
+  MP3Info *one;
+  info = Data_Make_Struct(cTest, MP3Info, 0, free, one);
+  ...
+  rb_obj_call_init(info, 0, 0);
+  return info;
+}</code></div>
+
+<h3 id="anexample">An Example</h3>
+<p>Okay, now we're ready for a full-size example. Given our vendor's header file above, we write the following code.</p>
+
+<div><code class="block">#include "ruby.h"
+#include "cdjukebox.h"
+
+VALUE cCDPlayer;
+
+static void cd_free(void *p) {
+  CDPlayerDispose(p);
+}
+
+static void progress(CDJukebox *rec, int percent)
+{
+  if (rb_block_given_p()) {
+    if (percent &gt; 100) percent = 100;
+    if (percent &lt; 0) percent = 0;
+    rb_yield(INT2FIX(percent));
+  }
+}
+
+static VALUE
+cd_seek(VALUE self, VALUE disc, VALUE track)
+{
+  CDJukebox *ptr;
+  Data_Get_Struct(self, CDJukebox, ptr);
+
+  CDPlayerSeek(ptr,
+               NUM2INT(disc),
+               NUM2INT(track),
+               progress);
+  return Qnil;
+}
+
+static VALUE
+cd_seekTime(VALUE self)
+{
+  double tm;
+  CDJukebox *ptr;
+  Data_Get_Struct(self, CDJukebox, ptr);
+  tm = CDPlayerAvgSeekTime(ptr);
+  return rb_float_new(tm);
+}
+
+static VALUE
+cd_unit(VALUE self)
+{
+  return rb_iv_get(self, "@unit");
+}
+
+static VALUE
+cd_init(VALUE self, VALUE unit)
+{
+  rb_iv_set(self, "@unit", unit);
+  return self;
+}
+
+VALUE cd_new(VALUE class, VALUE unit)
+{
+  VALUE argv[1];
+  CDJukebox *ptr = CDPlayerNew(NUM2INT(unit));
+  VALUE tdata = Data_Wrap_Struct(class, 0, cd_free, ptr);
+  argv[0] = unit;
+  rb_obj_call_init(tdata, 1, argv);
+  return tdata;
+}
+
+void Init_CDJukebox() {
+  cCDPlayer = rb_define_class("CDPlayer", rb_cObject);
+  rb_define_singleton_method(cCDPlayer, "new", cd_new, 1);
+  rb_define_method(cCDPlayer, "initialize", cd_init, 1);
+  rb_define_method(cCDPlayer, "seek", cd_seek, 2);
+  rb_define_method(cCDPlayer, "seekTime", cd_seekTime, 0);
+  rb_define_method(cCDPlayer, "unit", cd_unit, 0);
+}
+</code></div>
+<p>Now we have the ability to control our jukebox from Ruby in a nice, object-oriented manner:</p>
+
+<div><code class="block">require "code/ext/CDJukebox"
+p = CDPlayer.new(1)
+puts "Unit is #{p.unit}"
+p.seek(3, 16) {|x| puts "#{x}% done" }
+puts "Avg. time was #{p.seekTime} seconds"</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Unit is 1
+26% done
+79% done
+100% done
+Avg. time was 1.2 seconds</code></div>
+<p>This example demonstrates most of what we've talked about so far, with one additional neat feature. The vendor's library provided a callback routine&mdash;a function pointer that is called every so often while the hardware is grinding its way to the next disc. We've set that up here to run a code block passed as an argument to <code>seek</code>. In the <code>progress</code> function, we check to see if there is an iterator in the current context and, if there is, run it with the current percent done as an argument.</p>
+
+<h2 id="memoryallocation">Memory Allocation</h2>
+<p>You may sometimes need to allocate memory in an extension that won't be used for object storage&mdash;perhaps you've got a giant bitmap for a Bloom filter, or an image, or a whole bunch of little structures that Ruby doesn't use directly.</p>
+<p>In order to work correctly with the garbage collector, you should use the following memory allocation routines. These routines do a little bit more work than the standard <code>malloc</code>. For instance, if <code>ALLOC_N</code> determines that it cannot allocate the desired amount of memory, it will invoke the garbage collector to try to reclaim some space. It will raise a <code class="exception">NoMemError</code> if it can't or if the requested amount of memory is invalid.</p>
+
+<div class="figure important">
+<h4 id="memoryallocation">Memory Allocation</h4>
+	<dl>
+		<dt><code><span class="functionreturntype"><em>type *</em></span> <span class="functionname">ALLOC_N</span>(<span class="functionparams"><em>c-type</em>, n</span>)</code></dt>
+		<dd>Allocates <em>n</em> <em>c-type</em> objects, where <em>c-type</em> is the literal name of the C type, not a variable of that type.</dd>
+
+		<dt><code><span class="functionreturntype"><em>type *</em></span> <span class="functionname">ALLOC</span>(<span class="functionparams"><em>c-type</em></span>)</code></dt>
+		<dd>Allocates a <em>c-type</em> and casts the result to a pointer of that type.</dd>
+
+		<dt><code><span class="functionreturntype"></span> <span class="functionname">REALLOC_N</span>(<span class="functionparams"><em>var</em>, <em>c-type</em>, n</span>)</code></dt>
+		<dd>Reallocates <em>n</em> <em>c-type</em>s and assigns the result to <em>var</em>, a pointer to a <em>c-type</em>.</dd>
+
+		<dt><code><span class="functionreturntype"><em>type *</em></span> <span class="functionname">ALLOCA_N</span>(<span class="functionparams"><em>c-type</em>, n</span>)</code></dt>
+		<dd>Allocates memory for <em>n</em> objects of <em>c-type</em> on the stack&mdash;this memory will be automatically freed when the function that invokes <code>ALLOCA_N</code> returns.</dd>
+	</dl>
+</div>
+
+
+<h2 id="creatinganextension">Creating an Extension</h2>
+<p>Having written the source code for an extension, we now need to compile it so Ruby can use it. We can either do this as a shared object, which is dynamically loaded at runtime, or statically link the extension into the main Ruby interpreter itself. The basic procedure is the same:</p>
+
+<ul>
+	<li>Create the C source code file(s) in a given directory.</li>
+	<li>Create <code>extconf.rb</code>.</li>
+	<li>Run <code>extconf.rb</code> to create a <code>Makefile</code> for the C files in this directory.</li>
+	<li>Run <code>make</code>.</li>
+	<li>Run <code>make install</code>.</li>
+</ul>
+
+<div class="figure">Figure not available...</div>
+
+<h3 id="creatingamakefilewithextconfrb">Creating a Makefile with extconf.rb</h3>
+<p><a href="ext_ruby.html#figure_17.2">Figure 17.2</a> shows the overall workflow when building an extension. The key to the whole process is the <code>extconf.rb</code> program which you, as a developer, create. In <code>extconf.rb</code>, you write a simple program that determines what features are available on the user's system and where those features may be located. Executing <code>extconf.rb</code> builds a customized <code>Makefile</code>, tailored for both your application and the system on which it's being compiled. When you run the <code>make</code> command against this <code>Makefile</code>, your extension is built and (optionally) installed.</p>
+<p>The simplest <code>extconf.rb</code> may be just two lines long, and for many extensions this is sufficient.</p>
+
+<div><code class="block">require 'mkmf'
+create_makefile("Test")</code></div>
+<p>The first line brings in the <code class="class"><a href="lib_standard.html#mkmf">mkmf</a></code> library module. This contains all the commands we'll be using. The second line creates a <code>Makefile</code> for an extension called &ldquo;Test.&rdquo; (Note that &ldquo;Test&rdquo; is the name of the extension; the makefile will always be called &ldquo;Makefile.&rdquo;) <code>Test</code> will be built from all the C source files in the current directory.</p>
+<p>Let's say that we run this <code>extconf.rb</code> program in a directory containing a single source file, <code>main.c</code>. The result is a <code>Makefile</code> that will build our extension. On our system, this contains the following commands.</p>
+
+<div><code class="block">gcc -fPIC -I/usr/local/lib/ruby/1.6/i686-linux -g -O2  \
+  -c main.c -o main.o
+gcc -shared -o Test.so main.o -lc</code></div>
+<p>The result of this compilation is <code>Test.so</code>, which may be dynamically linked into Ruby at runtime with &ldquo;<code>require</code>&rdquo;. See how the <code>mkmf</code> commands have located platform-specific libraries and used compiler-specific options automatically. Pretty neat, eh?</p>
+<p>Although this basic program works for many simple extensions, you may have to do some more work if your extension needs header files or libraries that aren't included in the default compilation environment, or if you conditionally compile code based on the presence of libraries or functions.</p>
+<p>A common requirement is to specify nonstandard directories where include files and libraries may be found. This is a two-step process. First, your <code>extconf.rb</code> should contain one or more <code class="method">dir_config</code> commands. This specifies a tag for a set of directories. Then, when you run the <code>extconf.rb</code> program, you tell <code>mkmf</code> where the corresponding physical directories are on the current system.</p>
+<p>If <code>extconf.rb</code> contains the line <code>dir_config(</code><em>name</em><code>)</code>, then you give the location of the corresponding directories with the command-line options:</p>
+<dl>
+	<dt><code>--with-<em>name</em>-include=<em>directory</em></code></dt>
+	<dd>Add <em>directory</em>/<code>include</code> to the compile command.</dd>
+	
+	<dt><code>--with-<em>name</em>-lib=<em>directory</em></code></dt>
+	<dd>Add <em>directory</em>/<code>lib</code> to the link command.</dd>
+</dl>
+
+<p>If (as is common) your include and library directories are both subdirectories of some other directory, and (as is also common) they're called <code>include</code> and <code>lib</code>, you can take a shortcut:</p>
+<dl>
+	<dt><code>--with-<em>name</em>-dir=<em>directory</em></code></dt>
+	<dd>Add <em>directory</em>/<code>lib</code> and <em>directory</em>/<code>include</code> to the link command and compile command, respectively.</dd>
+</dl>
+<p>There's a twist here. As well as specifying all these <code>--with</code> options when you run <code>extconf.rb</code>, you can also use the <code>--with</code> options that were specified when Ruby was built for your machine. This means you can find out the locations of libraries that are used by Ruby itself.</p>
+<p>To make all this concrete, lets say you need to use libraries and include files for the CD jukebox we're developing. Your <code>extconf.rb</code> program might contain</p>
+
+<div><code class="block">require 'mkmf'
+dir_config('cdjukebox')
+# .. more stuff
+create_makefile("CDJukeBox")</code></div>
+<p>You'd then run <code>extconf.rb</code> with something like:</p>
+
+<div><code class="block">% ruby extconf.rb --with-cdjukebox-dir=/usr/local/cdjb</code></div>
+<p>The generated <code>Makefile</code> would assume that the libraries were in <code>/usr/local/cdjb/lib</code> and the include files were in <code>/usr/local/cdjb/include</code>.</p>
+<p>The <code class="method">dir_config</code> command adds to the list of places to search for libraries and include files. It does not, however, link the libraries into your application. To do that, you'll need to use one or more <code class="method">have_library</code> or <code class="method">find_library</code> commands.</p>
+<p><code class="method">have_library</code> looks for a given entry point in a named library. If it finds the entry point, it adds the library to the list of libraries to be used when linking your extension. <code class="method">find_library</code> is similar, but allows you to specify a list of directories to search for the library.</p>
+
+<div><code class="block">require 'mkmf'
+dir_config('cdjukebox')
+have_library('cdjb', 'CDPlayerNew')
+create_makefile("CDJukeBox")</code></div>
+<p>On some platforms, a popular library may be in one of several places. The X Window system, for example, is notorious for living in different directories on different systems. The <code>find_library</code> command will search a list of supplied directories to find the right one (this is different from <code>have_library</code>, which uses only configuration information for the search). For example, to create a <code>Makefile</code> that uses X Windows and a jpeg library, <code>extconf.rb</code> might contain</p>
+
+<div><code class="block">require 'mkmf'
+
+if have_library("jpeg","jpeg_mem_init") and
+   find_library("X11", "XOpenDisplay", "/usr/X11/lib",
+                "/usr/X11R6/lib", "/usr/openwin/lib")
+then
+    create_makefile("XThing")
+else
+    puts "No X/JPEG support available"
+end</code></div>
+<p>We've added some additional functionality to this program. All of the <code>mkmf</code> commands return <code class="const">false</code> if they fail. This means that we can write an <code>extconf.rb</code> that generates a <code>Makefile</code> only if everything it needs is present. The Ruby distribution does this so that it will try to compile only those extensions that are supported on your system.</p>
+<p>You also may want your extension code to be able to configure the features it uses depending on the target environment. For example, our CD jukebox may be able to use a high-performance MP3 decoder if the end user has one installed. We can check by looking for its header file.</p>
+
+<div><code class="block">require 'mkmf'
+dir_config('cdjukebox')
+have_library('cdjb', 'CDPlayerNew')
+have_header('hp_mp3.h')
+create_makefile("CDJukeBox")</code></div>
+<p>We can also check to see if the target environment has a particular function in any of the libraries we'll be using. For example, the <code class="method">setpriority</code> call would be useful but isn't always available. We can check for it with:</p>
+
+<div><code class="block">require 'mkmf'
+dir_config('cdjukebox')
+have_func('setpriority')
+create_makefile("CDJukeBox")</code></div>
+<p>Both <code class="method">have_header</code> and <code class="method">have_func</code> define preprocessor constants if they find their targets. The names are formed by converting the target name to uppercase and prepending &ldquo;HAVE_&rdquo;. Your C code can take advantage of this using constructs such as:</p>
+
+<div><code class="block">#if defined(HAVE_HP_MP3_H)
+#  include &lt;hp_mp3.h&gt;
+#endif
+
+#if defined(HAVE_SETPRIORITY)
+  err = setpriority(PRIOR_PROCESS, 0, -10)
+#endif</code></div>
+<p>If you have special requirements that can't be met with all these <code>mkmf</code> commands, your program can directly add to the global variables <code>$CFLAGS</code> and <code>$LFLAGS</code>, which are passed to the compiler and linker, respectively.</p>
+
+<h3 id="staticlinking">Static Linking</h3>
+<p>Finally, if your system doesn't support dynamic linking, or if you have an extension module that you want to have statically linked into Ruby itself, edit the file <code>ext/Setup</code> in the distribution and add your directory to the list of extensions in the file, then rebuild Ruby. The extensions listed in <code>Setup</code> will be statically linked into the Ruby executable. If you want to disable any dynamic linking, and link all extensions statically, edit <code>ext/Setup</code> to contain the following option.</p>
+
+<div><code class="block">option nodynamic</code></div>
+
+<h2 id="embeddingarubyinterpreter">Embedding a Ruby Interpreter</h2>
+<p>In addition to extending Ruby by adding C code, you can also turn the problem around and embed Ruby itself within your application. Here's an example.</p>
+
+<div><code class="block">#include "ruby.h"
+
+main() {
+  /* ... our own application stuff ... */
+  ruby_init();
+  ruby_script("embedded");
+  rb_load_file("start.rb");
+  while (1) {
+    if (need_to_do_ruby) {
+      ruby_run();
+    }
+    /* ... run our app stuff */
+  }
+}</code></div>
+<p>To initialize the Ruby interpreter, you need to call <code>ruby_init()</code>. But on some platforms, you may need to take special steps before that:</p>
+
+<div><code class="block">#if defined(NT)
+  NtInitialize(&amp;argc, &amp;argv);
+#endif
+#if defined(__MACOS__) &amp;&amp; defined(__MWERKS__)
+  argc = ccommand(&amp;argv);
+#endif</code></div>
+<p>See <code>main.c</code> in the Ruby distribution for any other special defines or setup needed for your platform.</p>
+
+<div class="figure important">
+<h4 id="embeddedrubyapi">Embedded Ruby API</h4>
+	<dl>
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">ruby_init</span>(<span class="functionparams"></span>)</code></dt>
+		<dd>Sets up and initializes the interpreter. This function should be called before any other Ruby-related functions.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">ruby_options</span>(<span class="functionparams">int argc, char **argv</span>)</code></dt>
+		<dd>Gives the Ruby interpreter the command-line options.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">ruby_script</span>(<span class="functionparams">char *name</span>)</code></dt>
+		<dd>Sets the name of the Ruby script (and <code class="keyword">$0</code>) to <em>name</em>.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_load_file</span>(<span class="functionparams">char *file</span>)</code></dt>
+		<dd>Loads the given file into the interpreter.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">ruby_run</span>(<span class="functionparams"></span>)</code></dt>
+		<dd>Runs the interpreter.</dd>
+	</dl>
+</div>
+
+<p>You need to take some special care with exception handling; any Ruby calls you make at this top level should be protected to catch exceptions and handle them cleanly. <code>rb_protect</code>, <code>rb_rescue</code>, and related functions are documented in &ldquo;<a href="ext_ruby.html#exceptions">Exceptions</a>&rdquo;.</p>
+<p>For an example of embedding a Ruby interpreter within another program, see also <code>eruby</code>, which is described in &ldquo;<a href="web.html#embeddingrubyinhtml">Embedding Ruby in HTML</a>&rdquo;.</p>
+
+<h2 id="bridgingrubytootherlanguages">Bridging Ruby to Other Languages</h2>
+<p>So far, we've discussed extending Ruby by adding routines written in C. However, you can write extensions in just about any language, as long as you can bridge the two languages with C. Almost anything is possible, including awkward marriages of Ruby and C++, Ruby and Java, and so on.</p>
+<p>But you may be able to accomplish the same thing without resorting to C code. For example, you could bridge to other languages using middleware such as CORBA or COM. See the section on <a href="win32.html#windowsautomation">Windows automation</a> for more details.</p>
+
+<h2 id="rubyclanguageapi">Ruby C Language API</h2>
+<p>Last, but by no means least, here are several C-level functions that you may find useful when writing an extension.</p>
+<p>Some functions require an <code>ID</code>: you can obtain an <code>ID</code> for a string by using <code>rb_intern</code> and reconstruct the name from an <code>ID</code> by using <code>rb_id2name</code>.</p>
+<p>As most of these C functions have Ruby equivalents that are already described in detail elsewhere in this book, the descriptions here will be brief.</p>
+<p>Also note that the following listing is not complete. There are many more functions available&mdash;too many to document them all, as it turns out. If you need a method that you can't find here, check &ldquo;<code>ruby.h</code>&rdquo; or &ldquo;<code>intern.h</code>&rdquo; for likely candidates. Also, at or near the bottom of each source file is a set of method definitions that describe the binding from Ruby methods to C functions. You may be able to call the C function directly, or search for a wrapper function that calls the function you are looking for. The following list, based on the list in <code>README.EXT</code>, shows the main source files in the interpreter.</p>
+<dl>
+		<dt>Ruby Language Core</dt><dd><br>
+class.c error.c eval.c gc.c object.c parse.y variable.c</dd><dt>Utility Functions</dt><dd><br>
+dln.c regex.c st.c util.c</dd><dt>Ruby Interpreter</dt><dd><br>
+dmyext.c inits.c keywords main.c ruby.c version.c</dd><dt>Base Library</dt><dd><br>
+array.c bignum.c compar.c dir.c enum.c file.c hash.c io.c marshal.c math.c numeric.c pack.c prec.c process.c random.c range.c re.c signal.c sprintf.c string.c struct.c time.c</dd></dl>
+
+<div class="figure important">
+<h4 id="definingobjects">Defining Objects</h4>
+	<dl>
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_define_class</span>(<span class="functionparams">char *name, VALUE superclass</span>)</code></dt>
+		<dd>Defines a new class at the top level with the given <em>name</em> and <em>superclass</em> (for class <code>Object</code>, use <code>rb_cObject</code>).</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_define_module</span>(<span class="functionparams">char *name</span>)</code></dt>
+		<dd>Defines a new module at the top level with the given <em>name</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_define_class_under</span>(<span class="functionparams">VALUE under, char *name,
+    VALUE superclass</span>)</code></dt>
+		<dd>Defines a nested class under the class or module <em>under</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_define_module_under</span>(<span class="functionparams">VALUE under, char *name</span>)</code></dt>
+		<dd>Defines a nested module under the class or module <em>under</em>.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_include_module</span>(<span class="functionparams">VALUE parent, VALUE module</span>)</code></dt>
+		<dd>Includes the given <em>module</em> into the class or module <em>parent</em>.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_extend_object</span>(<span class="functionparams">VALUE obj, VALUE module</span>)</code></dt>
+		<dd>Extends <em>obj</em> with <em>module</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_require</span>(<span class="functionparams">const char *name</span>)</code></dt>
+		<dd>Equivalent to &ldquo;<code class="keyword">require</code> <em>name</em>.&rdquo;     Returns <code>Qtrue</code> or <code>Qfalse</code>.</dd>
+	</dl>
+</div>
+
+<p>In some of the function definitions that follow, the parameter <em>argc</em> specifies how many arguments a Ruby method takes. It may have the following values:</p>
+
+<table class="figure">
+<thead><tr>
+  <th><em>argc</em></th>
+  <th>Function prototype</th>
+</tr></thead><tbody>
+<tr class="firstRow">
+  <td>0..17</td>
+  <td><code>VALUE func(VALUE self, VALUE arg...)</code><br>The C function will be called with this many actual arguments.</td>
+</tr>
+<tr>
+  <td>-1</td>
+  <td><code>VALUE func(int argc, VALUE *argv, VALUE self)</code><br>The C function will be given a variable number of arguments passed as a C array.</td>
+</tr>
+<tr>
+  <td>-2</td>
+  <td><code>VALUE func(VALUE self, VALUE args)</code><br>The C function will be given a variable number of arguments passed as a Ruby array.</td>
+</tr></tbody>
+</table>
+
+<p>In a function that has been given a variable number of arguments, you can use the C function <code>rb_scan_args</code> to sort things out (see below).</p>
+
+<div class="figure important">
+<h4 id="definingmethods">Defining Methods</h4>
+	<dl>
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_define_method</span>(<span class="functionparams">VALUE classmod, char *name, VALUE(*func)(), int argc</span>)</code></dt>
+		<dd>Defines an instance method in the class or module <em>classmod</em> with the given <em>name</em>, implemented by the C function <em>func</em> and taking <em>argc</em> arguments.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_define_module_function</span>(<span class="functionparams">VALUE classmod, char *name, VALUE(*func)(), int argc)</span>)</code></dt>
+		<dd>Defines a method in class <em>classmod</em> with the given <em>name</em>, implemented by the C function <em>func</em> and taking <em>argc</em> arguments.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_define_global_function</span>(<span class="functionparams">char *name, VALUE(*func)(), int argc</span>)</code></dt>
+		<dd>Defines a global function (a private method of <code class="module">Kernel</code>) with the given <em>name</em>, implemented by the C function <em>func</em> and taking <em>argc</em> arguments.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_define_singleton_method</span>(<span class="functionparams">VALUE classmod, char *name, VALUE(*func)(), int argc</span>)</code></dt>
+		<dd>Defines a singleton method in class <em>classmod</em> with the given <em>name</em>, implemented by the C function <em>func</em> and taking <em>argc</em> arguments.</dd>
+
+		<dt><code><span class="functionreturntype">int</span> <span class="functionname">rb_scan_args</span>(<span class="functionparams">int argcount, VALUE *argv, char *fmt, ...</span>)</code></dt>
+		<dd>Scans the argument list and assigns to variables similar to <code>scanf</code>: <em>fmt</em> is a string containing zero, one, or two digits followed by some flag characters. The first digit indicates the count of mandatory arguments; the second is the count of optional arguments. A &ldquo;*&rdquo; means to pack the rest of the arguments into a Ruby array. A &ldquo;&amp;&rdquo; means that an attached code block will be taken and assigned to the given variable (if no code block was given, <code>Qnil</code> will be assigned). After the <em>fmt</em> string, pointers to <code>VALUE</code> are given (as with <code>scanf</code>) to which the arguments are assigned.
+<div><code class="block">VALUE name, one, two, rest;
+rb_scan_args(argc, argv, "12", &amp;name, &amp;one, &amp;two);
+rb_scan_args(argc, argv, "1*", &amp;name, &amp;rest);</code></div></dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_undef_method</span>(<span class="functionparams">VALUE classmod, const char *name</span>)</code></dt>
+		<dd>Undefines the given method <em>name</em> in the given <em>classmod</em> class or module.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_define_alias</span>(<span class="functionparams">VALUE classmod, const char *newname,
+    const char *oldname</span>)</code></dt>
+		<dd>Defines an alias for <em>oldname</em> in class or module <em>classmod</em>.</dd>
+	</dl>
+</div>
+
+
+<div class="figure important">
+<h4 id="definingvariablesandconstants">Defining Variables and Constants</h4>
+	<dl>
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_define_const</span>(<span class="functionparams">VALUE classmod, char *name, VALUE value</span>)</code></dt>
+		<dd>Defines a constant in the class or module <em>classmod</em>, with the given <em>name</em> and <em>value</em>.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_define_global_const</span>(<span class="functionparams">char *name, VALUE value</span>)</code></dt>
+		<dd>Defines a global constant with the given <em>name</em> and <em>value</em>.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_define_variable</span>(<span class="functionparams">const char *name, VALUE *object</span>)</code></dt>
+		<dd>Exports the address of the given <em>object</em> that was created in C to the Ruby namespace as <em>name</em>. From Ruby, this will be a global variable, so <em>name</em> should start with a leading dollar sign. Be sure to honor Ruby's rules for allowed variable names; illegally named variables will not be accessible from Ruby.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_define_class_variable</span>(<span class="functionparams">VALUE class, const char *name,
+    VALUE val</span>)</code></dt>
+		<dd>Defines a class variable <em>name</em>     (which must be specified with a &ldquo;<code>@@</code>&rdquo; prefix) in the given <em>class</em>, initialized to <em>value</em>.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_define_virtual_variable</span>(<span class="functionparams">const char *name,
+    VALUE(*getter)(), void(*setter)()</span>)</code></dt>
+		<dd>Exports a virtual variable to Ruby namespace as the global $<em>name</em>. No actual storage exists for the variable; attempts to get and set the value will call the given functions with the prototypes:
+<div><code class="block">VALUE getter(ID id, VALUE *data,
+             struct global_entry *entry);
+void setter(VALUE value, ID id, VALUE *data,
+            struct global_entry *entry);</code></div>
+<p>You will likely not need to use the <em>entry</em> parameter and can safely omit it from your function declarations.</p></dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_define_hooked_variable</span>(<span class="functionparams">const char *name,
+    VALUE *variable, VALUE(*getter)(), void(*setter)()</span>)</code></dt>
+		<dd>Defines functions to be called when reading or writing to <em>variable</em>. See also <code>rb_define_virtual_variable</code>.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_define_readonly_variable</span>(<span class="functionparams">const char *name,
+    VALUE *value</span>)</code></dt>
+		<dd>Same as <code class="keyword">rb_define_variable</code>, but read-only from Ruby.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_define_attr</span>(<span class="functionparams">VALUE variable, const char *name,
+    int read, int write</span>)</code></dt>
+		<dd>Creates accessor methods for the given <em>variable</em>, with the given <em>name</em>. If <em>read</em> is nonzero, create a read method; if <em>write</em> is nonzero, create a write method.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_global_variable</span>(<span class="functionparams">VALUE *obj</span>)</code></dt>
+		<dd>Registers the given address with the garbage collector.</dd>
+	</dl>
+</div>
+
+
+<div class="figure important">
+<h4 id="callingmethods">Calling Methods</h4>
+	<dl>
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_funcall</span>(<span class="functionparams">VALUE recv, ID id, int argc, ...</span>)</code></dt>
+		<dd>Invokes the method given by <em>id</em> in the object <em>recv</em> with the given number of arguments <em>argc</em> and the arguments themselves (possibly none).</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_funcall2</span>(<span class="functionparams">VALUE recv, ID id, int argc, VALUE *args</span>)</code></dt>
+		<dd>Invokes the method given by <em>id</em> in the object <em>recv</em> with the given number of arguments <em>argc</em> and the arguments themselves given in the C array <em>args</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_funcall3</span>(<span class="functionparams">VALUE recv, ID id, int argc, VALUE *args</span>)</code></dt>
+		<dd>Same as <code>rb_funcall2</code>, but will not call private methods.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_apply</span>(<span class="functionparams">VALUE recv, ID name, int argc, VALUE args</span>)</code></dt>
+		<dd>Invokes the method given by <em>id</em> in the object <em>recv</em> with the given number of arguments <em>argc</em> and the arguments themselves given in the Ruby <code class="class">Array</code> <em>args</em>.</dd>
+
+		<dt><code><span class="functionreturntype">ID</span> <span class="functionname">rb_intern</span>(<span class="functionparams">char *name</span>)</code></dt>
+		<dd>Returns an <code class="keyword">ID</code> for a given <em>name</em>. If the name does not exist, a symbol table entry will be created for it.</dd>
+
+		<dt><code><span class="functionreturntype">char *</span> <span class="functionname">rb_id2name</span>(<span class="functionparams">ID id</span>)</code></dt>
+		<dd>Returns a name for the given <em>id</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_call_super</span>(<span class="functionparams">int argc, VALUE *args</span>)</code></dt>
+		<dd>Calls the current method in the superclass of the current object.</dd>
+	</dl>
+</div>
+
+
+<div class="figure important">
+<h4 id="exceptions">Exceptions</h4>
+	<dl>
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_raise</span>(<span class="functionparams">VALUE exception, const char *fmt, ...</span>)</code></dt>
+		<dd>Raises an <em>exception</em>. The given string <em>fmt</em> and remaining arguments are interpreted as with <code class="keyword">printf</code>.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_fatal</span>(<span class="functionparams">const char *fmt, ...</span>)</code></dt>
+		<dd>Raises a <code class="exception">Fatal</code> exception, terminating the process. No rescue blocks are called, but ensure blocks will be called. The given string <em>fmt</em> and remaining arguments are interpreted as with <code class="keyword">printf</code>.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_bug</span>(<span class="functionparams">const char *fmt, ...</span>)</code></dt>
+		<dd>Terminates the process immediately&mdash;no handlers of any sort will be called. The given string <em>fmt</em> and remaining arguments are interpreted as with <code class="keyword">printf</code>. You should call this function only if a fatal bug has been exposed. You don't write fatal bugs, do you?</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_sys_fail</span>(<span class="functionparams">const char *msg</span>)</code></dt>
+		<dd>Raises a platform-specific exception corresponding to the last known system error, with the given <em>msg</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_rescue</span>(<span class="functionparams">VALUE (*body)(), VALUE args, VALUE(*rescue)(), VALUE rargs</span>)</code></dt>
+		<dd>Executes <em>body</em> with the given <em>args</em>. If a <code class="exception">StandardError</code> exception is raised, then execute <em>rescue</em> with the given <em>rargs</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_ensure</span>(<span class="functionparams">VALUE(*body)(), VALUE args, VALUE(*ensure)(), VALUE eargs</span>)</code></dt>
+		<dd>Executes <em>body</em> with the given <em>args</em>. Whether or not an exception is raised, execute <em>ensure</em> with the given <em>rargs</em> after <em>body</em> has completed.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_protect</span>(<span class="functionparams">VALUE (*body)(), VALUE args, int *result</span>)</code></dt>
+		<dd>Executes <em>body</em> with the given <em>args</em> and returns nonzero in <em>result</em> if any exception was raised.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_notimplement</span>(<span class="functionparams"></span>)</code></dt>
+		<dd>Raises a <code class="exception">NotImpError</code> exception to indicate that the enclosed function is not implemented yet, or not available on this platform.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_exit</span>(<span class="functionparams">int status</span>)</code></dt>
+		<dd>Exits Ruby with the given <em>status</em>. Raises a <code class="exception">SystemExit</code> exception and calls registered exit functions and finalizers.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_warn</span>(<span class="functionparams">const char *fmt, ...</span>)</code></dt>
+		<dd>Unconditionally issues a warning message to standard error. The given string <em>fmt</em> and remaining arguments are interpreted as with <code class="keyword">printf</code>.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_warning</span>(<span class="functionparams">const char *fmt, ...</span>)</code></dt>
+		<dd>Conditionally issues a warning message to standard error if Ruby was invoked with the <code class="keyword">-w</code> flag. The given string <em>fmt</em> and remaining arguments are interpreted as with <code class="keyword">printf</code>.</dd>
+	</dl>
+</div>
+
+
+<div class="figure important">
+<h4 id="iterators">Iterators</h4>
+	<dl>
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_iter_break</span>(<span class="functionparams"></span>)</code></dt>
+		<dd>Breaks out of the enclosing iterator block.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_each</span>(<span class="functionparams">VALUE obj</span>)</code></dt>
+		<dd>Invokes the <code class="keyword">each</code> method of the given <em>obj</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_yield</span>(<span class="functionparams">VALUE arg</span>)</code></dt>
+		<dd>Transfers execution to the iterator block in the current context, passing <em>arg</em> as an argument. Multiple values may be passed in an array.</dd>
+
+		<dt><code><span class="functionreturntype">int</span> <span class="functionname">rb_block_given_p</span>(<span class="functionparams"></span>)</code></dt>
+		<dd>Returns true if <code>yield</code> would execute a block in the current context&mdash;that is, if a code block was passed to the current method and is available to be called.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_iterate</span>(<span class="functionparams">VALUE (*method)(), VALUE args, VALUE (*block)(), VALUE arg2</span>)</code></dt>
+		<dd>Invokes <em>method</em> with argument <em>args</em> and block <em>block</em>. A <code class="keyword">yield</code> from that method will invoke <em>block</em> with the argument given to <code class="keyword">yield</code>, and a second argument <em>arg2</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_catch</span>(<span class="functionparams">const char *tag, VALUE (*proc)(), VALUE value</span>)</code></dt>
+		<dd>Equivalent to Ruby <code>catch</code>.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_throw</span>(<span class="functionparams">const char *tag , VALUE value</span>)</code></dt>
+		<dd>Equivalent to Ruby <code>throw</code>.</dd>
+	</dl>
+</div>
+
+
+<div class="figure important">
+<h4 id="accessingvariables">Accessing Variables</h4>
+	<dl>
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_iv_get</span>(<span class="functionparams">VALUE obj, char *name</span>)</code></dt>
+		<dd>Returns the instance variable <em>name</em> (which must be specified with a &ldquo;<code>@</code>&rdquo; prefix) from the given <em>obj</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_ivar_get</span>(<span class="functionparams">VALUE obj, ID name</span>)</code></dt>
+		<dd>Returns the instance variable <em>name</em> from the given <em>obj</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_iv_set</span>(<span class="functionparams">VALUE obj, char *name, VALUE value</span>)</code></dt>
+		<dd>Sets the value of the instance variable <em>name</em> (which must be specified with a &ldquo;<code>@</code>&rdquo; prefix) in the given <em>obj</em> to <em>value</em>. Returns <em>value</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_ivar_set</span>(<span class="functionparams">VALUE obj, ID name, VALUE value</span>)</code></dt>
+		<dd>Sets the value of the instance variable <em>name</em> in the given <em>obj</em> to <em>value</em>. Returns <em>value</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_gv_set</span>(<span class="functionparams">const char *name, VALUE value</span>)</code></dt>
+		<dd>Sets the global variable <em>name</em> (the &ldquo;<code>$</code>&rdquo; prefix is optional) to <em>value</em>. Returns <em>value</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_gv_get</span>(<span class="functionparams">const char *name</span>)</code></dt>
+		<dd>Returns the global variable <em>name</em> (the &ldquo;<code>$</code>&rdquo; prefix is optional).</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_cvar_set</span>(<span class="functionparams">VALUE class, ID name, VALUE val</span>)</code></dt>
+		<dd>Sets the class variable <em>name</em> in the given <em>class</em> to <em>value</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_cvar_get</span>(<span class="functionparams">VALUE class, ID name</span>)</code></dt>
+		<dd>Returns the class variable <em>name</em> from the given <em>class</em>.</dd>
+
+		<dt><code><span class="functionreturntype">int</span> <span class="functionname">rb_cvar_defined</span>(<span class="functionparams">VALUE class, ID name</span>)</code></dt>
+		<dd>Returns <code>Qtrue</code> if the given class variable <em>name</em> has been defined for <em>class</em>; otherwise, returns <code>Qfalse</code>.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_cv_set</span>(<span class="functionparams">VALUE class, const char *name, VALUE val</span>)</code></dt>
+		<dd>Sets the class variable <em>name</em>     (which must be specified with a &ldquo;<code>@@</code>&rdquo; prefix) in the given <em>class</em> to <em>value</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_cv_get</span>(<span class="functionparams">VALUE class, const char *name</span>)</code></dt>
+		<dd>Returns the class variable <em>name</em> (which must be specified with a &ldquo;<code>@@</code>&rdquo; prefix) from the given <em>class</em>.</dd>
+	</dl>
+</div>
+
+
+<div class="figure important">
+<h4 id="objectstatus">Object Status</h4>
+	<dl>
+		<dt><code><span class="functionreturntype"></span> <span class="functionname">OBJ_TAINT</span>(<span class="functionparams">VALUE obj</span>)</code></dt>
+		<dd>Marks the given <em>obj</em> as tainted.</dd>
+
+		<dt><code><span class="functionreturntype">int</span> <span class="functionname">OBJ_TAINTED</span>(<span class="functionparams">VALUE obj</span>)</code></dt>
+		<dd>Returns nonzero if the given <em>obj</em> is tainted.</dd>
+
+		<dt><code><span class="functionreturntype"></span> <span class="functionname">OBJ_FREEZE</span>(<span class="functionparams">VALUE obj</span>)</code></dt>
+		<dd>Marks the given <em>obj</em> as frozen.</dd>
+
+		<dt><code><span class="functionreturntype">int</span> <span class="functionname">OBJ_FROZEN</span>(<span class="functionparams">VALUE obj</span>)</code></dt>
+		<dd>Returns nonzero if the given <em>obj</em> is frozen.</dd>
+
+		<dt><code><span class="functionreturntype"></span> <span class="functionname">Check_SafeStr</span>(<span class="functionparams">VALUE str</span>)</code></dt>
+		<dd>Raises <code class="exception">SecurityError</code> if current safe level &gt; 0 and <em>str</em> is tainted, or a <code class="exception">TypeError</code> if <em>str</em> is not a <code>T_STRING</code>.</dd>
+
+		<dt><code><span class="functionreturntype">int</span> <span class="functionname">rb_safe_level</span>(<span class="functionparams"></span>)</code></dt>
+		<dd>Returns the current safe level.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_secure</span>(<span class="functionparams">int level</span>)</code></dt>
+		<dd>Raises <code class="exception">SecurityError</code> if <em>level</em> &lt;= current safe level.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_set_safe_level</span>(<span class="functionparams">int newlevel</span>)</code></dt>
+		<dd>Sets the current safe level to <em>newlevel</em>.</dd>
+	</dl>
+</div>
+
+
+<div class="figure important">
+<h4 id="commonlyusedmethods">Commonly Used Methods</h4>
+	<dl>
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_ary_new</span>(<span class="functionparams"></span>)</code></dt>
+		<dd>Returns a new <code class="class">Array</code> with default size.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_ary_new2</span>(<span class="functionparams">long length</span>)</code></dt>
+		<dd>Returns a new <code class="class">Array</code> of the given <em>length</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_ary_new3</span>(<span class="functionparams">long length, ...</span>)</code></dt>
+		<dd>Returns a new <code class="class">Array</code> of the given <em>length</em> and populated with the remaining arguments.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_ary_new4</span>(<span class="functionparams">long length, VALUE *values</span>)</code></dt>
+		<dd>Returns a new <code class="class">Array</code> of the given <em>length</em> and populated with the C array <em>values</em>.</dd>
+
+		<dt><code><span class="functionreturntype">void</span> <span class="functionname">rb_ary_store</span>(<span class="functionparams">VALUE self, long index, VALUE value</span>)</code></dt>
+		<dd>Stores <em>value</em> at <em>index</em> in array <em>self</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_ary_push</span>(<span class="functionparams">VALUE self, VALUE value</span>)</code></dt>
+		<dd>Pushes <em>value</em> onto the end of array <em>self</em>. Returns <em>value</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_ary_pop</span>(<span class="functionparams">VALUE self</span>)</code></dt>
+		<dd>Removes and returns the last element from the array <em>self</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_ary_shift</span>(<span class="functionparams">VALUE self</span>)</code></dt>
+		<dd>Removes and returns the first element from the array <em>self</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_ary_unshift</span>(<span class="functionparams">VALUE self, VALUE value</span>)</code></dt>
+		<dd>Pushes <em>value</em> onto the front of array <em>self</em>. Returns <em>value</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_ary_entry</span>(<span class="functionparams">VALUE self, long index</span>)</code></dt>
+		<dd>Returns array <em>self</em>'s element at <em>index</em>.</dd>
+
+		<dt><code><span class="functionreturntype">int</span> <span class="functionname">rb_respond_to</span>(<span class="functionparams">VALUE self, ID method</span>)</code></dt>
+		<dd>Returns nonzero if <em>self</em> responds to <em>method</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_thread_create</span>(<span class="functionparams">VALUE (*func)(), void *data</span>)</code></dt>
+		<dd>Runs <em>func</em> in a new thread, passing <em>data</em> as an argument.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_hash_new</span>(<span class="functionparams"></span>)</code></dt>
+		<dd>Returns a new, empty <code class="class">Hash</code>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_hash_aref</span>(<span class="functionparams">VALUE self, VALUE key</span>)</code></dt>
+		<dd>Returns the element corresponding to <em>key</em> in <em>self</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_hash_aset</span>(<span class="functionparams">VALUE self, VALUE key, VALUE value</span>)</code></dt>
+		<dd>Sets the value for <em>key</em> to <em>value</em> in <em>self</em>. Returns <em>value</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_obj_is_instance_of</span>(<span class="functionparams">VALUE obj, VALUE klass</span>)</code></dt>
+		<dd>Returns <code>Qtrue</code> if <em>obj</em> is an instance of <em>klass</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_obj_is_kind_of</span>(<span class="functionparams">VALUE obj, VALUE klass</span>)</code></dt>
+		<dd>Returns <code>Qtrue</code> if <em>klass</em> is the class of <em>obj</em> or <em>class</em> is one of the superclasses of the class of <em>obj</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_str_new</span>(<span class="functionparams">const char *src, long length</span>)</code></dt>
+		<dd>Returns a new <code class="class">String</code> initialized with <em>length</em> characters from <em>src</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_str_new2</span>(<span class="functionparams">const char *src</span>)</code></dt>
+		<dd>Returns a new <code class="class">String</code> initialized with the null-terminated C string <em>src</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_str_dup</span>(<span class="functionparams">VALUE str</span>)</code></dt>
+		<dd>Returns a new <code class="class">String</code> object duplicated from <em>str</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_str_cat</span>(<span class="functionparams">VALUE self, const char *src, long length</span>)</code></dt>
+		<dd>Concatenates <em>length</em> characters from <em>src</em> onto the <code class="class">String</code> <em>self</em>. Returns <em>self</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_str_concat</span>(<span class="functionparams">VALUE self, VALUE other</span>)</code></dt>
+		<dd>Concatenates <em>other</em> onto the <code class="class">String</code> <em>self</em>. Returns <em>self</em>.</dd>
+
+		<dt><code><span class="functionreturntype">VALUE</span> <span class="functionname">rb_str_split</span>(<span class="functionparams">VALUE self, const char *delim</span>)</code></dt>
+		<dd>Returns an array of <code class="class">String</code> objects created by splitting <em>self</em> on <em>delim</em>.</dd>
+	</dl>
+</div>
+
+
+<div id="menubot" class="menu">
+	<a href="win32.html" class="prev">&lt; Previous</a><a href="language.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ext_ruby.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

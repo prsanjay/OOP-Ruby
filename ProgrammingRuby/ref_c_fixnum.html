@@ -1,0 +1,187 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Fixnum</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_c_fixnum',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="class" id="Fixnum">class <strong>Fixnum</strong> &lt; Integer</h1>
+
+<p>A <code class="class">Fixnum</code> holds <code>Integer</code> values that can be represented in a   native machine word (minus 1 bit). If any operation on a <code>Fixnum</code> exceeds this range, the value is automatically converted to a <code>Bignum</code>.</p>
+
+<p><code>Fixnum</code> objects have immediate value.   This means that when they are assigned or passed as parameters, the actual object is passed, rather than a reference to that object. Assignment does not alias <code>Fixnum</code> objects. There is effectively only one <code>Fixnum</code> object instance for any given integer value, so, for example, you cannot add a singleton method to a <code class="class">Fixnum</code>.</p>
+
+<h2 class="refsubsection" id="instancemethods">instance methods</h2>
+<dl class="methodlist">
+	<dt id="Fixnum.Arithmeticoperations" class="noncode">Arithmetic operations</dt>
+		<dd class="callseq noncode">Performs various arithmetic operations on <i class="obj">fix</i>.</dd>
+		<dd class="desc"><table>
+			<tr class="firstRow">
+				<td><i class="obj">fix</i></td>
+				<td><code>+</code></td>
+				<td><i class="obj">aNumeric</i></td>
+				<td>Addition</td>
+			</tr>
+			<tr>
+				<td><i class="obj">fix</i></td>
+				<td><code>-</code></td>
+				<td><i class="obj">aNumeric</i></td>
+				<td>Subtraction</td>
+			</tr>
+			<tr>
+				<td><i class="obj">fix</i></td>
+				<td><code>*</code></td>
+				<td><i class="obj">aNumeric</i></td>
+				<td>Multiplication</td>
+			</tr>
+			<tr>
+				<td><i class="obj">fix</i></td>
+				<td><code>/</code></td>
+				<td><i class="obj">aNumeric</i></td>
+				<td>Division</td>
+			</tr>
+			<tr>
+				<td><i class="obj">fix</i></td>
+				<td><code>%</code></td>
+				<td><i class="obj">aNumeric</i></td>
+				<td>Modulo</td>
+			</tr>
+			<tr>
+				<td><i class="obj">fix</i></td>
+				<td><code>**</code></td>
+				<td><i class="obj">aNumeric</i></td>
+				<td>Exponentiation</td>
+			</tr>
+		</table>
+
+		</dd>
+
+	<dt id="Fixnum.Bitoperations" class="noncode">Bit operations</dt>
+		<dd class="callseq noncode">Performs various operations on the binary representations of the <code>Fixnum</code>.</dd>
+		<dd class="desc"><table>
+				<tr class="firstRow">
+					<td><code>~</code> <i class="obj">fix</i></td>
+					<td></td>
+					<td></td>
+					<td>Invert bits</td>
+				</tr>
+				<tr>
+					<td><i class="obj">fix</i></td>
+					<td><code>|</code></td>
+					<td><i class="obj">aNumeric</i></td>
+					<td>Bitwise <span class="smallcaps">OR</span></td>
+				</tr>
+				<tr>
+					<td><i class="obj">fix</i></td>
+					<td><code>&amp;</code></td>
+					<td><i class="obj">aNumeric</i></td>
+					<td>Bitwise <span class="smallcaps">AND</span></td>
+				</tr>
+				<tr>
+					<td><i class="obj">fix</i></td>
+					<td><code>^</code></td>
+					<td><i class="obj">aNumeric</i></td>
+					<td>Bitwise <span class="smallcaps">EXCLUSIVE</span> <span class="smallcaps">OR</span></td>
+				</tr>
+				<tr>
+					<td><i class="obj">fix</i></td>
+					<td><code>&lt;&lt;</code></td>
+					<td><i class="obj">aNumeric</i></td>
+					<td>Left-shift <em>aNumeric</em> bits</td>
+				</tr>
+				<tr>
+					<td><i class="obj">fix</i></td>
+					<td><code>&gt;&gt;</code></td>
+					<td><i class="obj">aNumeric</i></td>
+					<td>Right-shift <em>aNumeric</em> bits (with sign extension)</td>
+				</tr>
+			</table>
+		</dd>
+
+	<dt id="Fixnum._lt_eq_lt">&lt;=&gt;</dt>
+		<dd class="callseq"><i class="obj">fix</i> &lt;=&gt; <i class="obj">aNumeric</i>  &rarr; -1, 0, +1</dd>
+		<dd class="desc">Comparison&mdash;Returns -1, 0, or +1 depending on whether <i class="obj">fix</i> is less than, equal to, or greater than <i class="obj">aNumeric</i>. This is the basis for the tests in <code>Comparable</code>. </dd>
+
+	<dt id="Fixnum._ob_cb">[ ]</dt>
+		<dd class="callseq"><i class="obj">fix</i>[ <i class="obj">n</i> ]  &rarr; 0, 1</dd>
+		<dd class="desc">Bit Reference&mdash;Returns the <em>n</em>th bit in the binary representation of <i class="obj">fix</i>, where <i class="obj">fix</i>[0] is the least significant bit.
+
+<div><code class="block">a = 0b11001100101010
+30.downto(0) do |n| print a[n] end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">0000000000000000011001100101010</code></div>
+
+		</dd>
+
+	<dt id="Fixnum.id2name">id2name</dt>
+		<dd class="callseq"><i class="obj">fix</i>.id2name  &rarr; <i class="obj">aString</i> or <code>nil</code></dd>
+		<dd class="desc">Returns the name of the object whose symbol id is the value of <i class="obj">fix</i>.  If there is no symbol in the symbol table with this value, returns <code>nil</code>. <code class="method">id2name</code> has nothing to do with the <code>Object.id</code> method. See also <code class="class_instance_method"><a href="ref_c_string.html#String.intern"><span class="class">String</span>#<span class="method">intern</span></a></code> and class <code class="class"><a href="ref_c_symbol.html">Symbol</a></code>.
+
+<div><code class="block">symbol = :@inst_var <span class="output"><span class="outputmark">&rarr;</span> :@inst_var</span>
+id     = symbol.to_i <span class="output"><span class="outputmark">&rarr;</span> 9002</span>
+id.id2name <span class="output"><span class="outputmark">&rarr;</span> "@inst_var"</span></code></div>
+
+		</dd>
+
+	<dt id="Fixnum.size">size</dt>
+		<dd class="callseq"><i class="obj">fix</i>.size  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns the number of <em>bytes</em> in the machine representation
+      of a <code>Fixnum</code>.
+
+		</dd>
+
+	<dt id="Fixnum.to_f">to_f</dt>
+		<dd class="callseq"><i class="obj">fix</i>.to_f  &rarr; <i class="obj">aFloat</i></dd>
+		<dd class="desc">Converts <i class="obj">fix</i> to a <code>Float</code>.
+
+		</dd>
+
+	<dt id="Fixnum.to_i">to_i</dt>
+		<dd class="callseq"><i class="obj">fix</i>.to_i  &rarr; <i class="obj">fix</i></dd>
+		<dd class="desc">Returns <i class="obj">fix</i>.
+
+		</dd>
+
+	<dt id="Fixnum.to_s">to_s</dt>
+		<dd class="callseq"><i class="obj">fix</i>.to_s  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns a string containing the decimal representation of self.</dd>
+</dl>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_c_fixnum.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

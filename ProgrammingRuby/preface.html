@@ -1,0 +1,201 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Preface</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	<a href="foreword.html" class="prev">&lt; Previous</a><a href="roadmap.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'preface',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+<h1 id="preface">Preface</h1>
+<p>This book is a tutorial and reference for the Ruby programming language. Use Ruby, and you'll write better code, be more productive, and enjoy programming more.</p>
+<p>These are bold claims, but we think that after reading this book you'll agree with them. And we have the experience to back up this belief.</p>
+<p>As Pragmatic Programmers we've tried many, many languages in our search for tools to make our lives easier, for tools to help us do our jobs better.  Until now, though, we'd always been frustrated by the languages we were using.</p>
+<p>Our job is to solve problems, not spoonfeed compilers, so we like dynamic languages that adapt to us, without arbitrary, rigid rules.  We need clarity so we can communicate using our code. We value conciseness and the ability to express a requirement in code accurately and efficiently.  The less code we write, the less that can go wrong. (And our wrists and fingers are thankful, too.)</p>
+<p>We want to be as productive as possible, so we want our code to run the first time; time spent in the debugger is time stolen from the development clock. It also helps if we can try out code as we edit it; if you have to wait for a 2-hour make cycle, you may as well be using punch cards and submitting your work for batch compilation.</p>
+<p>We want a language that works at a high level of abstraction. The higher level the language, the less time we spend translating our requirements into code.</p>
+<p>When we discovered Ruby, we realized that we'd found what we'd been looking for.  More than any other language with which we have worked, Ruby <em>stays out of your way</em>.  You can concentrate on solving the problem at hand, instead of struggling with compiler and language issues.  That's how it can help you become a better programmer: by giving you the chance to spend your time creating solutions for your users, not for the compiler.</p>
+
+<h2 id="rubysparkles">Ruby Sparkles</h2>
+<p>Take a true object-oriented language, such as Smalltalk. Drop the unfamiliar syntax and move to more conventional, file-based source code.  Now add in a good measure of the flexibility and convenience of languages such as Python and Perl.</p>
+<p>You end up with Ruby.</p>
+<p>OO aficionados will find much to like in Ruby: things such as pure object orientation (everything's an object), metaclasses, closures, iterators, and ubiquitous heterogeneous collections. Smalltalk users will feel right at home (and C++ and Java users will feel jealous).</p>
+<p>At the same time, Perl and Python wizards will find many of their favorite features: full regular expression support, tight integration with the underlying operating system, convenient shortcuts, and dynamic evaluation.</p>
+<p>Ruby is easy to learn. Everyday tasks are simple to code, and once you've done them, they are easy to maintain and grow.  Apparently difficult things often turn out not to have been difficult after all. Ruby follows the <em>Principle of Least Surprise</em>&mdash;things work the way you would expect them to, with very few special cases or exceptions.  And that really <em>does</em> make a difference when you're programming.</p>
+<p>We call Ruby a <em>transparent</em> language. By that we mean that Ruby doesn't obscure the solutions you write behind lots of syntax and the need to churn out reams of support code just to get simple things done. With Ruby you write programs close to the problem domain. Rather than constantly mapping your ideas and designs down to the pedestrian level of most languages, with Ruby you'll find you can express them directly and express them elegantly. This means you code faster. It also means your programs stay readable and maintainable.</p>
+<p>Using Ruby, we are constantly amazed at how much code we can write in one sitting, code that works the first time. There are very few syntax errors, no type violations, and far fewer bugs than usual. This makes sense: there's less to get wrong. No bothersome semicolons to type mechanically at the end of each line.  No troublesome type declarations to keep in sync (especially in separate files).  No unnecessary words just to keep the compiler happy. No error-prone framework code.</p>
+<p>So why learn Ruby?  Because we think it will help you program <em>better</em>.  It will help you to focus on the problem at hand, with fewer distractions.  It will make your life easier.</p>
+
+<h2 id="whatkindoflanguageisruby">What Kind of Language Is Ruby?</h2>
+<p>In the old days, the distinction between languages was simple: they were either compiled, like C or Fortran, or interpreted, like BASIC. Compiled languages gave you speed and low-level access; interpreted languages were higher-level but slower.</p>
+<p>Times change, and things aren't that simple anymore.  Some language designers have taken to calling their creations &ldquo;scripting languages.&rdquo;  By this, we guess they mean that their languages are interpreted and can be used to replace batch files and shell scripts, orchestrating the behavior of other programs and the underlying operating system. Perl, TCL, and Python have all been called scripting languages.</p>
+<p>What exactly <em>is</em> a scripting language? Frankly we don't know if it's a distinction worth making.  In Ruby, you can access all the underlying operating system features.  You can do the same stuff in Ruby that you can in Perl or Python, and you can do it more cleanly. But Ruby is fundamentally different. It is a true programming language, too, with strong theoretical roots and an elegant, lightweight syntax. You <em>could</em> hack together a mess of &ldquo;scripts&rdquo; with Ruby, but you probably won't.  Instead, you'll be more inclined to <em>engineer</em> a solution, to produce a program that is easy to understand, simple to maintain, and a piece of cake to extend and reuse in the future.</p>
+<p>Although we have used Ruby for scripting jobs, most of the time we use it as a general-purpose programming language. We've used it to write GUI applications and middle-tier server processes, and we're using it to format large parts of this book.  Others have used it for managing server machines and databases. Ruby is serving Web pages, interfacing to databases and generating dynamic content. People are writing artificial intelligence and machine learning programs in Ruby, and at least one person is using it to investigate natural evolution. Ruby's finding a home as a vehicle for exploratory mathematics. And people all over the world are using it as a way of gluing together all their different applications.  It truly is a great language for producing solutions in a wide variety of problem domains.</p>
+
+<h2 id="isrubyforme">Is Ruby for Me?</h2>
+<p>Ruby is not the universal panacea for programmers' problems. There will always be times when you'll need a particular language: the environment may dictate it, you may have special libraries you need, performance concerns, or simply an issue with training. We haven't given up languages such as Java and C++ entirely (although there are times when we wish we could).</p>
+<p>However, Ruby is probably more applicable than you might think. It is easy to extend, both from within the language and by linking in third-party libraries. It is portable across a number of platforms. It's relatively lightweight and consumes only modest system resources. And it's easy to learn; we've known people who've put Ruby code into production systems within a day of picking up drafts of this book. We've used Ruby to implement parts of an X11 window manager, a task that's normally considered severe C coding. Ruby excelled, and helped us write code in hours that would otherwise have taken days.</p>
+<p>Once you get comfortable with Ruby, we think you'll keep coming back to it as your language of choice.</p>
+
+<h2 id="whydidwewritethisbook">Why Did We Write This Book?</h2>
+<p>So we'd just finished writing <em>The Pragmatic Programmer,</em> our families had just started talking to us again, and suddenly we felt the need to write another book. Why? We guess it comes down to a kind of missionary zeal.</p>
+<p>Ruby was created by Yukihiro Matsumoto (Matz) in Japan. Since 1995, its popularity in Japan has grown at an astounding rate; there are rumors that Ruby is more popular than Python in Japan. But to date, much of the detailed Ruby documentation is in Japanese. It probably isn't a programming language you'd just stumble across.</p>
+<p>We wanted to spread the word, to have more people outside Japan using Ruby and enjoying the benefits, so we decided to document Ruby in English. And what started out as a small project just sort of grew....</p>
+
+<h2 id="rubyversions">Ruby Versions</h2>
+<p>This book documents Version 1.6 of Ruby, which was released in September 2000.</p>
+<p>Ruby version numbering follows the same scheme used for many other open source projects. Releases with even subversion numbers (1.0, 1.2, 1.4, and so on) are stable, public releases. These are the releases that are prepackaged and made available on the various Ruby Web sites.</p>
+<p>Development versions of the software have odd subversion numbers, such as 1.1 and 1.3. These you'll have to download and build for yourself, as described in the box on page xxvii.</p>
+
+<h2 id="installingruby">Installing Ruby</h2>
+<p>You can get Ruby from <a href="ftp://ftp.netlab.co.jp/pub/lang/ruby" class="external">ftp://ftp.netlab.co.jp/pub/lang/ruby</a>, or from the <a href="support.html#downloadsites">mirror sites</a> listed in Appendix C.  There you will find the latest stable release, as well as various development releases.</p>
+<p>You'll always find source code releases of Ruby; you may also find prebuilt binaries for Windows or other operating systems (like the binary distribution of Ruby for Windows at <a href="http://www.pragmaticprogrammer.com/ruby/downloads/ruby-install.html" class="external">http://www.pragmaticprogrammer.com/ruby/downloads/ruby-install.asp</a>).</p>
+
+<div class="sidebar">
+	<h5>The Very Latest Ruby</h5>
+	<p>For those who just have to be on the very latest, hot-off-the-press and   <em>untested</em> cutting edge (as we were while writing this book), you can get development versions straight from the developers'   working repository.</p>
+	<p>The Ruby developers use CVS (Concurrent Version System, freely   available from <a href="http://www.cvshome.com" class="external">http://www.cvshome.com</a>) as their revision control   system.  You can check files out as an anonymous user from their   archive by executing the following CVS commands:</p>
+<div><code class="block">% cvs -d :pserver:anonymous@cvs.netlab.co.jp:/home/cvs
+   login
+(Logging in to anonymous@cvs.netlab.co.jp)
+CVS password: guest
+% cvs -d :pserver:anonymous@cvs.netlab.co.jp:/home/cvs
+   checkout ruby</code></div>
+	   
+	<p>The complete source code tree, just as the developers last left it, will now be copied to a &ldquo;ruby&rdquo; subdirectory on your machine, updating your local source tree from a repository on the other side of the world. Isn't it a great time to be alive?</p>
+</div>
+
+<h3 id="buildingruby">Building Ruby</h3>
+<p>In the Ruby distribution you'll find a file named <code>README</code>, which explains the installation procedure in detail.  To summarize, you build Ruby on POSIX-based systems using the same four commands you use for most other open source applications: <code>./configure</code>, <code>make</code>, <code>make test</code>, and <code>make   install</code>.  You can build Ruby under other environments (including Windows) by using a POSIX emulation environment such as <code>cygwin</code> <span class="footnote">See <a href="http://sourceware.cygnus.com/cygwin" class="external">http://sourceware.cygnus.com/cygwin</a> for   details.</span> or by using native compilers&mdash;see &ldquo;<code>ntsetup.bat</code>&rdquo; in the distribution's <code>win32</code> subdirectory as a starting point.</p>
+
+<h2 id="runningruby">Running Ruby</h2>
+<p>Now that Ruby is installed, you'd probably like to run some programs. Unlike compiled environments, there are two ways to run Ruby&mdash;interactively and as a program.</p>
+
+<h3 id="interactiveruby">Interactive Ruby</h3>
+<p>The easiest way to run Ruby interactively is simply to type &ldquo;ruby&rdquo; at the shell prompt.</p>
+
+<div><code class="block">% ruby
+puts "Hello, world!"
+^D
+Hello, world!</code></div>
+<p>Here we typed in the single <code>puts</code> expression and an end of file character (which is control-D on our system). This process works, but it's sort of painful if you make a typo, and you can't really see what's going on as you type.</p>
+<p>In the <code>sample</code> directory in the Ruby distribution you'll find a script named &ldquo;<code>eval.rb</code>&rdquo;.  It goes one step better by showing us the value of each expression as it is entered:</p>
+
+<div><code class="block">% cd sample
+% ruby eval.rb
+ruby&gt; a = "Hello, world!"
+"Hello, world!"
+ruby&gt; puts a
+Hello, world!
+nil
+ruby&gt; ^D
+%</code></div>
+<p>Here we can see the output from <code>puts</code>, and then the return value from <code>puts</code> (which is <code>nil</code>).</p>
+<p>That's all fine and well, except that multiline expressions do not work, and you can't edit the line you're on, or go back and use previous lines (as you might with command history in a shell).</p>
+<p>For the next step up from <code>eval.rb</code>, we have <code>irb</code>&mdash;Interactive Ruby.  <code>irb</code> is a Ruby Shell, complete with command-line history, line editing capabilities, and job control.  It is quite configurable and has many options, so much so that it has <a href="irb.html">its own appendix</a>. We recommend that you get familiar with <code>irb</code> so you can try some of our examples interactively.</p>
+
+<h3 id="rubyprograms">Ruby Programs</h3>
+<p>Finally, you can run a Ruby program from a file as you would any other shell script, Perl program, or Python program.  You can simply run Ruby giving the script name as an argument:</p>
+
+<div><code class="block">% ruby myprog.rb</code></div>
+<p>Or you can use the Unix &ldquo;shebang&rdquo; notation as the first line of the program file. <span class="footnote">If your system supports it, you can avoid hard-coding   the path to Ruby in the <em>shebang</em> line by using   <code>#!/usr/bin/env ruby</code>, which will search your path for <code>ruby</code>   and then execute it.</span></p>
+
+<div><code class="block">#!/usr/local/bin/ruby -w
+
+puts "Hello, World!"</code></div>
+<p>If you make this source file executable (using, for instance, <code>chmod +x myprog.rb</code>), Unix lets you run the file as a program:</p>
+
+<div><code class="block">% ./myprog.rb
+Hello, World!</code></div>
+<p>You can do something similar under Microsoft Windows using file associations.</p>
+
+<h2 id="resources">Resources</h2>
+<p>Visit the Ruby Web sites, <a href="http://www.rubycentral.com" class="external">http://www.rubycentral.com</a> and <a href="http://www.ruby-lang.org" class="external">http://www.ruby-lang.org</a>, to see what's new, and chat with other Ruby users on the newsgroup or mailing lists (see Appendix C).</p>
+<p>And we'd certainly appreciate hearing from you. Comments, suggestions, errors in the text, and problems in the examples are all welcome. E-mail us at:</p>
+<p><a href="mailto:rubybook@pragmaticprogrammer.com" class="external">mailto:rubybook@pragmaticprogrammer.com</a></p>
+<p>If you tell us about errors in the book, we'll add them to the errata list at:</p>
+<p><a href="http://www.pragmaticprogrammer.com/ruby/errata/errata.html" class="external">http://www.pragmaticprogrammer.com/ruby/errata/errata.asp</a></p>
+<p>Finally, <a href="http://www.pragmaticprogrammer.com/ruby" class="external">http://www.pragmaticprogrammer.com/ruby</a> also contains the source code for almost all the book's examples, organized by page.</p>
+
+<h2 id="acknowledgments">Acknowledgments</h2>
+<p>A book is a massive undertaking, one that we would never be able to complete without help from our all our friends, old and new. We're proud to count among our old friends the team at Addison-Wesley: Mike Hendrickson, John Fuller, the ever-helpful Julie Steele, and the wonderful Julie DiNicola. Thank you all.</p>
+<p>Our reviewers were fantastic. We put them up against some incredibly tight deadlines and they came through for us. Reviewing a book full of technical detail isn't easy, so we're especially grateful to George Coe, Bob Davison, Jeff Deifik, Hal Fulton, Tadayoshi Funaba, Clemens Hintze, Kazuhiro Hiwada, Kikutani Makoto, Mike Linksvayer, Aleksi Niemel&#228;, Lew Perin, Jared Richardson, Armin Roehrl, Conrad Schneiker, Patrick Schoenbach, and Eric Vought. Thanks also go to the two Julies at Addison-Wesley for coordinating this truly international effort.</p>
+<p>Several people helped us with specific areas of this book. Tadayoshi Funaba exchanged countless e-mails with us until we finally understood the <code class="class">Date</code> module. Guy Decoux and Clemens Hintze patiently answered our questions about writing Ruby extensions, and Masaki Suketa helped us understand the <code class="class">WinOLE</code> module.</p>
+<p>Although much of the original Ruby documentation is in Japanese, there is a growing body of English translations, mostly undertaken by Japanese developers whose skills with English never cease to amaze us. Although there are too many individual contributions to this effort to name each author, we would like to single out Goto Kentaro, who has produced a large volume of high-quality documentation and placed it online.</p>
+<p>Finally, we have to thank Yukihiro &ldquo;Matz&rdquo;  Matsumoto, the creator of Ruby. We've lost count of the number of questions we've asked of him, and the number of patient and detailed answers he's sent back. As well as creating a truly wonderful language, Matz has fostered a wonderfully supportive and open culture in which that language can prosper.</p>
+<p>Thank you all. Domo arigato gozaimasu.</p>
+<p><em>Dave Thomas</em> and <em>Andy Hunt</em><br>
+<span style="font-variant:small-caps">The Pragmatic Programmers</span><br>
+<a href="http://www.pragmaticprogrammer.com" class="external">http://www.pragmaticprogrammer.com</a></p>
+
+
+
+<h2 id="notationconventions">Notation Conventions</h2>
+<p>Throughout this book, we use the following typographic notations.</p>
+<p>Literal code examples are shown using a typewriter-like font:</p>
+
+<div><code class="block">class SampleCode
+  def run
+	#...
+  end
+end</code></div>
+<p>Within the text, <code class="class_instance_method"><span class="class">Fred</span>#<span class="method">doIt</span></code> is a reference to an instance method (<code class="method">doIt</code>) of class <code class="class">Fred</code>, while <code class="class_class_method"><span class="class">Fred</span>.<span class="method">new</span></code> <span class="footnote">In some other Ruby documentation, you may see class methods written as <code>Fred::new</code>. This is perfectly valid Ruby syntax; we just happen to feel that <code>Fred.new</code> is less distracting to read.</span> is a class method, and <code class="class_constant"><span class="class">Fred</span>::<span class="constant">EOF</span></code> is a class constant.</p>
+<p>The book contains many snippets of Ruby code. Where possible, we've tried to show what happens when they run. In simple cases, we show the value of expressions on the same line as the expression. For example:</p>
+
+<div><code class="block">a = 1
+b = 2
+a + b <span class="output"><span class="outputmark">&rarr;</span> 3</span></code></div>
+
+<p>At times, we're also interested in the values of assignment statements, in which case we'll show them.</p>
+
+<div><code class="block">a = 1 <span class="output"><span class="outputmark">&rarr;</span> 1</span>
+b = 2 <span class="output"><span class="outputmark">&rarr;</span> 2</span>
+a + b <span class="output"><span class="outputmark">&rarr;</span> 3</span></code></div>
+
+<p>If the program produces more complex output, we show it below the program code:</p>
+
+<div><code class="block">3.times { puts "Hello!" }</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Hello!
+Hello!
+Hello!</code></div>
+
+<p>In some of the library documentation, we wanted to show where spaces appear in the output. You'll see these spaces as &ldquo;&#8255;&rdquo; characters.</p>
+<p>Command-line invocations are shown with literal text in a Roman font, and parameters you supply in an <em>italic</em> font. Optional elements are shown in large square brackets.</p>
+<div class="syntax"><code class="block">ruby <i class="opt">[</i><i class="opt">flags</i><i class="opt">]*</i> <i class="opt">[</i><i class="opt">progname</i><i class="opt">]</i> <i class="opt">[</i><i class="opt">arguments</i><i class="opt">]+</i></code></div>
+
+<div id="menubot" class="menu">
+	<a href="foreword.html" class="prev">&lt; Previous</a><a href="roadmap.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="preface.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

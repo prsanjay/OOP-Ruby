@@ -1,0 +1,186 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Basic Input and Output</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	<a href="tut_modules.html" class="prev">&lt; Previous</a><a href="tut_threads.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'tut_io',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+<h1 id="basicinputandoutput">Basic Input and Output</h1>
+<p>Ruby provides what at first sight looks like two separate sets of I/O routines.  The first is the simple interface&mdash;we've been using it pretty much exclusively so far.</p>
+
+<div><code class="block">print "Enter your name: "
+name = gets</code></div>
+<p>There are a whole set of I/O-related methods implemented in the <code class="module">Kernel</code> module&mdash;<code class="method">gets</code>, <code class="method">open</code>, <code class="method">print</code>, <code class="method">printf</code>, <code class="method">putc</code>, <code class="method">puts</code>, <code class="method">readline</code>, <code class="method">readlines</code>, and <code class="method">test</code>&mdash;that make it simple and convenient to write straightforward Ruby programs. These methods typically do I/O to standard input and standard output, which makes them useful for writing filters. You'll find them documented starting in <code class="module"><a href="ref_m_kernel.html">Kernel</a></code>.</p>
+<p>The second way, which gives you a lot more control, is to use <code class="class">IO</code> objects.</p>
+
+<h2 id="whatisanioobject">What Is an IO Object?</h2>
+<p>Ruby defines a single base class, <code class="class">IO</code>, to handle input and output. This base class is subclassed by classes <code class="class">File</code> and <code class="class">BasicSocket</code> to provide more specialized behavior, but the principles are the same throughout. An <code class="class">IO</code> object is a bidirectional channel between a Ruby program and some external resource. <span class="footnote">(For those who just have to know the implementation details, this means that a single <code class="class">IO</code> object can sometimes be managing more than one operating system file descriptor. For example, if you open a pair of pipes, a single <code class="class">IO</code> object contains both a read pipe and a write pipe.)</span> There may be more to an <code class="class">IO</code> object than meets the eye, but in the end you still simply write to it and read from it.</p>
+<p>In this chapter, we'll be concentrating on class <code class="class">IO</code> and its most commonly used subclass, class <code class="class">File</code>. For more details on using the socket classes for networking, see the section &ldquo;<a href="lib_network.html#socketlevelaccess">Socket Level Access</a>.&rdquo;</p>
+
+<h2 id="openingandclosingfiles">Opening and Closing Files</h2>
+<p>As you might expect, you can create a new file object using <code class="class_class_method"><a href="ref_c_file.html#File.new"><span class="class">File</span>.<span class="method">new</span></a></code>.</p>
+
+<div><code class="block">  aFile = File.new("testfile", "r")
+
+  # ... process the file
+
+  aFile.close</code></div>
+<p>You can create a <code class="class">File</code> object that is open for reading, writing, or both, according to the mode string (here we opened &ldquo;<code>testfile</code>&rdquo; for reading with an &ldquo;<code>r</code>&rdquo;).  The full list of allowed modes appears on in <a href="ref_c_io.html#table_22.5">Table 22.5</a>.  You can also optionally specify file permissions when creating a file; see the description of <code class="class_class_method"><a href="ref_c_file.html#File.new"><span class="class">File</span>.<span class="method">new</span></a></code> for details.  After opening the file, we can work with it, writing and/or reading data as needed. Finally, as responsible software citizens, we close the file, ensuring that all buffered data is written and that all related resources are freed.</p>
+<p>But here Ruby can make life a little bit easier for you. The method <code class="class_class_method"><a href="ref_c_file.html#File.open"><span class="class">File</span>.<span class="method">open</span></a></code> also opens a file. In regular use, it behaves just like <code class="class_class_method"><a href="ref_c_file.html#File.new"><span class="class">File</span>.<span class="method">new</span></a></code>. However, if there's a block associated with the call, <code class="method">open</code> behaves differently. Instead of returning a new <code class="class">File</code> object, it invokes the block, passing the newly opened <code class="class">File</code> as a parameter. When the block exits, the file is automatically closed.</p>
+
+<div><code class="block">  File.open("testfile", "r") do |aFile|
+
+  # ... process the file
+
+  end</code></div>
+
+<h2 id="readingandwritingfiles">Reading and Writing Files</h2>
+<p>The same methods that we've been using for &ldquo;simple&rdquo; I/O are available for all file objects. So, <code class="method">gets</code> reads a line from standard input, and <code>aFile.gets</code> reads a line from the file object <code>aFile</code>.</p>
+<p>However, I/O objects enjoy an additional set of access methods, all intended to make our lives easier.</p>
+
+<h3 id="iteratorsforreading">Iterators for Reading</h3>
+<p>As well as using the usual loops to read data from an <code class="class">IO</code> stream, you can also use various Ruby iterators.  <code class="class_instance_method"><a href="ref_c_io.html#IO.each_byte"><span class="class">IO</span>#<span class="method">each_byte</span></a></code> invokes a block with the next 8-bit byte from the <code class="class">IO</code> object (in this case, an object of type <code class="class">File</code>).</p>
+
+<div><code class="block">aFile = File.new("testfile")
+aFile.each_byte {|ch| putc ch; putc ?. }</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">T.h.i.s. .i.s. .l.i.n.e. .o.n.e.
+.T.h.i.s. .i.s. .l.i.n.e. .t.w.o.
+.T.h.i.s. .i.s. .l.i.n.e. .t.h.r.e.e.
+.A.n.d. .s.o. .o.n.......
+.</code></div>
+
+<p><code class="class_instance_method"><a href="ref_c_io.html#IO.each_line"><span class="class">IO</span>#<span class="method">each_line</span></a></code> calls the block with the next line from the file. In the next example, we'll make the original newlines visible using <code class="class_instance_method"><a href="ref_c_string.html#String.dump"><span class="class">String</span>#<span class="method">dump</span></a></code>, so you can see that we're not cheating.</p>
+
+<div><code class="block">aFile.each_line {|line| puts "Got #{line.dump}" }</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Got "This is line one\n"
+Got "This is line two\n"
+Got "This is line three\n"
+Got "And so on...\n"</code></div>
+<p>You can pass <code class="method">each_line</code> any sequence of characters as a line separator, and it will break up the input accordingly, returning the line ending at the end of each line of data. That's why you see the &ldquo;<code>\n</code>&rdquo; characters in the output of the previous example. In the next example, we'll use &ldquo;<code>e</code>&rdquo; as the line separator.</p>
+
+<div><code class="block">aFile.each_line("e") do |line|
+  puts "Got #{ line.dump }"
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Got "This is line"
+Got " one"
+Got "\nThis is line"
+Got " two\nThis is line"
+Got " thre"
+Got "e"
+Got "\nAnd so on...\n"</code></div>
+<p>If you combine the idea of an iterator with the auto-closing block feature, you get <code class="class_class_method"><a href="ref_c_io.html#IO.foreach"><span class="class">IO</span>.<span class="method">foreach</span></a></code>. This method takes the name of an I/O source, opens it for reading, calls the iterator once for every line in the file, and then closes the file automatically.</p>
+
+<div><code class="block">IO.foreach("testfile") { |line| puts line }</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">This is line one
+This is line two
+This is line three
+And so on...</code></div>
+<p>Or, if you prefer, you can retrieve an entire file into an array of lines:</p>
+
+<div><code class="block">arr = IO.readlines("testfile")
+arr.length <span class="output"><span class="outputmark">&rarr;</span> 4</span>
+arr[0] <span class="output"><span class="outputmark">&rarr;</span> "This is line one\n"</span></code></div>
+
+
+<p>Don't forget that I/O is never certain in an uncertain world&mdash;exceptions will be raised on most errors, and you should be ready to catch them and take appropriate action.</p>
+
+<h3 id="writingtofiles">Writing to Files</h3>
+<p>So far, we've been merrily calling <code class="method">puts</code> and <code class="method">print</code>, passing in any old object and trusting that Ruby will do the right thing (which, of course, it does). But what exactly <em>is</em> it doing?</p>
+<p>The answer is pretty simple. With a couple of exceptions, every object you pass to <code class="method">puts</code> and <code class="method">print</code> is converted to a string by calling that object's <code class="method">to_s</code> method. If for some reason the <code class="method">to_s</code> method doesn't return a valid string, a string is created containing the object's class name and id, something like <code>&lt;ClassName:0x123456&gt;</code>.</p>
+<p>The exceptions are simple, too. The <code>nil</code> object will print as the string &ldquo;nil,&rdquo; and an array passed to <code class="method">puts</code> will be written as if each of its elements in turn were passed separately to <code class="method">puts</code>.</p>
+<p>What if you want to write binary data and don't want Ruby messing with it? Well, normally you can simply use <code class="class_instance_method"><a href="ref_c_io.html#IO.print"><span class="class">IO</span>#<span class="method">print</span></a></code> and pass in a string containing the bytes to be written. However, you can get at the low-level input and output routines if you really want&mdash;have a look at the documentation for <code class="class_instance_method"><a href="ref_c_io.html#IO.sysread"><span class="class">IO</span>#<span class="method">sysread</span></a></code> and <code class="class_instance_method"><a href="ref_c_io.html#IO.syswrite"><span class="class">IO</span>#<span class="method">syswrite</span></a></code>.</p>
+<p>And how do you get the binary data into a string in the first place? The two common ways are to poke it in byte by byte or to use <code class="class_instance_method"><a href="ref_c_array.html#Array.pack"><span class="class">Array</span>#<span class="method">pack</span></a></code>.</p>
+
+<div><code class="block">str = "" <span class="output"><span class="outputmark">&rarr;</span> ""</span>
+str &lt;&lt; 1 &lt;&lt; 2 &lt;&lt; 3 <span class="output"><span class="outputmark">&rarr;</span> "\001\002\003"</span>
+
+[ 4, 5, 6 ].pack("c*") <span class="output"><span class="outputmark">&rarr;</span> "\004\005\006"</span></code></div>
+
+
+
+<h4 id="butimissmyciostream">But I Miss My C++ Iostream</h4>
+<p>Sometimes there's just no accounting for taste...However, just as you can append an object to an <code class="class">Array</code> using the <code class="method">&lt;&lt;</code> operator, you can also append an object to an output <code class="class">IO</code> stream:</p>
+
+<div><code class="block">endl = "\n"
+$stdout &lt;&lt; 99 &lt;&lt; " red balloons" &lt;&lt; endl</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">99 red balloons</code></div>
+<p>Again, the <code class="method">&lt;&lt;</code> method uses <code class="method">to_s</code> to convert its arguments to strings before sending them on their merry way.</p>
+
+<h2 id="talkingtonetworks">Talking to Networks</h2>
+<p>Ruby is fluent in most of the Internet's protocols, both low-level and high-level.</p>
+<p>For those who enjoy groveling around at the network level, Ruby comes with a set of classes in the <a href="lib_network.html#socketlevelaccess">socket library</a>. These classes give you access to TCP, UDP, SOCKS, and Unix domain sockets, as well as any additional socket types supported on your architecture. The library also provides helper classes to make writing servers easier. Here's a simple program that gets information about the &ldquo;oracle&rdquo; user on our local machine using the finger protocol.</p>
+
+<div><code class="block">require 'socket'
+client = TCPSocket.open('localhost', 'finger')
+client.send("oracle\n", 0)    # 0 means standard packet
+puts client.readlines
+client.close</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Login: oracle         			Name: Oracle installation
+Directory: /home/oracle             	Shell: /bin/bash
+Never logged in.
+No Mail.
+No Plan.</code></div>
+<p>At a higher level, the <a href="lib_network.html#higherlevelaccess">lib/net set of library modules</a> provides handlers for a set of application-level protocols (currently FTP, HTTP, POP, SMTP, and telnet). For example, the following program lists the images that are displayed on the Pragmatic Programmer home page.</p>
+
+<div><code class="block">require 'net/http'
+
+h = Net::HTTP.new('www.pragmaticprogrammer.com', 80)
+resp, data = h.get('/index.asp', nil)
+if resp.message == "OK"
+  data.scan(/&lt;img src="(.*?)"/) { |x| puts x }
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">images/title_main.gif
+images/dot.gif
+images/dot.gif
+images/dot.gif
+images/aafounders_70.jpg
+images/pp_cover_thumb.png
+images/ruby_cover_thumb.png
+images/dot.gif
+images/dot.gif</code></div>
+
+
+<div id="menubot" class="menu">
+	<a href="tut_modules.html" class="prev">&lt; Previous</a><a href="tut_threads.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="tut_io.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

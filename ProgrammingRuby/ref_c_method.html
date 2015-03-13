@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Method</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_c_method',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="class" id="Method">class <strong>Method</strong> &lt; Object</h1>
+
+<p>Method objects are created by <code class="class_instance_method"><a href="ref_c_object.html#Object.method"><span class="class">Object</span>#<span class="method">method</span></a></code>, and are associated    with a particular object (not just with a class). They may be used   to invoke the method within the object, and as a block associated with   an iterator.</p>
+
+<div><code class="block">class Thing
+  def square(n)
+    n*n
+  end
+end
+aThing  = Thing.new
+aMethod = aThing.method("square")
+
+aMethod.call(9) <span class="output"><span class="outputmark">&rarr;</span> 81</span>
+[ 1, 2, 3 ].collect(&amp;aMethod) <span class="output"><span class="outputmark">&rarr;</span> [1, 4, 9]</span></code></div>
+
+<h2 class="refsubsection" id="instancemethods">instance methods</h2>
+<dl class="methodlist">
+	<dt id="Method._ob_cb">[ ]</dt>
+		<dd class="callseq"><i class="obj">meth</i>[ <i>[</i><i class="obj">args</i><i>]*</i> ]  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Synonym for <code>Method.call</code>.
+
+		</dd>
+
+	<dt id="Method.arity">arity</dt>
+		<dd class="callseq"><i class="obj">meth</i>.arity  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns an indication of the number of arguments accepted by a method.
+      Returns a nonnegative integer for methods that take a fixed number
+      of arguments.  For Ruby methods that take a variable number of
+      arguments, returns -n-1, where n is the number of required
+      arguments. For methods written in C, returns -1 if the call
+      takes a variable number of arguments.
+
+		</dd>
+
+	<dt id="Method.call">call</dt>
+		<dd class="callseq"><i class="obj">meth</i>.call( <i>[</i><i class="obj">args</i><i>]*</i> )  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Invokes the <i class="obj">meth</i> with the specified
+      arguments, returning the method's return value.
+
+<div><code class="block">m = 12.method("+")
+m.call(3) <span class="output"><span class="outputmark">&rarr;</span> 15</span>
+m.call(20) <span class="output"><span class="outputmark">&rarr;</span> 32</span></code></div>
+
+		</dd>
+
+	<dt id="Method.to_proc">to_proc</dt>
+		<dd class="callseq"><i class="obj">meth</i>.to_proc  &rarr; <i class="obj">aProc</i></dd>
+		<dd class="desc">Returns a <code class="class">Proc</code> object corresponding to this method.</dd>
+</dl>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_c_method.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

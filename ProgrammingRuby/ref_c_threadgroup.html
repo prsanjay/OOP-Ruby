@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>ThreadGroup</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_c_threadgroup',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="class" id="ThreadGroup">class <strong>ThreadGroup</strong> &lt; Object</h1>
+
+<p><code class="class">ThreadGroup</code> provides a means of keeping track of a number of   threads as a group.  A <code class="class">Thread</code> can belong to only one <code class="class">ThreadGroup</code> at a time; adding a thread to a new group will remove it from any previous group.</p>
+
+<p>Newly created threads belong to the same group as the thread from which they were created.</p>
+
+<h2 class="refsubsection" id="constants">constants</h2>
+<table class="constants"><tr class="firstRow">
+	<td><code class="constant">Default</code></td>
+	<td>Default thread group.</td>
+</tr></table>
+
+<h2 class="refsubsection" id="classmethods">class methods</h2>
+<dl class="methodlist">
+	<dt id="ThreadGroup.new">new</dt>
+		<dd class="callseq">ThreadGroup.new  &rarr; <i class="obj">thgrp</i></dd>
+		<dd class="desc">Returns a newly created <code class="class">ThreadGroup</code>.  The group is initially empty. </dd>
+</dl>
+
+<h2 class="refsubsection" id="instancemethods">instance methods</h2>
+<dl class="methodlist">
+	<dt id="ThreadGroup.add">add</dt>
+		<dd class="callseq"><i class="obj">thgrp</i>.add( <i class="obj">aThread</i> )  &rarr; <i class="obj">thgrp</i></dd>
+		<dd class="desc">Adds the given thread to this group, removing it from any other
+      group to which it may have previously belonged.
+
+<div><code class="block">puts "Initial group is #{ThreadGroup::Default.list}"
+tg = ThreadGroup.new
+t1 = Thread.new { sleep 10 }
+t2 = Thread.new { sleep 10 }
+puts "t1 is #{t1}"
+puts "t2 is #{t2}"
+tg.add( t1 )
+puts "Initial group now #{ThreadGroup::Default.list}"
+puts "tg group now #{tg.list}"</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Initial group is #&lt;Thread:0x401be5c8&gt;
+t1 is #&lt;Thread:0x401b5428&gt;
+t2 is #&lt;Thread:0x401b53d8&gt;
+Initial group now #&lt;Thread:0x401b53d8&gt;#&lt;Thread:0x401be5c8&gt;
+tg group now #&lt;Thread:0x401b5428&gt;</code></div>
+
+		</dd>
+
+	<dt id="ThreadGroup.list">list</dt>
+		<dd class="callseq"><i class="obj">thgrp</i>.list  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns an array of all existing <code class="class">Thread</code> objects that belong
+      to this group.
+
+<div><code class="block">ThreadGroup::Default.list <span class="output"><span class="outputmark">&rarr;</span> [#&lt;Thread:0x401be5c8 run&gt;]</span></code></div></dd>
+</dl>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_c_threadgroup.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

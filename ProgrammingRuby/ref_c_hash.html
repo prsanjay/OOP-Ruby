@@ -1,0 +1,493 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Hash</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_c_hash',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="class" id="Hash">class <strong>Hash</strong> &lt; Object</h1>
+
+<p>A <code class="class">Hash</code> is a collection of key-value pairs.  It is similar to an <code class="class">Array</code>, except that indexing is done via arbitrary keys of any object type, not an integer index.  The order in which you traverse a  hash by either key or value may seem arbitrary, and will generally not be in the insertion order.</p>
+
+<p>Hashes have a <em>default value</em> that is returned when accessing keys that do not exist in the hash.  By default, that value is <code>nil</code>.</p>
+
+<h2>mixins</h2>
+<dl>
+	<dt><code class="module"><a href="ref_m_enumerable.html#Enumerable">Enumerable</a></code></dt>
+	<dd><code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.collect">collect</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.detect">detect</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.each_with_index">each_with_index</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.entries">entries</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.find">find</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.find_all">find_all</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.grep">grep</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.include">include?</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.map">map</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.max">max</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.member">member?</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.min">min</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.reject">reject</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.select">select</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.sort">sort</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.to_a">to_a</a></code></dd>
+</dl>
+
+
+<h2 class="refsubsection" id="classmethods">class methods</h2>
+<dl class="methodlist">
+	<dt id="Hash._ob_cb">[ ]</dt>
+		<dd class="callseq">Hash[ <i>[</i><i class="obj">key</i> =&gt; <i class="obj">value</i><i>]*</i> ]  &rarr; <i class="obj">aHash</i></dd>
+		<dd class="desc">Creates a new hash populated with the given objects. Equivalent
+      to the literal <code>{ <i class="obj">key</i>, <i class="obj">value</i>, ... }</code>.
+      Keys and values occur in pairs, so there must be an
+      even number of arguments.
+
+<div><code class="block">Hash["a", 100, "b", 200] <span class="output"><span class="outputmark">&rarr;</span> {"a"=&gt;100, "b"=&gt;200}</span>
+Hash["a" =&gt; 100, "b" =&gt; 200] <span class="output"><span class="outputmark">&rarr;</span> {"a"=&gt;100, "b"=&gt;200}</span>
+{ "a" =&gt; 100, "b" =&gt; 200 } <span class="output"><span class="outputmark">&rarr;</span> {"a"=&gt;100, "b"=&gt;200}</span></code></div>
+
+		</dd>
+
+	<dt id="Hash.new">new</dt>
+		<dd class="callseq">Hash.new( <i class="obj">anObject</i>=<code>nil</code> )  &rarr; <i class="obj">aHash</i></dd>
+		<dd class="desc">Returns a new, empty hash.  If <i class="obj">anObject</i> is
+      specified, it will be used as the <em>default value</em>.
+
+<div><code class="block">h = Hash.new("Go Fish")
+h["a"] = 100
+h["b"] = 200
+h["a"] <span class="output"><span class="outputmark">&rarr;</span> 100</span>
+h["c"] <span class="output"><span class="outputmark">&rarr;</span> "Go Fish"</span></code></div>
+
+		</dd>
+</dl>
+
+
+<h2 class="refsubsection" id="instancemethods">instance methods</h2>
+<dl class="methodlist">
+	<dt id="Hash._eq_eq">==</dt>
+		<dd class="callseq"><i class="obj">hsh</i> == <i class="obj">anOtherHash</i>  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Equality&mdash;Two hashes are equal if they each contain the same number
+       of keys and if each key-value pair is equal to (according to
+       <code class="class_instance_method"><a href="ref_c_object.html#Object._eq_eq"><span class="class">Object</span>#<span class="method">==</span></a></code>) the corresponding elements in the other hash.
+
+<div><code class="block">h1 = { "a" =&gt; 1, "c" =&gt; 2 }
+h2 = { "a" =&gt; 1, "c" =&gt; 2, 7 =&gt; 35 }
+h3 = { "a" =&gt; 1, "c" =&gt; 2, 7 =&gt; 35 }
+h4 = { "a" =&gt; 1, "d" =&gt; 2, "f" =&gt; 35 }
+h1 == h2 <span class="output"><span class="outputmark">&rarr;</span> false</span>
+h2 == h3 <span class="output"><span class="outputmark">&rarr;</span> true</span>
+h3 == h4 <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+		</dd>
+
+	<dt id="Hash._ob_cb">[ ]</dt>
+		<dd class="callseq"><i class="obj">hsh</i>[ <i class="obj">aKeyObject</i> ]   &rarr; <i class="obj">aValueObject</i></dd>
+		<dd class="desc">Element Reference&mdash;Retrieves the <i class="obj">aValueObject</i> stored for
+      <i class="obj">aKeyObject</i>.  If not found, returns the <em>default value</em>.
+
+<div><code class="block">h = { "a" =&gt; 100, "b" =&gt; 200 }
+h["a"] <span class="output"><span class="outputmark">&rarr;</span> 100</span>
+h["c"] <span class="output"><span class="outputmark">&rarr;</span> nil</span></code></div>
+
+		</dd>
+
+	<dt id="Hash._ob_cb_eq">[ ]=</dt>
+		<dd class="callseq"><i class="obj">hsh</i>[ <i class="obj">aKeyObject</i> ] = <i class="obj">aValueObject</i>  &rarr; <i class="obj">aValueObject</i></dd>
+		<dd class="desc">Element Assignment&mdash;Associates the value given by
+      <i class="obj">aValueObject</i> with the key given by <i class="obj">aKeyObject</i>.
+      <i class="obj">aKeyObject</i> should not have its value changed while it is
+      in use as a key (a <code class="class">String</code> passed as a key will be
+      duplicated and frozen).
+
+<div><code class="block">h = { "a" =&gt; 100, "b" =&gt; 200 }
+h["a"] = 9
+h["c"] = 4
+h <span class="output"><span class="outputmark">&rarr;</span> {"a"=&gt;9, "b"=&gt;200, "c"=&gt;4}</span></code></div>
+
+		</dd>
+
+	<dt id="Hash.clear">clear</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.clear  &rarr; <i class="obj">hsh</i></dd>
+		<dd class="desc">Removes all key-value pairs from <i class="obj">hsh</i>.
+
+<div><code class="block">h = { "a" =&gt; 100, "b" =&gt; 200 } <span class="output"><span class="outputmark">&rarr;</span> {"a"=&gt;100, "b"=&gt;200}</span>
+h.clear <span class="output"><span class="outputmark">&rarr;</span> {}</span></code></div>
+
+		</dd>
+
+	<dt id="Hash.default">default</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.default  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Returns the &ldquo;<em>default value</em>&rdquo;&mdash;that is, the value returned for a
+      key that does not exist in the hash.  Defaults to <code>nil</code>.
+      See also <code class="class_instance_method"><a href="ref_c_hash.html#Hash.default_eq"><span class="class">Hash</span>#<span class="method">default=</span></a></code>.
+
+		</dd>
+
+	<dt id="Hash.default_eq">default=</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.default = <i class="obj">anObject</i>  &rarr; <i class="obj">hsh</i></dd>
+		<dd class="desc">Sets the &ldquo;<em>default value</em>&rdquo;&mdash;that is, the value returned for a
+      key that does not exist in the hash.  Defaults to <code>nil</code>.
+
+<div><code class="block">h = { "a" =&gt; 100, "b" =&gt; 200 }
+h.default = "Go fish"
+h["a"] <span class="output"><span class="outputmark">&rarr;</span> 100</span>
+h["z"] <span class="output"><span class="outputmark">&rarr;</span> "Go fish"</span></code></div>
+
+		</dd>
+
+	<dt id="Hash.delete">delete</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.delete( <i class="obj">aKeyObject</i> )  &rarr; <i class="obj">aValueObject</i></dd>
+		<dd class="callseq"><i class="obj">hsh</i>.delete( <i class="obj">aKeyObject</i> ) {| aKeyObject | block } &rarr; <i class="obj">aValueObject</i></dd>
+		<dd class="desc">Deletes and returns a key-value pair from <i class="obj">hsh</i> whose key is equal to
+      <i class="obj">aKeyObject</i>.  If the key is not found, returns
+      the <em>default value</em>.  If the optional code block is given
+      and the key is not found,  pass in the key and return
+      the result of <i class="obj">block</i>.
+
+<div><code class="block">h = { "a" =&gt; 100, "b" =&gt; 200 }
+h.delete("a") <span class="output"><span class="outputmark">&rarr;</span> 100</span>
+h.delete("z") <span class="output"><span class="outputmark">&rarr;</span> nil</span>
+h.delete("z") { |el| "#{el} not found" } <span class="output"><span class="outputmark">&rarr;</span> "z not found"</span></code></div>
+
+		</dd>
+
+	<dt id="Hash.delete_if">delete_if</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.delete_if {| key, value | block }  &rarr; <i class="obj">hsh</i></dd>
+		<dd class="desc">Deletes every key-value pair from <i class="obj">hsh</i> for which <i class="obj">block</i>
+      evaluates to <code class="const">true</code>.
+
+<div><code class="block">h = { "a" =&gt; 100, "b" =&gt; 200, "c" =&gt; 300 }
+h.delete_if {|key, value| key &gt;= "b" } <span class="output"><span class="outputmark">&rarr;</span> {"a"=&gt;100}</span></code></div>
+
+		</dd>
+
+	<dt id="Hash.each">each</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.each {| key, value | block }  &rarr; <i class="obj">hsh</i></dd>
+		<dd class="desc">Calls <i class="obj">block</i> once for each key in <i class="obj">hsh</i>, passing the key
+      and value as parameters.
+
+<div><code class="block">h = { "a" =&gt; 100, "b" =&gt; 200 }
+h.each {|key, value| print key, " is ", value, "\n" }</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">a is 100
+b is 200</code></div>
+
+		</dd>
+
+	<dt id="Hash.each_key">each_key</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.each_key {| key | block }  &rarr; <i class="obj">hsh</i></dd>
+		<dd class="desc">Calls <i class="obj">block</i> once for each key in <i class="obj">hsh</i>, passing the key
+      as a parameter.
+
+<div><code class="block">h = { "a" =&gt; 100, "b" =&gt; 200 }
+h.each_key {|key| puts key }</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">a
+b</code></div>
+
+		</dd>
+
+	<dt id="Hash.each_pair">each_pair</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.each_pair {| key, value | block }  &rarr; <i class="obj">hsh</i></dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><a href="ref_c_hash.html#Hash.each"><span class="class">Hash</span>#<span class="method">each</span></a></code>.
+
+		</dd>
+
+	<dt id="Hash.each_value">each_value</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.each_value {| value | block }  &rarr; <i class="obj">hsh</i></dd>
+		<dd class="desc">Calls <i class="obj">block</i> once for each key in <i class="obj">hsh</i>, passing the value
+      as a parameter.
+
+<div><code class="block">h = { "a" =&gt; 100, "b" =&gt; 200 }
+h.each_value {|value| puts value }</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">100
+200</code></div>
+
+		</dd>
+
+	<dt id="Hash.empty_qm">empty?</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.empty?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">hsh</i> contains no key-value pairs.
+
+<div><code class="block">{}.empty? <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="Hash.fetch">fetch</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.fetch( <i class="obj">aKeyObject</i> [, <i class="obj">aDefObject</i>] )  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="callseq"><i class="obj">hsh</i>.fetch( <i class="obj">aKeyObject</i> ) {| aKeyObject | block } &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Returns a value from the hash for the given key.  If the key
+      can't be found, there are several options: With no other
+      arguments, it will raise an <code class="exception">IndexError</code> exception; if
+      <i class="obj">aDefObject</i> is given, then that will be returned;  if the
+      optional code block is specified, then that will be run and its
+      result returned.
+
+<div><code class="block">h = { "a" =&gt; 100, "b" =&gt; 200 }
+h.fetch("a") <span class="output" style="width:10em"><span class="outputmark">&rarr;</span> 100</span>
+h.fetch("z", "go fish") <span class="output" style="width:10em"><span class="outputmark">&rarr;</span> "go fish"</span>
+h.fetch("z") { |el| "go fish, #{el}"} <span class="output" style="width:10em"><span class="outputmark">&rarr;</span> "go fish, z"</span></code></div>
+
+      The following example shows that an exception is raised if the
+      key is not found and a default value is not supplied.
+
+<div><code class="block">h = { "a" =&gt; 100, "b" =&gt; 200 }
+h.fetch("z")</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">prog.rb:2:in `fetch': key not found (IndexError)
+	from prog.rb:2</code></div>
+
+		</dd>
+
+	<dt id="Hash.has_key_qm">has_key?</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.has_key?( <i class="obj">aKeyObject</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the given key is present in <i class="obj">hsh</i>.
+
+<div><code class="block">h = { "a" =&gt; 100, "b" =&gt; 200 }
+h.has_key?("a") <span class="output"><span class="outputmark">&rarr;</span> true</span>
+h.has_key?("z") <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+		</dd>
+
+	<dt id="Hash.has_value_qm">has_value?</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.has_value?( <i class="obj">aValueObject</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the given value is present for some key in
+      <i class="obj">hsh</i>.
+
+<div><code class="block">h = { "a" =&gt; 100, "b" =&gt; 200 }
+h.has_value?(100) <span class="output"><span class="outputmark">&rarr;</span> true</span>
+h.has_value?(999) <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+		</dd>
+
+	<dt id="Hash.include_qm">include?</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.include?( <i class="obj">aKeyObject</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><a href="ref_c_hash.html#Hash.has_key_qm"><span class="class">Hash</span>#<span class="method">has_key?</span></a></code>.
+
+		</dd>
+
+	<dt id="Hash.index">index</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.index( <i class="obj">aValueObject</i> )  &rarr; <i class="obj">aKeyObject</i></dd>
+		<dd class="desc">Returns the key for a given value.  If not found, returns the
+      <em>default value</em>.
+
+<div><code class="block">h = { "a" =&gt; 100, "b" =&gt; 200 }
+h.index(200) <span class="output"><span class="outputmark">&rarr;</span> "b"</span>
+h.index(999) <span class="output"><span class="outputmark">&rarr;</span> nil</span></code></div>
+
+		</dd>
+
+	<dt id="Hash.indexes">indexes</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.indexes( <i>[</i><i class="obj">key</i><i>]+</i> )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns a new array consisting of values for the given key(s).
+      Will insert the <em>default value</em> for keys that are not found.
+
+<div><code class="block">h = { "a" =&gt; 100, "b" =&gt; 200, "c" =&gt; 300 }
+h.indexes("a", "c") <span class="output"><span class="outputmark">&rarr;</span> [100, 300]</span>
+h.indexes("a", "c", "z") <span class="output"><span class="outputmark">&rarr;</span> [100, 300, nil]</span></code></div>
+
+		</dd>
+
+	<dt id="Hash.indices">indices</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.indices( <i>[</i><i class="obj">key</i><i>]+</i> )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><a href="ref_c_hash.html#Hash.indexes"><span class="class">Hash</span>#<span class="method">indexes</span></a></code>.
+
+		</dd>
+
+	<dt id="Hash.invert">invert</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.invert  &rarr; <i class="obj">aHash</i></dd>
+		<dd class="desc">Returns a new hash created by using <i class="obj">hsh</i>'s values as keys, and the
+      keys as values.
+
+<div><code class="block">h = { "n" =&gt; 100, "m" =&gt; 100, "y" =&gt; 300, "d" =&gt; 200, "a" =&gt; 0 }
+h.invert <span class="output"><span class="outputmark">&rarr;</span> {0=&gt;"a", 100=&gt;"n", 200=&gt;"d", 300=&gt;"y"}</span></code></div>
+
+		</dd>
+
+	<dt id="Hash.key_qm">key?</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.key?( <i class="obj">aKeyObject</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><a href="ref_c_hash.html#Hash.has_key_qm"><span class="class">Hash</span>#<span class="method">has_key?</span></a></code>.
+
+		</dd>
+
+	<dt id="Hash.keys">keys</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.keys  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns a new array populated with the keys from this hash.
+      See also <code class="class_instance_method"><a href="ref_c_hash.html#Hash.values"><span class="class">Hash</span>#<span class="method">values</span></a></code>.
+
+<div><code class="block">h = { "a" =&gt; 100, "b" =&gt; 200, "c" =&gt; 300, "d" =&gt; 400 }
+h.keys <span class="output"><span class="outputmark">&rarr;</span> ["a", "b", "c", "d"]</span></code></div>
+
+		</dd>
+
+	<dt id="Hash.length">length</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.length  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns the number of key-value pairs in the hash.
+
+<div><code class="block">h = { "d" =&gt; 100, "a" =&gt; 200, "v" =&gt; 300, "e" =&gt; 400 }
+h.length <span class="output"><span class="outputmark">&rarr;</span> 4</span>
+h.delete("a") <span class="output"><span class="outputmark">&rarr;</span> 200</span>
+h.length <span class="output"><span class="outputmark">&rarr;</span> 3</span></code></div>
+
+		</dd>
+
+	<dt id="Hash.member_qm">member?</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.member?( <i class="obj">aKeyObject</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><a href="ref_c_hash.html#Hash.has_key_qm"><span class="class">Hash</span>#<span class="method">has_key?</span></a></code>.
+
+		</dd>
+
+	<dt id="Hash.rehash">rehash</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.rehash  &rarr; <i class="obj">hsh</i></dd>
+		<dd class="desc">Rebuilds the hash based on the current hash values for each key.
+      If values of key objects have changed since they were inserted,
+      this method will reindex <i class="obj">hsh</i>.
+      If <code class="class_instance_method"><a href="ref_c_hash.html#Hash.rehash"><span class="class">Hash</span>#<span class="method">rehash</span></a></code> is called while an
+      iterator is traversing the hash, an <code class="exception">IndexError</code> will be
+      raised in the iterator.
+
+<div><code class="block">a = [ "a", "b" ]
+c = [ "c", "d" ]
+h = { a =&gt; 100, c =&gt; 300 }
+h[a] <span class="output"><span class="outputmark">&rarr;</span> 100</span>
+a[0] = "z"
+h[a] <span class="output"><span class="outputmark">&rarr;</span> nil</span>
+h.rehash <span class="output"><span class="outputmark">&rarr;</span> {["z", "b"]=&gt;100, ["c", "d"]=&gt;300}</span>
+h[a] <span class="output"><span class="outputmark">&rarr;</span> 100</span></code></div>
+
+		</dd>
+
+	<dt id="Hash.reject">reject</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.reject {| key, value | block }  &rarr; <i class="obj">aHash</i></dd>
+		<dd class="desc">Same as <code class="class_instance_method"><a href="ref_c_hash.html#Hash.delete_if"><span class="class">Hash</span>#<span class="method">delete_if</span></a></code>, but works on (and returns) a
+      copy of the <i class="obj">hsh</i>. Equivalent to <code><i class="obj">hsh</i>.dup.delete_if</code>.
+
+		</dd>
+
+	<dt id="Hash.reject_oh">reject!</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.reject! {| key, value | block }  &rarr; <i class="obj">hsh</i> or <code>nil</code></dd>
+		<dd class="desc">Equivalent to <code class="class_instance_method"><a href="ref_c_hash.html#Hash.delete_if"><span class="class">Hash</span>#<span class="method">delete_if</span></a></code>, but returns <code>nil</code> if no
+      changes were made.
+
+		</dd>
+
+	<dt id="Hash.replace">replace</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.replace( <i class="obj">anOtherHash</i> )  &rarr; <i class="obj">hsh</i></dd>
+		<dd class="desc">Replaces the contents of <i class="obj">hsh</i> with the contents of
+      <i class="obj">anOtherHash</i>.
+
+<div><code class="block">h = { "a" =&gt; 100, "b" =&gt; 200 }
+h.replace({ "c" =&gt; 300, "d" =&gt; 400 }) <span class="output"><span class="outputmark">&rarr;</span> {"c"=&gt;300, "d"=&gt;400}</span></code></div>
+
+		</dd>
+
+	<dt id="Hash.shift">shift</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.shift  &rarr; <i class="obj">anArray</i> or <code>nil</code></dd>
+		<dd class="desc">Removes a key-value pair
+      from <i class="obj">hsh</i>
+      and returns it as the two-item array <code>[</code>
+      <i class="obj">key, value</i> <code>]</code>, or <code>nil</code> if the
+      hash is empty.
+
+<div><code class="block">h = { 1 =&gt; "a", 2 =&gt; "b", 3 =&gt; "c" }
+h.shift <span class="output"><span class="outputmark">&rarr;</span> [1, "a"]</span>
+h <span class="output"><span class="outputmark">&rarr;</span> {2=&gt;"b", 3=&gt;"c"}</span></code></div>
+
+		</dd>
+
+	<dt id="Hash.size">size</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.size  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><a href="ref_c_hash.html#Hash.length"><span class="class">Hash</span>#<span class="method">length</span></a></code>.
+
+		</dd>
+
+	<dt id="Hash.sort">sort</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.sort   &rarr; <i class="obj">anArray</i> </dd>
+		<dd class="callseq"><i class="obj">hsh</i>.sort {| a, b | block } &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Converts <i class="obj">hsh</i> to a nested array of <code>[</code> <i class="obj">key, value</i>
+      <code>]</code> arrays and sorts it, using <code class="class_instance_method"><a href="ref_c_array.html#Array.sort"><span class="class">Array</span>#<span class="method">sort</span></a></code>.
+
+<div><code class="block">h = { "a" =&gt; 20, "b" =&gt; 30, "c" =&gt; 10  }
+h.sort <span class="output"><span class="outputmark">&rarr;</span> [["a", 20], ["b", 30], ["c", 10]]</span>
+h.sort {|a,b| a[1]&lt;=&gt;b[1]} <span class="output"><span class="outputmark">&rarr;</span> [["c", 10], ["a", 20], ["b", 30]]</span></code></div>
+
+		</dd>
+
+	<dt id="Hash.store">store</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.store( <i class="obj">aKeyObject, aValueObject</i> )   &rarr; <i class="obj">aValueObject</i></dd>
+		<dd class="desc">Synonym for Element Assignment (<code class="class_instance_method"><a href="ref_c_hash.html#Hash._ob_cb_eq"><span class="class">Hash</span>#<span class="method">[]=</span></a></code>).
+
+		</dd>
+
+	<dt id="Hash.to_a">to_a</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.to_a   &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Converts <i class="obj">hsh</i> to a nested array of <code>[</code> <i class="obj">key, value</i>
+      <code>]</code> arrays.
+
+<div><code class="block">h = { "c" =&gt; 300, "a" =&gt; 100, "d" =&gt; 400, "c" =&gt; 300  }
+h.to_a <span class="output"><span class="outputmark">&rarr;</span> [["a", 100], ["c", 300], ["d", 400]]</span></code></div>
+
+		</dd>
+
+	<dt id="Hash.to_s">to_s</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.to_s  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Converts <i class="obj">hsh</i> to a string by converting the hash to an array
+      of <code>[</code> <i class="obj">key, value</i> <code>]</code> pairs and then converting that array to a string using
+      <code class="class_instance_method"><a href="ref_c_array.html#Array.join"><span class="class">Array</span>#<span class="method">join</span></a></code> with the default separator.
+
+<div><code class="block">h = { "c" =&gt; 300, "a" =&gt; 100, "d" =&gt; 400, "c" =&gt; 300  }
+h.to_s <span class="output"><span class="outputmark">&rarr;</span> "a100c300d400"</span></code></div>
+
+		</dd>
+
+	<dt id="Hash.update">update</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.update( <i class="obj">anOtherHash</i> )  &rarr; <i class="obj">hsh</i></dd>
+		<dd class="desc">Adds the contents of <i class="obj">anOtherHash</i> to <i class="obj">hsh</i>, overwriting
+     entries with duplicate keys  with those from <i class="obj">anOtherHash</i>.
+
+<div><code class="block">h1 = { "a" =&gt; 100, "b" =&gt; 200 }
+h2 = { "b" =&gt; 254, "c" =&gt; 300 }
+h1.update(h2) <span class="output"><span class="outputmark">&rarr;</span> {"a"=&gt;100, "b"=&gt;254, "c"=&gt;300}</span></code></div>
+
+		</dd>
+
+	<dt id="Hash.value_qm">value?</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.value?( <i class="obj">aValueObject</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><a href="ref_c_hash.html#Hash.has_value_qm"><span class="class">Hash</span>#<span class="method">has_value?</span></a></code>.
+
+		</dd>
+
+	<dt id="Hash.values">values</dt>
+		<dd class="callseq"><i class="obj">hsh</i>.values  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns a new array populated with the values from <i class="obj">hsh</i>.
+      See also <code class="class_instance_method"><a href="ref_c_hash.html#Hash.keys"><span class="class">Hash</span>#<span class="method">keys</span></a></code>.
+
+<div><code class="block">h = { "a" =&gt; 100, "b" =&gt; 200, "c" =&gt; 300 }
+h.values <span class="output"><span class="outputmark">&rarr;</span> [100, 200, 300]</span></code></div></dd>
+</dl>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_c_hash.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

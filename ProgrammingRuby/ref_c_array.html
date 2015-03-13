@@ -1,0 +1,867 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Array</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_c_array',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="class" id="Array">class <strong>Array</strong> &lt; Object</h1>
+
+<p>Arrays are ordered, integer-indexed collections of any object. Array indexing starts at 0, as in C or Java.  A negative index is   assumed relative to the end of the array&mdash;that is, an index of -1   indicates the last element of the array, -2 is the next to last   element in the array, and so on.</p>
+<h2>mixins</h2>
+<dl>
+	<dt><code class="module"><a href="ref_m_enumerable.html#Enumerable">Enumerable</a></code></dt>
+	<dd><code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.collect">collect</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.detect">detect</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.each_with_index">each_with_index</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.entries">entries</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.find">find</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.find_all">find_all</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.grep">grep</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.include">include?</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.map">map</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.max">max</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.member">member?</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.min">min</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.reject">reject</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.select">select</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.sort">sort</a></code>, <code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.to_a">to_a</a></code></dd>
+</dl>
+
+
+<h2 class="refsubsection" id="classmethods">class methods</h2>
+<dl class="methodlist">
+	<dt id="Array._ob_cb">[ ]</dt>
+	<dd class="callseq">Array[ <i>[</i>anObject<i>]*</i> ]  &rarr; <i class="obj">anArray</i></dd>
+	<dd class="desc">Returns a new array populated with the given objects. Equivalent to
+      the operator form <code>Array.[](</code><em>...</em><code>)</code>.
+
+<div><code class="block">Array.[]( 1, 'a', /^A/ ) <span class="output"><span class="outputmark">&rarr;</span> [1, "a", /^A/]</span>
+Array[ 1, 'a', /^A/ ] <span class="output"><span class="outputmark">&rarr;</span> [1, "a", /^A/]</span>
+[ 1, 'a', /^A/ ] <span class="output"><span class="outputmark">&rarr;</span> [1, "a", /^A/]</span></code></div>
+
+		</dd>
+<dt id="Array.new">new</dt>
+	<dd class="callseq">Array.new( <i class="obj">anInteger=0</i>, <i class="obj">anObject=nil</i> )  &rarr; <i class="obj">anArray</i></dd>
+	<dd class="desc">Returns a new array, optionally with a size and initial value (that is, <i class="obj">anInteger</i> references to the same <i class="obj">anObject</i>).
+
+<div><code class="block">Array.new <span class="output"><span class="outputmark">&rarr;</span> []</span>
+Array.new(2) <span class="output"><span class="outputmark">&rarr;</span> [nil, nil]</span>
+Array.new(5, "A") <span class="output"><span class="outputmark">&rarr;</span> ["A", "A", "A", "A", "A"]</span>
+Array.new(2, Hash.new) <span class="output"><span class="outputmark">&rarr;</span> [{}, {}]</span></code></div>
+
+		</dd>
+</dl>
+
+<h2 class="refsubsection" id="instancemethods">instance methods</h2>
+<dl class="methodlist">
+	<dt id="Array._et">&amp;</dt>
+	<dd class="callseq"><i class="obj">arr</i> &amp; <i class="obj">anOtherArray</i>  &rarr; <i class="obj">anArray</i></dd>
+	<dd class="desc">Set Intersection&mdash;Returns a new array containing elements common to the two arrays, with no duplicates.
+
+<div><code class="block">[ 1, 1, 3, 5 ] &amp; [ 1, 2, 3 ] <span class="output"><span class="outputmark">&rarr;</span> [1, 3]</span></code></div>
+
+		</dd>
+<dt id="Array._st">*</dt>
+	<dd class="callseq"><i class="obj">arr</i> * <i class="obj">anInteger</i>  &rarr; <i class="obj">anArray</i></dd>
+	<dd class="callseq"><i class="obj">arr</i> * <i class="obj">aString</i>    &rarr; <i class="obj">anOtherString</i></dd>
+	<dd class="desc">Repetition&mdash;With a <code class="class">String</code> argument, equivalent to
+       <code><i class="obj">arr</i>.join(aString)</code>. Otherwise, returns a new array
+       built by concatenating the <i class="obj">anInteger</i> copies of <i class="obj">arr</i>.
+
+<div><code class="block">[ 1, 2, 3 ] * 3 <span class="output"><span class="outputmark">&rarr;</span> [1, 2, 3, 1, 2, 3, 1, 2, 3]</span></code></div>
+
+		</dd>
+<dt id="Array._pl">+</dt>
+	<dd class="callseq"><i class="obj">arr</i> + <i class="obj">anOtherArray</i>  &rarr; <i class="obj">anArray</i></dd>
+	<dd class="desc">Concatenation&mdash;Returns a new array built by concatenating the
+       two arrays together to produce a third array.
+
+<div><code class="block">[ 1, 2, 3 ] + [ 4, 5 ] <span class="output"><span class="outputmark">&rarr;</span> [1, 2, 3, 4, 5]</span></code></div>
+
+		</dd>
+<dt id="Array._mi_mi">-</dt>
+	<dd class="callseq"><i class="obj">arr</i> - <i class="obj">anOtherArray</i>  &rarr; <i class="obj">anArray</i></dd>
+	<dd class="desc">Set Difference&mdash;Returns a new array that is a copy of
+       the original array, removing any items that also appear in
+       <i class="obj">anOtherArray</i> and duplicated items.
+
+<div><code class="block">[ 1, 1, 2, 2, 3, 3, 3, 4, 5 ] - [ 1, 2, 4 ] <span class="output"><span class="outputmark">&rarr;</span> [3, 5]</span></code></div>
+
+		</dd>
+<dt id="Array._lt_lt">&lt;&lt;</dt>
+	<dd class="callseq"><i class="obj">arr</i> &lt;&lt; <i class="obj">anObject</i>  &rarr; <i class="obj">arr</i></dd>
+	<dd class="desc">Append&mdash;Pushes the given object on to the end of this array. This
+       expression returns the array itself, so several appends
+       may be chained together.
+
+       See also <code class="class_instance_method"><a href="ref_c_array.html#Array.push"><span class="class">Array</span>#<span class="method">push</span></a></code>.
+
+<div><code class="block">[ 1, 2 ] &lt;&lt; "c" &lt;&lt; "d" &lt;&lt; [ 3, 4 ] <span class="output"><span class="outputmark">&rarr;</span> [1, 2, "c", "d", [3, 4]]</span></code></div>
+
+		</dd>
+<dt id="Array._lt_eq_lt">&lt;=&gt;</dt>
+	<dd class="callseq"><i class="obj">arr</i> &lt;=&gt; <i class="obj">anOtherArray</i>  &rarr; -1, 0, +1</dd>
+	<dd class="desc">Comparison&mdash;Returns an integer -1, 0,
+       or +1 if this array is less than, equal to, or greater than
+       <i class="obj">anOtherArray</i>.  Each object in each array is compared
+       (using <code class="method">&lt;=&gt;</code>). If any value isn't
+       equal, then that inequality is the return value. If all the
+       values found are equal, then the return is based on a
+       comparison of the array lengths.  Thus, two arrays are
+       &ldquo;equal&rdquo; according to <code class="class_instance_method"><a href="ref_c_array.html#Array._lt_eq_lt"><span class="class">Array</span>#<span class="method">&lt;=&gt;</span></a></code> if and only if they have
+       the same length and the value of each element is equal to the
+       value of the corresponding element in the other array.
+
+<div><code class="block">[ "a", "a", "c" ]    &lt;=&gt; [ "a", "b", "c" ] <span class="output"><span class="outputmark">&rarr;</span> -1</span>
+[ 1, 2, 3, 4, 5, 6 ] &lt;=&gt; [ 1, 2 ] <span class="output"><span class="outputmark">&rarr;</span> 1</span></code></div>
+
+		</dd>
+<dt id="Array._eq_eq">==</dt>
+	<dd class="callseq"><i class="obj">arr</i> == <i class="obj">anOtherArray</i>  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+	<dd class="desc">Equality&mdash;Two arrays are equal if they contain the same number
+       of elements and if each element is equal to (according to
+       <code class="class_instance_method"><a href="ref_c_object.html#Object._eq_eq"><span class="class">Object</span>#<span class="method">==</span></a></code>) the corresponding element in the other array.
+
+<div><code class="block">[ "a", "c" ]    == [ "a", "c", 7 ] <span class="output"><span class="outputmark">&rarr;</span> false</span>
+[ "a", "c", 7 ] == [ "a", "c", 7 ] <span class="output"><span class="outputmark">&rarr;</span> true</span>
+[ "a", "c", 7 ] == [ "a", "d", "f" ] <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+		</dd>
+<dt id="Array._eq_eq_eq">===</dt>
+	<dd class="callseq"><i class="obj">arr</i> === <i class="obj">anOtherArray</i>  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+	<dd class="desc">Case Equality&mdash;Equality as evaluated by <code>case</code>
+       expressions. For arrays, this is the same as <code class="class_instance_method"><a href="ref_c_array.html#Array._eq_eq"><span class="class">Array</span>#<span class="method">==</span></a></code>.
+
+		</dd>
+<dt id="Array._ob_cb">[ ]</dt>
+	<dd class="callseq"><i class="obj">arr</i>[<i class="obj">anInteger</i>]   &rarr; <i class="obj">anObject</i> or <code>nil</code></dd>
+	<dd class="callseq"><i class="obj">arr</i>[<i class="obj">start</i>, <i class="obj">length</i>]  &rarr; <i class="obj">aSubArray</i> or <code>nil</code></dd>
+	<dd class="callseq"><i class="obj">arr</i>[<i class="obj">aRange</i>] &rarr; <i class="obj">aSubArray</i> or <code>nil</code></dd>
+	<dd class="desc">Element Reference&mdash;Returns the element at index <i class="obj">anInteger</i>,
+     or returns a subarray starting at index <i class="obj">start</i> and
+     continuing for <i class="obj">length</i> elements, or returns a subarray
+     specified by <i class="obj">aRange</i>.
+     Negative indices count backward from the end of the
+     array (-1 is the last element). Returns <code>nil</code> if any indices
+     are out of range.
+
+<div><code class="block">a = [ "a", "b", "c", "d", "e" ]
+a[2] +  a[0] + a[1] <span class="output"><span class="outputmark">&rarr;</span> "cab"</span>
+a[6] <span class="output"><span class="outputmark">&rarr;</span> nil</span>
+a[1, 2] <span class="output"><span class="outputmark">&rarr;</span> ["b", "c"]</span>
+a[1..3] <span class="output"><span class="outputmark">&rarr;</span> ["b", "c", "d"]</span>
+a[4..7] <span class="output"><span class="outputmark">&rarr;</span> ["e"]</span>
+a[6..10] <span class="output"><span class="outputmark">&rarr;</span> nil</span>
+a[-3, 3] <span class="output"><span class="outputmark">&rarr;</span> ["c", "d", "e"]</span></code></div>
+
+		</dd>
+<dt id="Array._ob_cb_eq">[ ]=</dt>
+	<dd class="callseq"><i class="obj">arr</i>[<i class="obj">anInteger</i>] = <i class="obj">anObject</i>  &rarr;  <i class="obj">anObject</i>  </dd>
+	<dd class="callseq"><i class="obj">arr</i>[<i class="obj">start</i>, <i class="obj">length</i>] = <i class="obj">aSubArray</i>  &rarr;  <i class="obj">aSubArray</i> </dd>
+	<dd class="callseq"><i class="obj">arr</i>[<i class="obj">aRange</i>] = <i class="obj">aSubArray</i> &rarr; <i class="obj">aSubArray</i></dd>
+	<dd class="desc">Element Assignment&mdash;Sets the element at index <i class="obj">anInteger</i>,
+       or replaces a subarray starting at index <i class="obj">start</i> and
+       continuing for <i class="obj">length</i> elements, or replaces a subarray
+       specified by <i class="obj">aRange</i>.  If <i class="obj">anInteger</i> is greater than
+       the current capacity of the array, the array grows
+       automatically. A negative <i class="obj">anInteger</i> will count backward
+       from the end of the array. Inserts elements if <i class="obj">length</i> is
+       zero. If <i class="obj">subArray</i> is <code>nil</code>, deletes elements from <i class="obj">arr</i>.
+       An <code class="exception">IndexError</code> is raised if a
+       negative index points past the beginning of the array. See also
+       <code class="class_instance_method"><a href="ref_c_array.html#Array.push"><span class="class">Array</span>#<span class="method">push</span></a></code>, <code class="class_instance_method"><a href="ref_c_array.html#Array.unshift"><span class="class">Array</span>#<span class="method">unshift</span></a></code>.
+
+<div><code class="block">a = Array.new <span class="output"><span class="outputmark">&rarr;</span> []</span>
+a[4] = "4";                  a <span class="output"><span class="outputmark">&rarr;</span> [nil, nil, nil, nil, "4"]</span>
+a[0, 3] = [ 'a', 'b', 'c' ]; a <span class="output"><span class="outputmark">&rarr;</span> ["a", "b", "c", nil, "4"]</span>
+a[1..2] = [ 1, 2 ];          a <span class="output"><span class="outputmark">&rarr;</span> ["a", 1, 2, nil, "4"]</span>
+a[0, 2] = "?";               a <span class="output"><span class="outputmark">&rarr;</span> ["?", 2, nil, "4"]</span>
+a[0..2] = "A";               a <span class="output"><span class="outputmark">&rarr;</span> ["A", "4"]</span>
+a[-1]   = "Z";               a <span class="output"><span class="outputmark">&rarr;</span> ["A", "Z"]</span>
+a[1..-1] = nil;              a <span class="output"><span class="outputmark">&rarr;</span> ["A"]</span></code></div>
+
+		</dd>
+<dt id="Array._ba">|</dt>
+	<dd class="callseq"><i class="obj">arr</i> | <i class="obj">anOtherArray</i>  &rarr; <i class="obj">anArray</i></dd>
+	<dd class="desc">Set Union&mdash;Returns a new array by joining this array with
+      <i class="obj">anOtherArray</i>, removing duplicates.
+
+<div><code class="block">[ "a", "b", "c" ] | [ "c", "d", "a" ] <span class="output"><span class="outputmark">&rarr;</span> ["a", "b", "c", "d"]</span></code></div>
+
+		</dd>
+<dt id="Array.assoc">assoc</dt>
+	<dd class="callseq"><i class="obj">arr</i>.assoc( <i class="obj">anObject</i> )  &rarr; <i class="obj">anArray</i> or <code>nil</code></dd>
+	<dd class="desc">Searches through an array whose elements are also arrays
+       comparing <i class="obj">anObject</i> with the first element of each contained array
+       using <i class="obj">anObject</i><code>.==</code> .
+       Returns the first contained array that matches (that
+       is, the first <em>assoc</em>iated array),
+       or <code>nil</code> if no match is found.
+       See also <code class="class_instance_method"><a href="ref_c_array.html#Array.rassoc"><span class="class">Array</span>#<span class="method">rassoc</span></a></code>.
+
+<div><code class="block">s1 = [ "colors", "red", "blue", "green" ]
+s2 = [ "letters", "a", "b", "c" ]
+s3 = "foo"
+a  = [ s1, s2, s3 ]
+a.assoc("letters") <span class="output"><span class="outputmark">&rarr;</span> ["letters", "a", "b", "c"]</span>
+a.assoc("foo") <span class="output"><span class="outputmark">&rarr;</span> nil</span></code></div>
+
+		</dd>
+<dt id="Array.at">at</dt>
+	<dd class="callseq"><i class="obj">arr</i>.at( <i class="obj">anInteger</i> )   &rarr; <i class="obj">anObject</i> or <code>nil</code></dd>
+	<dd class="desc">Returns the element at index <i class="obj">anInteger</i>.  A
+       negative index counts from the end of <i class="obj">arr</i>.  Returns <code>nil</code>
+       if the index is out of range. See also <code class="class_instance_method"><a href="ref_c_array.html#Array._ob_cb"><span class="class">Array</span>#<span class="method">[]</span></a></code>.
+       (<code class="class_instance_method"><a href="ref_c_array.html#Array.at"><span class="class">Array</span>#<span class="method">at</span></a></code> is slightly faster than <code class="class_instance_method"><a href="ref_c_array.html#Array._ob_cb"><span class="class">Array</span>#<span class="method">[]</span></a></code>, as it
+       does not accept ranges and so on.)
+
+<div><code class="block">a = [ "a", "b", "c", "d", "e" ]
+a.at(0) <span class="output"><span class="outputmark">&rarr;</span> "a"</span>
+a.at(-1) <span class="output"><span class="outputmark">&rarr;</span> "e"</span></code></div>
+
+		</dd>
+<dt id="Array.clear">clear</dt>
+	<dd class="callseq"><i class="obj">arr</i>.clear  &rarr; <i class="obj">arr</i></dd>
+	<dd class="desc">Removes all elements from <i class="obj">arr</i>.
+
+<div><code class="block">a = [ "a", "b", "c", "d", "e" ]
+a.clear <span class="output"><span class="outputmark">&rarr;</span> []</span></code></div>
+
+		</dd>
+<dt id="Array.collect">collect</dt>
+	<dd class="callseq"><i class="obj">arr</i>.collect {| obj | block }  &rarr; <i class="obj">anArray</i></dd>
+	<dd class="desc">Returns a new array by invoking <i class="obj">block</i> once for every
+      element, passing each element as a parameter to <i class="obj">block</i>.  The
+      result of <i class="obj">block</i> is used as the given element in the new
+      array. See also <code class="class_instance_method"><a href="ref_c_array.html#Array.collect_oh"><span class="class">Array</span>#<span class="method">collect!</span></a></code>.
+
+<div><code class="block">a = [ "a", "b", "c", "d" ]
+a.collect {|x| x + "!" } <span class="output"><span class="outputmark">&rarr;</span> ["a!", "b!", "c!", "d!"]</span>
+a <span class="output"><span class="outputmark">&rarr;</span> ["a", "b", "c", "d"]</span></code></div>
+
+		</dd>
+<dt id="Array.collect_oh">collect!</dt>
+	<dd class="callseq"><i class="obj">arr</i>.collect! {| obj | block }  &rarr; <i class="obj">arr</i></dd>
+	<dd class="desc">Invokes <i class="obj">block</i> once for each element of <i class="obj">arr</i>, replacing the
+      element with the value returned by <i class="obj">block</i>.
+       See also <code class="class_instance_method"><a href="ref_c_array.html#Array.collect"><span class="class">Array</span>#<span class="method">collect</span></a></code>.
+
+<div><code class="block">a = [ "a", "b", "c", "d" ]
+a.collect! {|x| x + "!" } <span class="output"><span class="outputmark">&rarr;</span> ["a!", "b!", "c!", "d!"]</span>
+a <span class="output"><span class="outputmark">&rarr;</span> ["a!", "b!", "c!", "d!"]</span></code></div>
+
+		</dd>
+<dt id="Array.compact">compact</dt>
+	<dd class="callseq"><i class="obj">arr</i>.compact  &rarr; <i class="obj">anArray</i></dd>
+	<dd class="desc">Returns a new array based on the <i class="obj">arr</i> with
+      all <code>nil</code> elements removed.
+
+<div><code class="block">[ "a", nil, "b", nil, "c", nil ].compact <span class="output"><span class="outputmark">&rarr;</span> ["a", "b", "c"]</span></code></div>
+
+		</dd>
+<dt id="Array.compact_oh">compact!</dt>
+	<dd class="callseq"><i class="obj">arr</i>.compact!  &rarr; <i class="obj">arr</i> or <code>nil</code></dd>
+	<dd class="desc">Same as <code class="class_instance_method"><a href="ref_c_array.html#Array.compact"><span class="class">Array</span>#<span class="method">compact</span></a></code>, but modifies the receiver in place.
+      Returns <code>nil</code> if no changes were made.
+
+<div><code class="block">[ "a", nil, "b", nil, "c" ].compact! <span class="output"><span class="outputmark">&rarr;</span> ["a", "b", "c"]</span>
+[ "a", "b", "c" ].compact! <span class="output"><span class="outputmark">&rarr;</span> nil</span></code></div>
+
+		</dd>
+<dt id="Array.concat">concat</dt>
+	<dd class="callseq"><i class="obj">arr</i>.concat( <i class="obj">anOtherArray</i> )  &rarr; <i class="obj">arr</i></dd>
+	<dd class="desc">Appends the elements in <i class="obj">anOtherArray</i> to <i class="obj">arr</i>.
+
+<div><code class="block">[ "a", "b" ].concat( ["c", "d"] ) <span class="output"><span class="outputmark">&rarr;</span> ["a", "b", "c", "d"]</span></code></div>
+
+		</dd>
+<dt id="Array.delete">delete</dt>
+	<dd class="callseq"><i class="obj">arr</i>.delete( <i class="obj">anObject</i> )  &rarr; <i class="obj">anObject</i> or <code>nil</code> </dd>
+	<dd class="callseq"><i class="obj">arr</i>.delete( <i class="obj">anObject</i> ) {|  | block } &rarr; <i class="obj">anObject</i> or <code>nil</code></dd>
+	<dd class="desc">Deletes items from the self that are equal to <i class="obj">anObject</i>.
+      If the item is not found, returns <code>nil</code>.  If the optional
+      code block is given, returns the result of <i class="obj">block</i> if the item
+      is not found.
+
+<div><code class="block">a = [ "a", "b", "b", "b", "c" ]
+a.delete("b") <span class="output"><span class="outputmark">&rarr;</span> "b"</span>
+a <span class="output"><span class="outputmark">&rarr;</span> ["a", "c"]</span>
+a.delete("z") <span class="output"><span class="outputmark">&rarr;</span> nil</span>
+a.delete("z") { "not found" } <span class="output"><span class="outputmark">&rarr;</span> "not found"</span></code></div>
+
+		</dd>
+<dt id="Array.delete_at">delete_at</dt>
+	<dd class="callseq"><i class="obj">arr</i>.delete_at( <i class="obj">anIndex</i> )  &rarr; <i class="obj">anObject</i> or <code>nil</code></dd>
+	<dd class="desc">Deletes the element at the specified index, returning that
+      element, or <code>nil</code> if the index is out of range.
+      See also <code class="class_instance_method"><a href="ref_c_array.html#Array.slice_oh"><span class="class">Array</span>#<span class="method">slice!</span></a></code>.
+
+<div><code class="block">a = %w( ant bat cat dog )
+a.delete_at(2) <span class="output"><span class="outputmark">&rarr;</span> "cat"</span>
+a <span class="output"><span class="outputmark">&rarr;</span> ["ant", "bat", "dog"]</span>
+a.delete_at(99) <span class="output"><span class="outputmark">&rarr;</span> nil</span></code></div>
+
+		</dd>
+<dt id="Array.delete_if">delete_if</dt>
+	<dd class="callseq"><i class="obj">arr</i>.delete_if {|  | block }  &rarr; <i class="obj">arr</i></dd>
+	<dd class="desc">Deletes every element of <i class="obj">arr</i> for which <i class="obj">block</i>
+      evaluates to <code class="const">true</code>.
+
+<div><code class="block">a = [ "a", "b", "c" ]
+a.delete_if {|x| x &gt;= "b" } <span class="output"><span class="outputmark">&rarr;</span> ["a"]</span></code></div>
+
+		</dd>
+<dt id="Array.each">each</dt>
+	<dd class="callseq"><i class="obj">arr</i>.each {| item | block }  &rarr; <i class="obj">arr</i></dd>
+	<dd class="desc">Calls <i class="obj">block</i> once for each element in <i class="obj">arr</i>, passing that
+      element as a parameter.
+
+<div><code class="block">a = [ "a", "b", "c" ]
+a.each {|x| print x, " -- " }</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">a -- b -- c --</code></div>
+
+		</dd>
+<dt id="Array.each_index">each_index</dt>
+	<dd class="callseq"><i class="obj">arr</i>.each_index {| anIndex | block }  &rarr; <i class="obj">arr</i></dd>
+	<dd class="desc">Same as <code class="class_instance_method"><a href="ref_c_array.html#Array.each"><span class="class">Array</span>#<span class="method">each</span></a></code>, but passes the index of the element instead of
+      the element itself.
+
+<div><code class="block">a = [ "a", "b", "c" ]
+a.each_index {|x| print x, " -- " }</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">0 -- 1 -- 2 --</code></div>
+
+		</dd>
+<dt id="Array.empty_qm">empty?</dt>
+	<dd class="callseq"><i class="obj">arr</i>.empty?   &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+	<dd class="desc">Returns <code class="const">true</code> if <i class="obj">arr</i> array contains no elements.
+
+<div><code class="block">[].empty? <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+<dt id="Array.eql_qm">eql?</dt>
+	<dd class="callseq"><i class="obj">arr</i>.eql?( <i class="obj">anOtherArray</i> ) &rarr;<code class="const">true</code> or <code class="const">false</code></dd>
+	<dd class="desc">An array is equal to another array if the lengths are equal and
+      each corresponding element is equal (according to
+      <code class="class_instance_method"><a href="ref_c_object.html#Object.eql_qm"><span class="class">Object</span>#<span class="method">eql?</span></a></code>).  See also <code class="class_instance_method"><a href="ref_c_array.html#Array._lt_eq_lt"><span class="class">Array</span>#<span class="method">&lt;=&gt;</span></a></code>.
+      <code>eql?</code> is used for <code class="class">Hash</code> comparison.
+
+<div><code class="block">[ "a", "b", "c" ].eql?(["a", "b", "c"]) <span class="output"><span class="outputmark">&rarr;</span> true</span>
+[ "a", "b", "c" ].eql?(["a", "b"]) <span class="output"><span class="outputmark">&rarr;</span> false</span>
+[ "a", "b", "c" ].eql?(["b", "c", "d"]) <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+		</dd>
+<dt id="Array.fill">fill</dt>
+	<dd class="callseq"><i class="obj">arr</i>.fill( <i class="obj">anObject</i> )  &rarr; <i class="obj">arr</i> </dd>
+	<dd class="callseq"><i class="obj">arr</i>.fill( <i class="obj">anObject</i>, <i class="obj">start</i> [, <i class="obj">length</i>] )   &rarr; <i class="obj">arr</i> </dd>
+	<dd class="callseq"><i class="obj">arr</i>.fill( <i class="obj">anObject</i>, <i class="obj">aRange</i> )  &rarr; <i class="obj">arr</i></dd>
+	<dd class="desc">Sets the selected elements of <i class="obj">arr</i> (which may be the entire array)
+      to <i class="obj">anObject</i>. A <i class="obj">start</i> of <code>nil</code> is
+      equivalent to zero. A <i class="obj">length</i> of <code>nil</code> is equivalent to
+      <i class="obj">arr</i>.length.
+
+<div><code class="block">a = [ "a", "b", "c", "d" ]
+a.fill("x") <span class="output"><span class="outputmark">&rarr;</span> ["x", "x", "x", "x"]</span>
+a.fill("z", 2, 2) <span class="output"><span class="outputmark">&rarr;</span> ["x", "x", "z", "z"]</span>
+a.fill("y", 0..1) <span class="output"><span class="outputmark">&rarr;</span> ["y", "y", "z", "z"]</span></code></div>
+
+		</dd>
+<dt id="Array.first">first</dt>
+	<dd class="callseq"><i class="obj">arr</i>.first  &rarr; <i class="obj">anObject</i> or <code>nil</code></dd>
+	<dd class="desc">Returns the first element of the array.  If the array is empty,
+      returns <code>nil</code>.
+
+<div><code class="block">a = [ "q", "r", "s", "t" ]
+a.first <span class="output"><span class="outputmark">&rarr;</span> "q"</span></code></div>
+
+		</dd>
+<dt id="Array.flatten">flatten</dt>
+	<dd class="callseq"><i class="obj">arr</i>.flatten  &rarr; <i class="obj">anArray</i></dd>
+	<dd class="desc">Returns a new array that is a one-dimensional flattening of this
+      array (recursively). That is, for every element that is an
+      array, extract its elements into the new array.
+
+<div><code class="block">s = [ 1, 2, 3 ] <span class="output"><span class="outputmark">&rarr;</span> [1, 2, 3]</span>
+t = [ 4, 5, 6, [7, 8] ] <span class="output"><span class="outputmark">&rarr;</span> [4, 5, 6, [7, 8]]</span>
+a = [ s, t, 9, 10 ] <span class="output"><span class="outputmark">&rarr;</span> [[1, 2, 3], [4, 5, 6, [7, 8]], 9, 10]</span>
+a.flatten <span class="output"><span class="outputmark">&rarr;</span> [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</span></code></div>
+
+		</dd>
+<dt id="Array.flatten_oh">flatten!</dt>
+	<dd class="callseq"><i class="obj">arr</i>.flatten!  &rarr; <i class="obj">arr</i> or <code>nil</code></dd>
+	<dd class="desc">Same as <code class="class_instance_method"><a href="ref_c_array.html#Array.flatten"><span class="class">Array</span>#<span class="method">flatten</span></a></code>, but modifies the receiver in place.
+      Returns <code>nil</code> if no modifications were made (i.e., <i class="obj">arr</i>
+      contains no subarrays.)
+
+<div><code class="block">a = [ 1, 2, [3, [4, 5] ] ]
+a.flatten! <span class="output"><span class="outputmark">&rarr;</span> [1, 2, 3, 4, 5]</span>
+a.flatten! <span class="output"><span class="outputmark">&rarr;</span> nil</span>
+a <span class="output"><span class="outputmark">&rarr;</span> [1, 2, 3, 4, 5]</span></code></div>
+
+		</dd>
+<dt id="Array.include_qm">include?</dt>
+	<dd class="callseq"><i class="obj">arr</i>.include?( <i class="obj">anObject</i> )   &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+	<dd class="desc">Returns <code class="const">true</code> if the given object
+      is present in <i class="obj">arr</i> (that is, if any object <code class="method">==</code>
+      <i class="obj">anObject</i>), <code class="const">false</code> otherwise.
+
+<div><code class="block">a = [ "a", "b", "c" ]
+a.include?("b") <span class="output"><span class="outputmark">&rarr;</span> true</span>
+a.include?("z") <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+    
+<table id="table_22.1">
+	<caption>Table 22.1 : Template characters for <code class="class_instance_method"><a href="ref_c_array.html#Array.pack"><span class="class">Array</span>#<span class="method">pack</span></a></code></caption>
+	<thead><tr><th>Directive</th><th>Meaning</th></tr></thead>
+	<tr class="firstRow">
+		<td>@</td>
+		<td>Moves to absolute position</td>
+	</tr>
+	<tr>
+		<td>A</td>
+		<td>ASCII string (space padded, count is width)</td>
+	</tr>
+	<tr>
+		<td>a</td>
+		<td>ASCII string (null padded, count is width)</td>
+	</tr>
+	<tr>
+		<td>B</td>
+		<td>Bit string (descending bit order)</td>
+	</tr>
+	<tr>
+		<td>b</td>
+		<td>Bit string (ascending bit order)</td>
+	</tr>
+	<tr>
+		<td>C</td>
+		<td>Unsigned char</td>
+	</tr>
+	<tr>
+		<td>c</td>
+		<td>Char</td>
+	</tr>
+	<tr>
+		<td>d</td>
+		<td>Double-precision float, native format</td>
+	</tr>
+	<tr>
+		<td>E</td>
+		<td>Double-precision float, little-endian byte order</td>
+	</tr>
+	<tr>
+		<td>e</td>
+		<td>Single-precision float, little-endian byte order</td>
+	</tr>
+	<tr>
+		<td>f</td>
+		<td>Single-precision float, native format</td>
+	</tr>
+	<tr>
+		<td>G</td>
+		<td>Double-precision float, network (big-endian) byte order</td>
+	</tr>
+	<tr>
+		<td>g</td>
+		<td>Single-precision float, network (big-endian) byte order</td>
+	</tr>
+	<tr>
+		<td>H</td>
+		<td>Hex string (high nibble first)</td>
+	</tr>
+	<tr>
+		<td>h</td>
+		<td>Hex string (low nibble first)</td>
+	</tr>
+	<tr>
+		<td>I</td>
+		<td>Unsigned integer</td>
+	</tr>
+	<tr>
+		<td>i</td>
+		<td>Integer</td>
+	</tr>
+	<tr>
+		<td>L</td>
+		<td>Unsigned long</td>
+	</tr>
+	<tr>
+		<td>l</td>
+		<td>Long</td>
+	</tr>
+	<tr>
+		<td>M</td>
+		<td>Quoted printable, MIME encoding (see RFC2045)</td>
+	</tr>
+	<tr>
+		<td>m</td>
+		<td>Base64 encoded string</td>
+	</tr>
+	<tr>
+		<td>N</td>
+		<td>Long, network (big-endian) byte order</td>
+	</tr>
+	<tr>
+		<td>n</td>
+		<td>Short, network (big-endian) byte-order</td>
+	</tr>
+	<tr>
+		<td>P</td>
+		<td>Pointer to a structure (fixed-length string)</td>
+	</tr>
+	<tr>
+		<td>p</td>
+		<td>Pointer to a null-terminated string</td>
+	</tr>
+	<tr>
+		<td>S</td>
+		<td>Unsigned short</td>
+	</tr>
+	<tr>
+		<td>s</td>
+		<td>Short</td>
+	</tr>
+	<tr>
+		<td>U</td>
+		<td>UTF-8</td>
+	</tr>
+	<tr>
+		<td>u</td>
+		<td>UU-encoded string</td>
+	</tr>
+	<tr>
+		<td>V</td>
+		<td>Long, little-endian byte order</td>
+	</tr>
+	<tr>
+		<td>v</td>
+		<td>Short, little-endian byte order</td>
+	</tr>
+	<tr>
+		<td>X</td>
+		<td>Back up a byte</td>
+	</tr>
+	<tr>
+		<td>x</td>
+		<td>Null byte</td>
+	</tr>
+	<tr>
+		<td>Z</td>
+		<td>Same as &ldquo;A&rdquo;</td>
+	</tr>
+</table>
+
+		</dd>
+<dt id="Array.index">index</dt>
+	<dd class="callseq"><i class="obj">arr</i>.index( <i class="obj">anObject</i> )  &rarr; <i class="obj">anInteger</i> or <code>nil</code></dd>
+	<dd class="desc">Returns the index of the first object in <i class="obj">arr</i> such that
+      the object <code class="method">==</code> <i class="obj">anObject</i>.  Returns
+      <code>nil</code> if no match is found.
+
+<div><code class="block">a = [ "a", "b", "c" ]
+a.index("b") <span class="output"><span class="outputmark">&rarr;</span> 1</span>
+a.index("z") <span class="output"><span class="outputmark">&rarr;</span> nil</span></code></div>
+
+		</dd>
+<dt id="Array.indexes">indexes</dt>
+	<dd class="callseq"><i class="obj">arr</i>.indexes( <i class="obj">i1, i2, ... iN</i> )  &rarr; <i class="obj">anArray</i></dd>
+	<dd class="desc">Returns a new array consisting of elements at the given indices.
+      May insert <code>nil</code> for indices out of range.
+
+<div><code class="block">a = [ "a", "b", "c", "d", "e", "f", "g" ]
+a.indexes(0, 2, 4) <span class="output"><span class="outputmark">&rarr;</span> ["a", "c", "e"]</span>
+a.indexes(0, 2, 4, 12) <span class="output"><span class="outputmark">&rarr;</span> ["a", "c", "e", nil]</span></code></div>
+
+		</dd>
+<dt id="Array.indices">indices</dt>
+	<dd class="callseq"><i class="obj">arr</i>.indices( <i class="obj">i1, i2, ... iN</i> )  &rarr; <i class="obj">anArray</i></dd>
+	<dd class="desc">Synonym for <code class="class_instance_method"><a href="ref_c_array.html#Array.indexes"><span class="class">Array</span>#<span class="method">indexes</span></a></code>.
+
+		</dd>
+<dt id="Array.join">join</dt>
+	<dd class="callseq"><i class="obj">arr</i>.join( <i class="obj">aSepString</i>=<var>$,</var> )  &rarr; <i class="obj">aString</i></dd>
+	<dd class="desc">Returns a string created by converting each element of the array to a
+      string, separated by <i class="obj">aSepString</i>.
+
+<div><code class="block">[ "a", "b", "c" ].join <span class="output"><span class="outputmark">&rarr;</span> "abc"</span>
+[ "a", "b", "c" ].join("-") <span class="output"><span class="outputmark">&rarr;</span> "a-b-c"</span></code></div>
+
+		</dd>
+<dt id="Array.last">last</dt>
+	<dd class="callseq"><i class="obj">arr</i>.last  &rarr; <i class="obj">anObject</i> or <code>nil</code></dd>
+	<dd class="desc">Returns the last element of <i class="obj">arr</i>.  If the array is empty,
+      returns <code>nil</code>.
+
+<div><code class="block">[ "w", "x", "y", "z" ].last <span class="output"><span class="outputmark">&rarr;</span> "z"</span></code></div>
+
+		</dd>
+<dt id="Array.length">length</dt>
+	<dd class="callseq"><i class="obj">arr</i>.length  &rarr; <i class="obj">anInteger</i></dd>
+	<dd class="desc">Returns the number of elements in <i class="obj">arr</i>. May be zero.
+
+<div><code class="block">[ 1, 2, 3, 4, 5 ].length <span class="output"><span class="outputmark">&rarr;</span> 5</span></code></div>
+
+		</dd>
+<dt id="Array.map_oh">map!</dt>
+	<dd class="callseq"><i class="obj">arr</i>.map! {| obj | block }  &rarr; <i class="obj">arr</i></dd>
+	<dd class="desc">Synonym for <code class="class_instance_method"><a href="ref_c_array.html#Array.collect_oh"><span class="class">Array</span>#<span class="method">collect!</span></a></code>.
+
+		</dd>
+<dt id="Array.nitems">nitems</dt>
+	<dd class="callseq"><i class="obj">arr</i>.nitems  &rarr; <i class="obj">anInteger</i></dd>
+	<dd class="desc">Returns the number of non-<code>nil</code> elements in <i class="obj">arr</i>. May be zero.
+
+<div><code class="block">[ 1, nil, 3, nil, 5 ].nitems <span class="output"><span class="outputmark">&rarr;</span> 3</span></code></div>
+
+		</dd>
+<dt id="Array.pack">pack</dt>
+	<dd class="callseq"><i class="obj">arr</i>.pack ( <i class="obj">aTemplateString</i> )   &rarr; <i class="obj">aBinaryString</i></dd>
+	<dd class="desc">Packs the contents of <i class="obj">arr</i> into a binary sequence according to the directives in <i class="obj">aTemplateString</i> (<a href="ref_c_array.html#table_22.1">see Table 22.1</a>). Directives &ldquo;A,&rdquo; &ldquo;a,&rdquo; and &ldquo;Z&rdquo; may be followed by a count, which gives the width of the resulting field. The remaining directives also may take a count, indicating the number of array elements to convert.  If the count is an asterisk (&ldquo;<code>*</code>&rdquo;), all remaining array elements will be converted. Any of the directives &ldquo;<code>sSiIlL</code>&rdquo; may be followed by an underscore (&ldquo;<code>_</code>&rdquo;) to use the underlying platform's native size for the specified type; otherwise, they use a platform-independent size.  Spaces are ignored in the template string. See also <code class="class_instance_method"><a href="ref_c_string.html#String.unpack"><span class="class">String</span>#<span class="method">unpack</span></a></code>.
+
+<div><code class="block">a = [ "a", "b", "c" ]
+n = [ 65, 66, 67 ]
+a.pack("A3A3A3") <span class="output"><span class="outputmark">&rarr;</span> "a&#8255;&#8255;b&#8255;&#8255;c&#8255;&#8255;"</span>
+a.pack("a3a3a3") <span class="output"><span class="outputmark">&rarr;</span> "a\000\000b\000\000c\000\000"</span>
+n.pack("ccc") <span class="output"><span class="outputmark">&rarr;</span> "ABC"</span></code></div>
+
+		</dd>
+<dt id="Array.pop">pop</dt>
+	<dd class="callseq"><i class="obj">arr</i>.pop  &rarr; <i class="obj">anObject</i> or <code>nil</code></dd>
+	<dd class="desc">Removes the last element from <i class="obj">arr</i> and returns it, or
+      <code>nil</code> if the array is empty (as with a stack).
+
+<div><code class="block">a = [ "a", "m", "z" ]
+a.pop <span class="output"><span class="outputmark">&rarr;</span> "z"</span>
+a <span class="output"><span class="outputmark">&rarr;</span> ["a", "m"]</span></code></div>
+
+		</dd>
+<dt id="Array.push">push</dt>
+	<dd class="callseq"><i class="obj">arr</i>.push( <i>[</i><i class="obj">anObject</i><i>]+</i>  )   &rarr; <i class="obj">arr</i></dd>
+	<dd class="desc">Appends the given argument(s) to the end of <i class="obj">arr</i> (as with a
+      stack).
+
+<div><code class="block">a = [ "a", "b", "c" ]
+a.push("d", "e", "f") <span class="output"><span class="outputmark">&rarr;</span> ["a", "b", "c", "d", "e", "f"]</span></code></div>
+
+		</dd>
+<dt id="Array.rassoc">rassoc</dt>
+	<dd class="callseq"><i class="obj">arr</i>.rassoc( <em>key</em> )  &rarr; <i class="obj">anArray</i> or <code>nil</code></dd>
+	<dd class="desc">Searches through the array whose elements are also arrays.
+      Compares <em>key</em> with the second element of each contained
+      array using <code>==</code>.  Returns the first contained array that
+      matches.  See also <code>assoc</code>.
+
+<div><code class="block">a = [ [ 1, "one"], [2, "two"], [3, "three"], ["ii", "two"] ]
+a.rassoc("two") <span class="output"><span class="outputmark">&rarr;</span> [2, "two"]</span>
+a.rassoc("four") <span class="output"><span class="outputmark">&rarr;</span> nil</span></code></div>
+
+		</dd>
+<dt id="Array.reject_oh">reject!</dt>
+	<dd class="callseq"><i class="obj">arr</i>.reject! {|  | block }  &rarr; <i class="obj">arr</i> or <code>nil</code></dd>
+	<dd class="desc">Equivalent to <code class="class_instance_method"><a href="ref_c_array.html#Array.delete_if"><span class="class">Array</span>#<span class="method">delete_if</span></a></code>, but returns <code>nil</code> if no
+    changes were made.
+
+		</dd>
+<dt id="Array.replace">replace</dt>
+	<dd class="callseq"><i class="obj">arr</i>.replace( <i class="obj">anOtherArray</i> )  &rarr; <i class="obj">arr</i></dd>
+	<dd class="desc">Replaces the contents of <i class="obj">arr</i> with the contents of
+      <i class="obj">anOtherArray</i>, truncating or expanding if necessary.
+
+<div><code class="block">a = [ "a", "b", "c", "d", "e" ]
+a.replace( [ "x", "y", "z" ] ) <span class="output"><span class="outputmark">&rarr;</span> ["x", "y", "z"]</span>
+a <span class="output"><span class="outputmark">&rarr;</span> ["x", "y", "z"]</span></code></div>
+
+		</dd>
+<dt id="Array.reverse">reverse</dt>
+	<dd class="callseq"><i class="obj">arr</i>.reverse  &rarr; <i class="obj">anArray</i></dd>
+	<dd class="desc">Returns a new array using <i class="obj">arr</i>'s elements in reverse order.
+
+<div><code class="block">[ "a", "b", "c" ].reverse <span class="output"><span class="outputmark">&rarr;</span> ["c", "b", "a"]</span>
+[ 1 ].reverse <span class="output"><span class="outputmark">&rarr;</span> [1]</span></code></div>
+
+		</dd>
+<dt id="Array.reverse_oh">reverse!</dt>
+	<dd class="callseq"><i class="obj">arr</i>.reverse!  &rarr; <i class="obj">arr</i> or <code>nil</code></dd>
+	<dd class="desc">Same as <code class="method">reverse</code>, but returns <code>nil</code> if
+      <i class="obj">arr</i> is unchanged (<i class="obj">arr</i><code class="method">.length</code> is zero or one).
+
+<div><code class="block">a = [ "a", "b", "c" ]
+a.reverse! <span class="output"><span class="outputmark">&rarr;</span> ["c", "b", "a"]</span>
+a <span class="output"><span class="outputmark">&rarr;</span> ["c", "b", "a"]</span>
+[ 1 ].reverse! <span class="output"><span class="outputmark">&rarr;</span> nil</span></code></div>
+
+		</dd>
+<dt id="Array.reverse_each">reverse_each</dt>
+	<dd class="callseq"><i class="obj">arr</i>.reverse_each {|  | block }</dd>
+	<dd class="desc">Same as <code class="class_instance_method"><a href="ref_c_array.html#Array.each"><span class="class">Array</span>#<span class="method">each</span></a></code>, but traverses <i class="obj">arr</i> in reverse order.
+
+<div><code class="block">a = [ "a", "b", "c" ]
+a.reverse_each {|x| print x, " " }</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">c b a</code></div>
+
+		</dd>
+<dt id="Array.rindex">rindex</dt>
+	<dd class="callseq"><i class="obj">arr</i>.rindex( <i class="obj">anObject</i> )  &rarr; <i class="obj">anInteger</i> or <code>nil</code></dd>
+	<dd class="desc">Returns the index of the last object in <i class="obj">arr</i> such that
+      the object <code class="method">==</code> <i class="obj">anObject</i>.  Returns
+      <code>nil</code> if no match is found.
+
+<div><code class="block">a = [ "a", "b", "b", "b", "c" ]
+a.rindex("b") <span class="output"><span class="outputmark">&rarr;</span> 3</span>
+a.rindex("z") <span class="output"><span class="outputmark">&rarr;</span> nil</span></code></div>
+
+		</dd>
+<dt id="Array.shift">shift</dt>
+	<dd class="callseq"><i class="obj">arr</i>.shift  &rarr; <i class="obj">anObject</i> or <code>nil</code></dd>
+	<dd class="desc">Returns the first element of <i class="obj">arr</i> and removes it (shifting
+      all other elements down by one).  Returns <code>nil</code> if the array
+      is empty.
+
+<div><code class="block">args = [ "-m", "-q", "filename" ]
+args.shift <span class="output"><span class="outputmark">&rarr;</span> "-m"</span>
+args <span class="output"><span class="outputmark">&rarr;</span> ["-q", "filename"]</span></code></div>
+
+		</dd>
+<dt id="Array.size">size</dt>
+	<dd class="callseq"><i class="obj">arr</i>.size  &rarr; <i class="obj">anInteger</i></dd>
+	<dd class="desc">Synonym for <code class="class_instance_method"><a href="ref_c_array.html#Array.length"><span class="class">Array</span>#<span class="method">length</span></a></code>.
+
+		</dd>
+<dt id="Array.slice">slice</dt>
+	<dd class="callseq"><i class="obj">arr</i>.slice( <i class="obj">anInteger</i> )   &rarr; <i class="obj">anObject</i></dd>
+	<dd class="callseq"><i class="obj">arr</i>.slice( <i class="obj">start</i>, <i class="obj">length</i> ) &rarr; <i class="obj">aSubArray</i></dd>
+	<dd class="callseq"><i class="obj">arr</i>.slice( <i class="obj">aRange</i> ) &rarr; <i class="obj">aSubArray</i></dd>
+	<dd class="desc">Synonym for <code class="class_instance_method"><a href="ref_c_array.html#Array._ob_cb"><span class="class">Array</span>#<span class="method">[ ]</span></a></code>.
+
+<div><code class="block">a = [ "a", "b", "c", "d", "e" ]
+a.slice(2) + a.slice(0) + a.slice(1) <span class="output"><span class="outputmark">&rarr;</span> "cab"</span>
+a.slice(6) <span class="output"><span class="outputmark">&rarr;</span> nil</span>
+a.slice(1, 2) <span class="output"><span class="outputmark">&rarr;</span> ["b", "c"]</span>
+a.slice(1..3) <span class="output"><span class="outputmark">&rarr;</span> ["b", "c", "d"]</span>
+a.slice(4..7) <span class="output"><span class="outputmark">&rarr;</span> ["e"]</span>
+a.slice(6..10) <span class="output"><span class="outputmark">&rarr;</span> nil</span>
+a.slice(-3, 3) <span class="output"><span class="outputmark">&rarr;</span> ["c", "d", "e"]</span></code></div>
+
+		</dd>
+<dt id="Array.slice_oh">slice!</dt>
+	<dd class="callseq"><i class="obj">arr</i>.slice!( <i class="obj">anInteger</i> )  &rarr; <i class="obj">anObject</i> or <code>nil</code></dd>
+	<dd class="callseq"><i class="obj">arr</i>.slice!( <i class="obj">start</i>, <i class="obj">length</i> ) &rarr; <i class="obj">aSubArray</i> or <code>nil</code></dd>
+	<dd class="callseq"><i class="obj">arr</i>.slice!( <i class="obj">aRange</i> ) &rarr; <i class="obj">aSubArray</i> or <code>nil</code></dd>
+	<dd class="desc">Deletes the element(s)  given by an index (optionally with a
+      length) or by a range. Returns the deleted object, subarray, or
+      <code>nil</code> if the index is out of range. Equivalent to:
+
+<div><code class="block">def slice!(*args)
+  result = self[*args]
+  self[*args] = nil
+  result
+end</code></div>
+
+<div><code class="block">a = [ "a", "b", "c" ]
+a.slice!(1) <span class="output"><span class="outputmark">&rarr;</span> "b"</span>
+a <span class="output"><span class="outputmark">&rarr;</span> ["a", "c"]</span>
+a.slice!(-1) <span class="output"><span class="outputmark">&rarr;</span> "c"</span>
+a <span class="output"><span class="outputmark">&rarr;</span> ["a"]</span>
+a.slice!(100) <span class="output"><span class="outputmark">&rarr;</span> nil</span>
+a <span class="output"><span class="outputmark">&rarr;</span> ["a"]</span></code></div>
+
+		</dd>
+<dt id="Array.sort">sort</dt>
+	<dd class="callseq"><i class="obj">arr</i>.sort   &rarr; <i class="obj">anArray</i> </dd>
+	<dd class="callseq"><i class="obj">arr</i>.sort {| a,b | block } &rarr; <i class="obj">anArray</i></dd>
+	<dd class="desc">Returns a new array created by sorting <i class="obj">arr</i>.  Comparisons
+      for the sort will be done using the <code>&lt;=&gt;</code> operator or using an optional
+      code block. The block implements a comparison between
+  <i class="obj">a</i> and <i class="obj">b</i>, returning -1, 0, or +1.
+
+<div><code class="block">a = [ "d", "a", "e", "c", "b" ]
+a.sort <span class="output"><span class="outputmark">&rarr;</span> ["a", "b", "c", "d", "e"]</span>
+a.sort {|x,y| y &lt;=&gt; x } <span class="output"><span class="outputmark">&rarr;</span> ["e", "d", "c", "b", "a"]</span></code></div>
+
+		</dd>
+<dt id="Array.sort_oh">sort!</dt>
+	<dd class="callseq"><i class="obj">arr</i>.sort!  &rarr; <i class="obj">arr</i> </dd>
+	<dd class="callseq"><i class="obj">arr</i>.sort! {| a,b | block } &rarr; <i class="obj">arr</i></dd>
+	<dd class="desc">Same as <code class="class_instance_method"><a href="ref_c_array.html#Array.sort"><span class="class">Array</span>#<span class="method">sort</span></a></code>, but modifies the receiver in place.
+      <i class="obj">arr</i> is effectively frozen while a sort is in progress.
+
+<div><code class="block">a = [ "d", "a", "e", "c", "b" ]
+a.sort! <span class="output"><span class="outputmark">&rarr;</span> ["a", "b", "c", "d", "e"]</span>
+a <span class="output"><span class="outputmark">&rarr;</span> ["a", "b", "c", "d", "e"]</span></code></div>
+
+		</dd>
+<dt id="Array.to_a">to_a</dt>
+	<dd class="callseq"><i class="obj">arr</i>.to_a  &rarr; <i class="obj">arr</i></dd>
+	<dd class="desc">Returns <i class="obj">arr</i>.
+
+		</dd>
+<dt id="Array.to_ary">to_ary</dt>
+	<dd class="callseq"><i class="obj">arr</i>.to_ary  &rarr; <i class="obj">arr</i></dd>
+	<dd class="desc">Synonym for <code class="class_instance_method"><a href="ref_c_array.html#Array.to_a"><span class="class">Array</span>#<span class="method">to_a</span></a></code>.
+
+		</dd>
+<dt id="Array.to_s">to_s</dt>
+	<dd class="callseq"><i class="obj">arr</i>.to_s  &rarr; <i class="obj">aString</i></dd>
+	<dd class="desc">Returns <i class="obj">arr</i><code>.join</code>.
+
+<div><code class="block">[ "a", "e", "i", "o" ].to_s <span class="output"><span class="outputmark">&rarr;</span> "aeio"</span></code></div>
+
+		</dd>
+<dt id="Array.uniq">uniq</dt>
+	<dd class="callseq"><i class="obj">arr</i>.uniq  &rarr; <i class="obj">anArray</i></dd>
+	<dd class="desc">Returns a new array by removing duplicate values in <i class="obj">arr</i>.
+
+<div><code class="block">a = [ "a", "a", "b", "b", "c" ]
+a.uniq <span class="output"><span class="outputmark">&rarr;</span> ["a", "b", "c"]</span></code></div>
+
+		</dd>
+<dt id="Array.uniq_oh">uniq!</dt>
+	<dd class="callseq"><i class="obj">arr</i>.uniq!  &rarr; <i class="obj">arr</i> or <code>nil</code></dd>
+	<dd class="desc">Same as <code class="class_instance_method"><a href="ref_c_array.html#Array.uniq"><span class="class">Array</span>#<span class="method">uniq</span></a></code>, but modifies the receiver in place.
+      Returns <code>nil</code> if no changes are made (that is, no duplicates
+      are found).
+
+<div><code class="block">a = [ "a", "a", "b", "b", "c" ]
+a.uniq! <span class="output"><span class="outputmark">&rarr;</span> ["a", "b", "c"]</span>
+b = [ "a", "b", "c" ]
+b.uniq! <span class="output"><span class="outputmark">&rarr;</span> nil</span></code></div>
+
+		</dd>
+<dt id="Array.unshift">unshift</dt>
+	<dd class="callseq"><i class="obj">arr</i>.unshift( <i class="obj">anObject</i> )  &rarr; <i class="obj">arr</i></dd>
+	<dd class="desc">Prepends <i class="obj">anObject</i> to the front of <i class="obj">arr</i>, and shifts all
+      other elements up one.
+
+<div><code class="block">a = [ "b", "c", "d" ]
+a.unshift("a") <span class="output"><span class="outputmark">&rarr;</span> ["a", "b", "c", "d"]</span></code></div>
+
+		</dd>
+</dl>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_c_array.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

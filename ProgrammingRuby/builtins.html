@@ -1,0 +1,982 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Built-in Classes and Methods</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	<a href="ospace.html" class="prev">&lt; Previous</a><a href="lib_standard.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'builtins',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 id="builtinclassesandmethods">Built-in Classes and Methods</h1>
+
+<p>This page lists the built-in Ruby classes and modules, and the  methods they contain. Click on a class, module, or method name for  a detailed description.</p>
+
+<div class="reference_overview">
+<h2 id="classes">Classes</h2>
+<table>
+	<thead><tr><th>Class</th><th>Class Methods</th><th>Instance Methods</th></tr></thead>
+	<tbody>
+<tr class="firstRow"><th>
+	<code class="class"><a href="ref_c_array.html#Array" id="Array">Array</a></code>
+</th><td>
+<code class="class_class_method"><a href="ref_c_array.html#Array._ob_cb">[ ]</a></code>
+<code class="class_class_method"><a href="ref_c_array.html#Array.new">new</a></code>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_array.html#Array._et">&amp;</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array._st">*</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array._pl">+</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array._mi">-</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array._lt_lt">&lt;&lt;</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array._lt_eq_gt">&lt;=&gt;</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array._eq_eq">==</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array._eq_eq_eq">===</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array._ob_cb">[ ]</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array._ob_cb_eq">[ ]=</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array._ba">|</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.assoc">assoc</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.at">at</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.clear">clear</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.collect">collect</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.collect_oh">collect!</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.compact">compact</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.compact_oh">compact!</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.concat">concat</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.delete">delete</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.delete_at">delete_at</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.delete_if">delete_if</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.each">each</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.each_index">each_index</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.empty_qm">empty?</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.eql_qm">eql?</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.fill">fill</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.first">first</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.flatten">flatten</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.flatten_oh">flatten!</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.include_qm">include?</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.index">index</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.indexes">indexes</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.indices">indices</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.join">join</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.last">last</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.length">length</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.map_oh">map!</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.nitems">nitems</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.pack">pack</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.pop">pop</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.push">push</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.rassoc">rassoc</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.reject_oh">reject!</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.replace">replace</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.reverse">reverse</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.reverse_oh">reverse!</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.reverse_each">reverse_each</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.rindex">rindex</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.shift">shift</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.size">size</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.slice">slice</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.slice_oh">slice!</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.sort">sort</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.sort_oh">sort!</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.to_a">to_a</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.to_ary">to_ary</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.to_s">to_s</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.uniq">uniq</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.uniq_oh">uniq!</a></code>
+<code class="class_instance_method"><a href="ref_c_array.html#Array.unshift">unshift</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_bignum.html#Bignum" id="Bignum">Bignum</a></code>
+</th><td>
+</td><td>
+	<a href="ref_c_bignum.html#Bignum.Arithmeticoperations">Arithmetic operations</a>
+	<a href="ref_c_bignum.html#Bignum.Bitoperations">Bit operations</a>
+<code class="class_instance_method"><a href="ref_c_bignum.html#Bignum._lt_eq_gt">&lt;=&gt;</a></code>
+<code class="class_instance_method"><a href="ref_c_bignum.html#Bignum._ob_cb">[ ]</a></code>
+<code class="class_instance_method"><a href="ref_c_bignum.html#Bignum.size">size</a></code>
+<code class="class_instance_method"><a href="ref_c_bignum.html#Bignum.to_f">to_f</a></code>
+<code class="class_instance_method"><a href="ref_c_bignum.html#Bignum.to_i">to_i</a></code>
+<code class="class_instance_method"><a href="ref_c_bignum.html#Bignum.to_s">to_s</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_binding.html#Binding" id="Binding">Binding</a></code>
+</th><td>
+</td><td>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_class.html#Class" id="Class">Class</a></code>
+</th><td>
+<code class="class_class_method"><a href="ref_c_class.html#Class.inherited">inherited</a></code>
+<code class="class_class_method"><a href="ref_c_class.html#Class.new">new</a></code>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_class.html#Class.new">new</a></code>
+<code class="class_instance_method"><a href="ref_c_class.html#Class.superclass">superclass</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_continuation.html#Continuation" id="Continuation">Continuation</a></code>
+</th><td>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_continuation.html#Continuation.call">call</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_dir.html#Dir" id="Dir">Dir</a></code>
+</th><td>
+<code class="class_class_method"><a href="ref_c_dir.html#Dir._ob_cb">[ ]</a></code>
+<code class="class_class_method"><a href="ref_c_dir.html#Dir.chdir">chdir</a></code>
+<code class="class_class_method"><a href="ref_c_dir.html#Dir.chroot">chroot</a></code>
+<code class="class_class_method"><a href="ref_c_dir.html#Dir.delete">delete</a></code>
+<code class="class_class_method"><a href="ref_c_dir.html#Dir.entries">entries</a></code>
+<code class="class_class_method"><a href="ref_c_dir.html#Dir.foreach">foreach</a></code>
+<code class="class_class_method"><a href="ref_c_dir.html#Dir.getwd">getwd</a></code>
+<code class="class_class_method"><a href="ref_c_dir.html#Dir.glob">glob</a></code>
+<code class="class_class_method"><a href="ref_c_dir.html#Dir.mkdir">mkdir</a></code>
+<code class="class_class_method"><a href="ref_c_dir.html#Dir.new">new</a></code>
+<code class="class_class_method"><a href="ref_c_dir.html#Dir.open">open</a></code>
+<code class="class_class_method"><a href="ref_c_dir.html#Dir.pwd">pwd</a></code>
+<code class="class_class_method"><a href="ref_c_dir.html#Dir.rmdir">rmdir</a></code>
+<code class="class_class_method"><a href="ref_c_dir.html#Dir.unlink">unlink</a></code>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_dir.html#Dir.close">close</a></code>
+<code class="class_instance_method"><a href="ref_c_dir.html#Dir.each">each</a></code>
+<code class="class_instance_method"><a href="ref_c_dir.html#Dir.read">read</a></code>
+<code class="class_instance_method"><a href="ref_c_dir.html#Dir.rewind">rewind</a></code>
+<code class="class_instance_method"><a href="ref_c_dir.html#Dir.seek">seek</a></code>
+<code class="class_instance_method"><a href="ref_c_dir.html#Dir.tell">tell</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_exception.html#Exception" id="Exception">Exception</a></code>
+</th><td>
+<code class="class_class_method"><a href="ref_c_exception.html#Exception.exception">exception</a></code>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_exception.html#Exception.backtrace">backtrace</a></code>
+<code class="class_instance_method"><a href="ref_c_exception.html#Exception.exception">exception</a></code>
+<code class="class_instance_method"><a href="ref_c_exception.html#Exception.message">message</a></code>
+<code class="class_instance_method"><a href="ref_c_exception.html#Exception.set_backtrace">set_backtrace</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_falseclass.html#FalseClass" id="FalseClass">FalseClass</a></code>
+</th><td>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_falseclass.html#FalseClass._et">&amp;</a></code>
+<code class="class_instance_method"><a href="ref_c_falseclass.html#FalseClass._up">^</a></code>
+<code class="class_instance_method"><a href="ref_c_falseclass.html#FalseClass._ba">|</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_file__stat.html#File::Stat" id="File::Stat">File::Stat</a></code>
+</th><td>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat._lt_eq_gt">&lt;=&gt;</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.atime">atime</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.blksize">blksize</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.blockdev_qm">blockdev?</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.blocks">blocks</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.chardev_qm">chardev?</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.ctime">ctime</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.dev">dev</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.directory_qm">directory?</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.executable_qm">executable?</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.executable_real_qm">executable_real?</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.file_qm">file?</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.ftype">ftype</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.gid">gid</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.grpowned_qm">grpowned?</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.ino">ino</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.mode">mode</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.mtime">mtime</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.nlink">nlink</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.owned_qm">owned?</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.pipe_qm">pipe?</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.rdev">rdev</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.readable_qm">readable?</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.readable_real_qm">readable_real?</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.setgid_qm">setgid?</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.setuid_qm">setuid?</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.size">size</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.size_qm">size?</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.socket_qm">socket?</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.sticky_qm">sticky?</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.symlink_qm">symlink?</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.uid">uid</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.writable_qm">writable?</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.writable_real_qm">writable_real?</a></code>
+<code class="class_instance_method"><a href="ref_c_file__stat.html#File::Stat.zero_qm">zero?</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_file.html#File" id="File">File</a></code>
+</th><td>
+<code class="class_class_method"><a href="ref_c_file.html#File.atime">atime</a></code>
+<code class="class_class_method"><a href="ref_c_file.html#File.basename">basename</a></code>
+<code class="class_class_method"><a href="ref_c_file.html#File.chmod">chmod</a></code>
+<code class="class_class_method"><a href="ref_c_file.html#File.chown">chown</a></code>
+<code class="class_class_method"><a href="ref_c_file.html#File.ctime">ctime</a></code>
+<code class="class_class_method"><a href="ref_c_file.html#File.delete">delete</a></code>
+<code class="class_class_method"><a href="ref_c_file.html#File.dirname">dirname</a></code>
+<code class="class_class_method"><a href="ref_c_file.html#File.expand_path">expand_path</a></code>
+<code class="class_class_method"><a href="ref_c_file.html#File.ftype">ftype</a></code>
+<code class="class_class_method"><a href="ref_c_file.html#File.join">join</a></code>
+<code class="class_class_method"><a href="ref_c_file.html#File.link">link</a></code>
+<code class="class_class_method"><a href="ref_c_file.html#File.lstat">lstat</a></code>
+<code class="class_class_method"><a href="ref_c_file.html#File.mtime">mtime</a></code>
+<code class="class_class_method"><a href="ref_c_file.html#File.new">new</a></code>
+<code class="class_class_method"><a href="ref_c_file.html#File.open">open</a></code>
+<code class="class_class_method"><a href="ref_c_file.html#File.readlink">readlink</a></code>
+<code class="class_class_method"><a href="ref_c_file.html#File.rename">rename</a></code>
+<code class="class_class_method"><a href="ref_c_file.html#File.size">size</a></code>
+<code class="class_class_method"><a href="ref_c_file.html#File.split">split</a></code>
+<code class="class_class_method"><a href="ref_c_file.html#File.stat">stat</a></code>
+<code class="class_class_method"><a href="ref_c_file.html#File.symlink">symlink</a></code>
+<code class="class_class_method"><a href="ref_c_file.html#File.truncate">truncate</a></code>
+<code class="class_class_method"><a href="ref_c_file.html#File.umask">umask</a></code>
+<code class="class_class_method"><a href="ref_c_file.html#File.unlink">unlink</a></code>
+<code class="class_class_method"><a href="ref_c_file.html#File.utime">utime</a></code>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_file.html#File.atime">atime</a></code>
+<code class="class_instance_method"><a href="ref_c_file.html#File.chmod">chmod</a></code>
+<code class="class_instance_method"><a href="ref_c_file.html#File.chown">chown</a></code>
+<code class="class_instance_method"><a href="ref_c_file.html#File.ctime">ctime</a></code>
+<code class="class_instance_method"><a href="ref_c_file.html#File.flock">flock</a></code>
+<code class="class_instance_method"><a href="ref_c_file.html#File.lstat">lstat</a></code>
+<code class="class_instance_method"><a href="ref_c_file.html#File.mtime">mtime</a></code>
+<code class="class_instance_method"><a href="ref_c_file.html#File.path">path</a></code>
+<code class="class_instance_method"><a href="ref_c_file.html#File.truncate">truncate</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_fixnum.html#Fixnum" id="Fixnum">Fixnum</a></code>
+</th><td>
+</td><td>
+	<a href="ref_c_fixnum.html#Fixnum.Arithmeticoperations">Arithmetic operations</a>
+	<a href="ref_c_fixnum.html#Fixnum.Bitoperations">Bit operations</a>
+<code class="class_instance_method"><a href="ref_c_fixnum.html#Fixnum._lt_eq_gt">&lt;=&gt;</a></code>
+<code class="class_instance_method"><a href="ref_c_fixnum.html#Fixnum._ob_cb">[ ]</a></code>
+<code class="class_instance_method"><a href="ref_c_fixnum.html#Fixnum.id2name">id2name</a></code>
+<code class="class_instance_method"><a href="ref_c_fixnum.html#Fixnum.size">size</a></code>
+<code class="class_instance_method"><a href="ref_c_fixnum.html#Fixnum.to_f">to_f</a></code>
+<code class="class_instance_method"><a href="ref_c_fixnum.html#Fixnum.to_i">to_i</a></code>
+<code class="class_instance_method"><a href="ref_c_fixnum.html#Fixnum.to_s">to_s</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_float.html#Float" id="Float">Float</a></code>
+</th><td>
+</td><td>
+	<a href="ref_c_float.html#Float.Arithmeticoperations">Arithmetic operations</a>
+<code class="class_instance_method"><a href="ref_c_float.html#Float._lt_eq_gt">&lt;=&gt;</a></code>
+<code class="class_instance_method"><a href="ref_c_float.html#Float.ceil">ceil</a></code>
+<code class="class_instance_method"><a href="ref_c_float.html#Float.finite_qm">finite?</a></code>
+<code class="class_instance_method"><a href="ref_c_float.html#Float.floor">floor</a></code>
+<code class="class_instance_method"><a href="ref_c_float.html#Float.infinite_qm">infinite?</a></code>
+<code class="class_instance_method"><a href="ref_c_float.html#Float.nan_qm">nan?</a></code>
+<code class="class_instance_method"><a href="ref_c_float.html#Float.round">round</a></code>
+<code class="class_instance_method"><a href="ref_c_float.html#Float.to_f">to_f</a></code>
+<code class="class_instance_method"><a href="ref_c_float.html#Float.to_i">to_i</a></code>
+<code class="class_instance_method"><a href="ref_c_float.html#Float.to_s">to_s</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_hash.html#Hash" id="Hash">Hash</a></code>
+</th><td>
+<code class="class_class_method"><a href="ref_c_hash.html#Hash._ob_cb">[ ]</a></code>
+<code class="class_class_method"><a href="ref_c_hash.html#Hash.new">new</a></code>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash._eq_eq">==</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash._ob_cb">[ ]</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash._ob_cb_eq">[ ]=</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.clear">clear</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.default">default</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.default_eq">default=</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.delete">delete</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.delete_if">delete_if</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.each">each</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.each_key">each_key</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.each_pair">each_pair</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.each_value">each_value</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.empty_qm">empty?</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.fetch">fetch</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.has_key_qm">has_key?</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.has_value_qm">has_value?</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.include_qm">include?</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.index">index</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.indexes">indexes</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.indices">indices</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.invert">invert</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.key_qm">key?</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.keys">keys</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.length">length</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.member_qm">member?</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.rehash">rehash</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.reject">reject</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.reject_oh">reject!</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.replace">replace</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.shift">shift</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.size">size</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.sort">sort</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.store">store</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.to_a">to_a</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.to_s">to_s</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.update">update</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.value_qm">value?</a></code>
+<code class="class_instance_method"><a href="ref_c_hash.html#Hash.values">values</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_integer.html#Integer" id="Integer">Integer</a></code>
+</th><td>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_integer.html#Integer.chr">chr</a></code>
+<code class="class_instance_method"><a href="ref_c_integer.html#Integer.downto">downto</a></code>
+<code class="class_instance_method"><a href="ref_c_integer.html#Integer.integer_qm">integer?</a></code>
+<code class="class_instance_method"><a href="ref_c_integer.html#Integer.next">next</a></code>
+<code class="class_instance_method"><a href="ref_c_integer.html#Integer.step">step</a></code>
+<code class="class_instance_method"><a href="ref_c_integer.html#Integer.succ">succ</a></code>
+<code class="class_instance_method"><a href="ref_c_integer.html#Integer.times">times</a></code>
+<code class="class_instance_method"><a href="ref_c_integer.html#Integer.upto">upto</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_io.html#IO" id="IO">IO</a></code>
+</th><td>
+<code class="class_class_method"><a href="ref_c_io.html#IO.foreach">foreach</a></code>
+<code class="class_class_method"><a href="ref_c_io.html#IO.new">new</a></code>
+<code class="class_class_method"><a href="ref_c_io.html#IO.pipe">pipe</a></code>
+<code class="class_class_method"><a href="ref_c_io.html#IO.popen">popen</a></code>
+<code class="class_class_method"><a href="ref_c_io.html#IO.readlines">readlines</a></code>
+<code class="class_class_method"><a href="ref_c_io.html#IO.select">select</a></code>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_io.html#IO._lt_lt">&lt;&lt;</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.binmode">binmode</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.clone">clone</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.close">close</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.close_read">close_read</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.close_write">close_write</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.closed_qm">closed?</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.each">each</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.each_byte">each_byte</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.each_line">each_line</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.eof">eof</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.eof_qm">eof?</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.fcntl">fcntl</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.fileno">fileno</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.flush">flush</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.getc">getc</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.gets">gets</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.ioctl">ioctl</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.isatty">isatty</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.lineno">lineno</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.lineno_eq">lineno=</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.pid">pid</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.pos">pos</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.pos_eq">pos=</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.print">print</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.printf">printf</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.putc">putc</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.puts">puts</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.read">read</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.readchar">readchar</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.readline">readline</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.readlines">readlines</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.reopen">reopen</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.rewind">rewind</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.seek">seek</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.stat">stat</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.sync">sync</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.sync_eq">sync=</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.sysread">sysread</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.syswrite">syswrite</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.tell">tell</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.to_i">to_i</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.to_io">to_io</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.tty_qm">tty?</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.ungetc">ungetc</a></code>
+<code class="class_instance_method"><a href="ref_c_io.html#IO.write">write</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_matchdata.html#MatchData" id="MatchData">MatchData</a></code>
+</th><td>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_matchdata.html#MatchData._ob_cb">[ ]</a></code>
+<code class="class_instance_method"><a href="ref_c_matchdata.html#MatchData.begin">begin</a></code>
+<code class="class_instance_method"><a href="ref_c_matchdata.html#MatchData.end">end</a></code>
+<code class="class_instance_method"><a href="ref_c_matchdata.html#MatchData.length">length</a></code>
+<code class="class_instance_method"><a href="ref_c_matchdata.html#MatchData.offset">offset</a></code>
+<code class="class_instance_method"><a href="ref_c_matchdata.html#MatchData.post_match">post_match</a></code>
+<code class="class_instance_method"><a href="ref_c_matchdata.html#MatchData.pre_match">pre_match</a></code>
+<code class="class_instance_method"><a href="ref_c_matchdata.html#MatchData.size">size</a></code>
+<code class="class_instance_method"><a href="ref_c_matchdata.html#MatchData.string">string</a></code>
+<code class="class_instance_method"><a href="ref_c_matchdata.html#MatchData.to_a">to_a</a></code>
+<code class="class_instance_method"><a href="ref_c_matchdata.html#MatchData.to_s">to_s</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_method.html#Method" id="Method">Method</a></code>
+</th><td>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_method.html#Method._ob_cb">[ ]</a></code>
+<code class="class_instance_method"><a href="ref_c_method.html#Method.arity">arity</a></code>
+<code class="class_instance_method"><a href="ref_c_method.html#Method.call">call</a></code>
+<code class="class_instance_method"><a href="ref_c_method.html#Method.to_proc">to_proc</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_module.html#Module" id="Module">Module</a></code>
+</th><td>
+<code class="class_class_method"><a href="ref_c_module.html#Module.constants">constants</a></code>
+<code class="class_class_method"><a href="ref_c_module.html#Module.nesting">nesting</a></code>
+<code class="class_class_method"><a href="ref_c_module.html#Module.new">new</a></code>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_module.html#Module._lt_cm_lt_eq_cm_gt_cm_gt_eq">&lt;, &lt;=, &gt;, &gt;=</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module._lt_eq_gt">&lt;=&gt;</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module._eq_eq_eq">===</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.ancestors">ancestors</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.class_eval">class_eval</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.class_variables">class_variables</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.clone">clone</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.const_defined_qm">const_defined?</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.const_get">const_get</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.const_set">const_set</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.constants">constants</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.included_modules">included_modules</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.instance_methods">instance_methods</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.method_defined_qm">method_defined?</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.module_eval">module_eval</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.name">name</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.private_class_method">private_class_method</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.private_instance_methods">private_instance_methods</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.protected_instance_methods">protected_instance_methods</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.public_class_method">public_class_method</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.public_instance_methods">public_instance_methods</a></code><br>
+<br><em>private methods:</em><br>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.alias_method">alias_method</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.append_features">append_features</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.attr">attr</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.attr_accessor">attr_accessor</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.attr_reader">attr_reader</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.attr_writer">attr_writer</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.extend_object">extend_object</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.include">include</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.method_added">method_added</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.module_function">module_function</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.private">private</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.protected">protected</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.public">public</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.remove_const">remove_const</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.remove_method">remove_method</a></code>
+<code class="class_instance_method"><a href="ref_c_module.html#Module.undef_method">undef_method</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_nilclass.html#NilClass" id="NilClass">NilClass</a></code>
+</th><td>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_nilclass.html#NilClass._et">&amp;</a></code>
+<code class="class_instance_method"><a href="ref_c_nilclass.html#NilClass._up">^</a></code>
+<code class="class_instance_method"><a href="ref_c_nilclass.html#NilClass._ba">|</a></code>
+<code class="class_instance_method"><a href="ref_c_nilclass.html#NilClass.nil_qm">nil?</a></code>
+<code class="class_instance_method"><a href="ref_c_nilclass.html#NilClass.to_a">to_a</a></code>
+<code class="class_instance_method"><a href="ref_c_nilclass.html#NilClass.to_i">to_i</a></code>
+<code class="class_instance_method"><a href="ref_c_nilclass.html#NilClass.to_s">to_s</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_numeric.html#Numeric" id="Numeric">Numeric</a></code>
+</th><td>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_numeric.html#Numeric._pl_at">+@</a></code>
+<code class="class_instance_method"><a href="ref_c_numeric.html#Numeric._mi_at">-@</a></code>
+<code class="class_instance_method"><a href="ref_c_numeric.html#Numeric.abs">abs</a></code>
+<code class="class_instance_method"><a href="ref_c_numeric.html#Numeric.coerce">coerce</a></code>
+<code class="class_instance_method"><a href="ref_c_numeric.html#Numeric.divmod">divmod</a></code>
+<code class="class_instance_method"><a href="ref_c_numeric.html#Numeric.eql_qm">eql?</a></code>
+<code class="class_instance_method"><a href="ref_c_numeric.html#Numeric.integer_qm">integer?</a></code>
+<code class="class_instance_method"><a href="ref_c_numeric.html#Numeric.modulo">modulo</a></code>
+<code class="class_instance_method"><a href="ref_c_numeric.html#Numeric.nonzero_qm">nonzero?</a></code>
+<code class="class_instance_method"><a href="ref_c_numeric.html#Numeric.remainder">remainder</a></code>
+<code class="class_instance_method"><a href="ref_c_numeric.html#Numeric.zero_qm">zero?</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_object.html#Object" id="Object">Object</a></code>
+</th><td>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_object.html#Object._eq_eq">==</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object._eq_eq_eq">===</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object._eq_sd">=~</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.__id__">__id__</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.__send__">__send__</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.class">class</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.clone">clone</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.display">display</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.dup">dup</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.eql_qm">eql?</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.equal_qm">equal?</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.extend">extend</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.freeze">freeze</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.frozen_qm">frozen?</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.hash">hash</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.id">id</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.inspect">inspect</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.instance_eval">instance_eval</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.instance_of_qm">instance_of?</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.instance_variables">instance_variables</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.is_a_qm">is_a?</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.kind_of_qm">kind_of?</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.method">method</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.method_missing">method_missing</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.methods">methods</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.nil_qm">nil?</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.private_methods">private_methods</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.protected_methods">protected_methods</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.public_methods">public_methods</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.respond_to_qm">respond_to?</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.send">send</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.singleton_methods">singleton_methods</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.taint">taint</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.tainted_qm">tainted?</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.to_a">to_a</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.to_s">to_s</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.type">type</a></code>
+<code class="class_instance_method"><a href="ref_c_object.html#Object.untaint">untaint</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_proc.html#Proc" id="Proc">Proc</a></code>
+</th><td>
+<code class="class_class_method"><a href="ref_c_proc.html#Proc.new">new</a></code>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_proc.html#Proc._ob_cb">[ ]</a></code>
+<code class="class_instance_method"><a href="ref_c_proc.html#Proc.arity">arity</a></code>
+<code class="class_instance_method"><a href="ref_c_proc.html#Proc.call">call</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_range.html#Range" id="Range">Range</a></code>
+</th><td>
+<code class="class_class_method"><a href="ref_c_range.html#Range.new">new</a></code>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_range.html#Range._eq_eq_eq">===</a></code>
+<code class="class_instance_method"><a href="ref_c_range.html#Range.begin">begin</a></code>
+<code class="class_instance_method"><a href="ref_c_range.html#Range.each">each</a></code>
+<code class="class_instance_method"><a href="ref_c_range.html#Range.end">end</a></code>
+<code class="class_instance_method"><a href="ref_c_range.html#Range.exclude_end_qm">exclude_end?</a></code>
+<code class="class_instance_method"><a href="ref_c_range.html#Range.first">first</a></code>
+<code class="class_instance_method"><a href="ref_c_range.html#Range.last">last</a></code>
+<code class="class_instance_method"><a href="ref_c_range.html#Range.length">length</a></code>
+<code class="class_instance_method"><a href="ref_c_range.html#Range.size">size</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_regexp.html#Regexp" id="Regexp">Regexp</a></code>
+</th><td>
+<code class="class_class_method"><a href="ref_c_regexp.html#Regexp.compile">compile</a></code>
+<code class="class_class_method"><a href="ref_c_regexp.html#Regexp.escape">escape</a></code>
+<code class="class_class_method"><a href="ref_c_regexp.html#Regexp.last_match">last_match</a></code>
+<code class="class_class_method"><a href="ref_c_regexp.html#Regexp.new">new</a></code>
+<code class="class_class_method"><a href="ref_c_regexp.html#Regexp.quote">quote</a></code>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_regexp.html#Regexp._eq_eq">==</a></code>
+<code class="class_instance_method"><a href="ref_c_regexp.html#Regexp._eq_eq_eq">===</a></code>
+<code class="class_instance_method"><a href="ref_c_regexp.html#Regexp._eq_sd">=~</a></code>
+<code class="class_instance_method"><a href="ref_c_regexp.html#Regexp._sd">~</a></code>
+<code class="class_instance_method"><a href="ref_c_regexp.html#Regexp.casefold_qm">casefold?</a></code>
+<code class="class_instance_method"><a href="ref_c_regexp.html#Regexp.kcode">kcode</a></code>
+<code class="class_instance_method"><a href="ref_c_regexp.html#Regexp.match">match</a></code>
+<code class="class_instance_method"><a href="ref_c_regexp.html#Regexp.source">source</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_string.html#String" id="String">String</a></code>
+</th><td>
+<code class="class_class_method"><a href="ref_c_string.html#String.new">new</a></code>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_string.html#String._pc">%</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String._st">*</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String._pl">+</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String._lt_lt">&lt;&lt;</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String._lt_eq_gt">&lt;=&gt;</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String._eq_eq">==</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String._eq_eq_eq">===</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String._eq_sd">=~</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String._ob_cb">[ ]</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String._ob_cb_eq">[ ]=</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String._sd">~</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.capitalize">capitalize</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.capitalize_oh">capitalize!</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.center">center</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.chomp">chomp</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.chomp_oh">chomp!</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.chop">chop</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.chop_oh">chop!</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.concat">concat</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.count">count</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.crypt">crypt</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.delete">delete</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.delete_oh">delete!</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.downcase">downcase</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.downcase_oh">downcase!</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.dump">dump</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.each">each</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.each_byte">each_byte</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.each_line">each_line</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.empty_qm">empty?</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.gsub">gsub</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.gsub_oh">gsub!</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.hash">hash</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.hex">hex</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.include_qm">include?</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.index">index</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.intern">intern</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.length">length</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.ljust">ljust</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.next">next</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.next_oh">next!</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.oct">oct</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.replace">replace</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.reverse">reverse</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.reverse_oh">reverse!</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.rindex">rindex</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.rjust">rjust</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.scan">scan</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.size">size</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.slice">slice</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.slice_oh">slice!</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.split">split</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.squeeze">squeeze</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.squeeze_oh">squeeze!</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.strip">strip</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.strip_oh">strip!</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.sub">sub</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.sub_oh">sub!</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.succ">succ</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.succ_oh">succ!</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.sum">sum</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.swapcase">swapcase</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.swapcase_oh">swapcase!</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.to_f">to_f</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.to_i">to_i</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.to_s">to_s</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.to_str">to_str</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.tr">tr</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.tr_oh">tr!</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.tr_s">tr_s</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.tr_s_oh">tr_s!</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.unpack">unpack</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.upcase">upcase</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.upcase_oh">upcase!</a></code>
+<code class="class_instance_method"><a href="ref_c_string.html#String.upto">upto</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_struct.html#Struct" id="Struct">Struct</a></code>
+</th><td>
+<code class="class_class_method"><a href="ref_c_struct.html#Struct.new">new</a></code>
+<code class="class_class_method"><a href="ref_c_struct.html#Struct.new">new</a></code>
+<code class="class_class_method"><a href="ref_c_struct.html#Struct.members">members</a></code>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_struct.html#Struct._eq_eq">==</a></code>
+<code class="class_instance_method"><a href="ref_c_struct.html#Struct._ob_cb">[ ]</a></code>
+<code class="class_instance_method"><a href="ref_c_struct.html#Struct._ob_cb_eq">[ ]=</a></code>
+<code class="class_instance_method"><a href="ref_c_struct.html#Struct.each">each</a></code>
+<code class="class_instance_method"><a href="ref_c_struct.html#Struct.length">length</a></code>
+<code class="class_instance_method"><a href="ref_c_struct.html#Struct.members">members</a></code>
+<code class="class_instance_method"><a href="ref_c_struct.html#Struct.size">size</a></code>
+<code class="class_instance_method"><a href="ref_c_struct.html#Struct.to_a">to_a</a></code>
+<code class="class_instance_method"><a href="ref_c_struct.html#Struct.values">values</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_struct__tms.html#Struct::Tms" id="Struct::Tms">Struct::Tms</a></code>
+</th><td>
+</td><td>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_symbol.html#Symbol" id="Symbol">Symbol</a></code>
+</th><td>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_symbol.html#Symbol.id2name">id2name</a></code>
+<code class="class_instance_method"><a href="ref_c_symbol.html#Symbol.inspect">inspect</a></code>
+<code class="class_instance_method"><a href="ref_c_symbol.html#Symbol.to_i">to_i</a></code>
+<code class="class_instance_method"><a href="ref_c_symbol.html#Symbol.to_s">to_s</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_threadgroup.html#ThreadGroup" id="ThreadGroup">ThreadGroup</a></code>
+</th><td>
+<code class="class_class_method"><a href="ref_c_threadgroup.html#ThreadGroup.new">new</a></code>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_threadgroup.html#ThreadGroup.add">add</a></code>
+<code class="class_instance_method"><a href="ref_c_threadgroup.html#ThreadGroup.list">list</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_thread.html#Thread" id="Thread">Thread</a></code>
+</th><td>
+<code class="class_class_method"><a href="ref_c_thread.html#Thread.abort_on_exception">abort_on_exception</a></code>
+<code class="class_class_method"><a href="ref_c_thread.html#Thread.abort_on_exception_eq">abort_on_exception=</a></code>
+<code class="class_class_method"><a href="ref_c_thread.html#Thread.critical">critical</a></code>
+<code class="class_class_method"><a href="ref_c_thread.html#Thread.critical_eq">critical=</a></code>
+<code class="class_class_method"><a href="ref_c_thread.html#Thread.current">current</a></code>
+<code class="class_class_method"><a href="ref_c_thread.html#Thread.exit">exit</a></code>
+<code class="class_class_method"><a href="ref_c_thread.html#Thread.fork">fork</a></code>
+<code class="class_class_method"><a href="ref_c_thread.html#Thread.kill">kill</a></code>
+<code class="class_class_method"><a href="ref_c_thread.html#Thread.list">list</a></code>
+<code class="class_class_method"><a href="ref_c_thread.html#Thread.main">main</a></code>
+<code class="class_class_method"><a href="ref_c_thread.html#Thread.new">new</a></code>
+<code class="class_class_method"><a href="ref_c_thread.html#Thread.pass">pass</a></code>
+<code class="class_class_method"><a href="ref_c_thread.html#Thread.start">start</a></code>
+<code class="class_class_method"><a href="ref_c_thread.html#Thread.stop">stop</a></code>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_thread.html#Thread._ob_cb">[ ]</a></code>
+<code class="class_instance_method"><a href="ref_c_thread.html#Thread._ob_cb_eq">[ ]=</a></code>
+<code class="class_instance_method"><a href="ref_c_thread.html#Thread.abort_on_exception">abort_on_exception</a></code>
+<code class="class_instance_method"><a href="ref_c_thread.html#Thread.abort_on_exception_eq">abort_on_exception=</a></code>
+<code class="class_instance_method"><a href="ref_c_thread.html#Thread.alive_qm">alive?</a></code>
+<code class="class_instance_method"><a href="ref_c_thread.html#Thread.exit">exit</a></code>
+<code class="class_instance_method"><a href="ref_c_thread.html#Thread.join">join</a></code>
+<code class="class_instance_method"><a href="ref_c_thread.html#Thread.key_qm">key?</a></code>
+<code class="class_instance_method"><a href="ref_c_thread.html#Thread.kill">kill</a></code>
+<code class="class_instance_method"><a href="ref_c_thread.html#Thread.priority">priority</a></code>
+<code class="class_instance_method"><a href="ref_c_thread.html#Thread.priority_eq">priority=</a></code>
+<code class="class_instance_method"><a href="ref_c_thread.html#Thread.raise">raise</a></code>
+<code class="class_instance_method"><a href="ref_c_thread.html#Thread.run">run</a></code>
+<code class="class_instance_method"><a href="ref_c_thread.html#Thread.safe_level">safe_level</a></code>
+<code class="class_instance_method"><a href="ref_c_thread.html#Thread.status">status</a></code>
+<code class="class_instance_method"><a href="ref_c_thread.html#Thread.stop_qm">stop?</a></code>
+<code class="class_instance_method"><a href="ref_c_thread.html#Thread.value">value</a></code>
+<code class="class_instance_method"><a href="ref_c_thread.html#Thread.wakeup">wakeup</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_time.html#Time" id="Time">Time</a></code>
+</th><td>
+<code class="class_class_method"><a href="ref_c_time.html#Time.at">at</a></code>
+<code class="class_class_method"><a href="ref_c_time.html#Time.gm">gm</a></code>
+<code class="class_class_method"><a href="ref_c_time.html#Time.local">local</a></code>
+<code class="class_class_method"><a href="ref_c_time.html#Time.mktime">mktime</a></code>
+<code class="class_class_method"><a href="ref_c_time.html#Time.new">new</a></code>
+<code class="class_class_method"><a href="ref_c_time.html#Time.now">now</a></code>
+<code class="class_class_method"><a href="ref_c_time.html#Time.times">times</a></code>
+<code class="class_class_method"><a href="ref_c_time.html#Time.utc">utc</a></code>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_time.html#Time._pl">+</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time._mi">-</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time._lt_eq_gt">&lt;=&gt;</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.asctime">asctime</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.ctime">ctime</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.day">day</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.gmt_qm">gmt?</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.gmtime">gmtime</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.hour">hour</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.isdst">isdst</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.localtime">localtime</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.mday">mday</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.min">min</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.mon">mon</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.month">month</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.sec">sec</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.strftime">strftime</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.to_a">to_a</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.to_f">to_f</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.to_i">to_i</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.to_s">to_s</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.tv_sec">tv_sec</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.tv_usec">tv_usec</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.usec">usec</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.utc">utc</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.utc_qm">utc?</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.wday">wday</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.yday">yday</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.year">year</a></code>
+<code class="class_instance_method"><a href="ref_c_time.html#Time.zone">zone</a></code>
+</td></tr><tr><th>
+	<code class="class"><a href="ref_c_trueclass.html#TrueClass" id="TrueClass">TrueClass</a></code>
+</th><td>
+</td><td>
+<code class="class_instance_method"><a href="ref_c_trueclass.html#TrueClass._et">&amp;</a></code>
+<code class="class_instance_method"><a href="ref_c_trueclass.html#TrueClass._up">^</a></code>
+<code class="class_instance_method"><a href="ref_c_trueclass.html#TrueClass._ba">|</a></code>
+</td></tr></tbody>
+</table>
+
+<h2 id="modules">Modules</h2>
+<table>
+	<thead><tr><th>Class</th><th>Module Methods</th><th>Instance Methods</th></tr></thead>
+	<tbody>
+<tr class="firstRow"><th>
+	<code class="modulename"><a href="ref_m_comparable.html#Comparable" id="Comparable">Comparable</a></code>
+</th><td>
+</td><td>
+	<a href="builtins.html#Comparisons">Comparisons</a>
+<code class="module_instance_method"><a href="ref_m_comparable.html#Comparable.between_qm">between?</a></code>
+</td></tr><tr><th>
+	<code class="modulename"><a href="ref_m_enumerable.html#Enumerable" id="Enumerable">Enumerable</a></code>
+</th><td>
+</td><td>
+<code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.collect">collect</a></code>
+<code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.detect">detect</a></code>
+<code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.each_with_index">each_with_index</a></code>
+<code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.entries">entries</a></code>
+<code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.find">find</a></code>
+<code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.find_all">find_all</a></code>
+<code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.grep">grep</a></code>
+<code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.include_qm">include?</a></code>
+<code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.map">map</a></code>
+<code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.max">max</a></code>
+<code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.member_qm">member?</a></code>
+<code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.min">min</a></code>
+<code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.reject">reject</a></code>
+<code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.select">select</a></code>
+<code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.sort">sort</a></code>
+<code class="module_instance_method"><a href="ref_m_enumerable.html#Enumerable.to_a">to_a</a></code>
+</td></tr><tr><th>
+	<code class="modulename"><a href="ref_m_errno.html#Errno" id="Errno">Errno</a></code>
+</th><td>
+</td><td>
+</td></tr><tr><th>
+	<code class="modulename"><a href="ref_m_filetest.html#FileTest" id="FileTest">FileTest</a></code>
+</th><td>
+</td><td>
+<code class="module_instance_method"><a href="ref_m_filetest.html#FileTest.blockdev_qm">blockdev?</a></code>
+<code class="module_instance_method"><a href="ref_m_filetest.html#FileTest.chardev_qm">chardev?</a></code>
+<code class="module_instance_method"><a href="ref_m_filetest.html#FileTest.directory_qm">directory?</a></code>
+<code class="module_instance_method"><a href="ref_m_filetest.html#FileTest.executable_qm">executable?</a></code>
+<code class="module_instance_method"><a href="ref_m_filetest.html#FileTest.executable_real_qm">executable_real?</a></code>
+<code class="module_instance_method"><a href="ref_m_filetest.html#FileTest.exist_qm">exist?</a></code>
+<code class="module_instance_method"><a href="ref_m_filetest.html#FileTest.exists_qm">exists?</a></code>
+<code class="module_instance_method"><a href="ref_m_filetest.html#FileTest.file_qm">file?</a></code>
+<code class="module_instance_method"><a href="ref_m_filetest.html#FileTest.grpowned_qm">grpowned?</a></code>
+<code class="module_instance_method"><a href="ref_m_filetest.html#FileTest.owned_qm">owned?</a></code>
+<code class="module_instance_method"><a href="ref_m_filetest.html#FileTest.pipe_qm">pipe?</a></code>
+<code class="module_instance_method"><a href="ref_m_filetest.html#FileTest.readable_qm">readable?</a></code>
+<code class="module_instance_method"><a href="ref_m_filetest.html#FileTest.readable_real_qm">readable_real?</a></code>
+<code class="module_instance_method"><a href="ref_m_filetest.html#FileTest.setgid_qm">setgid?</a></code>
+<code class="module_instance_method"><a href="ref_m_filetest.html#FileTest.setuid_qm">setuid?</a></code>
+<code class="module_instance_method"><a href="ref_m_filetest.html#FileTest.size">size</a></code>
+<code class="module_instance_method"><a href="ref_m_filetest.html#FileTest.size_qm">size?</a></code>
+<code class="module_instance_method"><a href="ref_m_filetest.html#FileTest.socket_qm">socket?</a></code>
+<code class="module_instance_method"><a href="ref_m_filetest.html#FileTest.sticky_qm">sticky?</a></code>
+<code class="module_instance_method"><a href="ref_m_filetest.html#FileTest.symlink_qm">symlink?</a></code>
+<code class="module_instance_method"><a href="ref_m_filetest.html#FileTest.writable_qm">writable?</a></code>
+<code class="module_instance_method"><a href="ref_m_filetest.html#FileTest.writable_real_qm">writable_real?</a></code>
+<code class="module_instance_method"><a href="ref_m_filetest.html#FileTest.zero_qm">zero?</a></code>
+</td></tr><tr><th>
+	<code class="modulename"><a href="ref_m_gc.html#GC" id="GC">GC</a></code>
+</th><td>
+<code class="module_module_method"><a href="ref_m_gc.html#GC.disable">disable</a></code>
+<code class="module_module_method"><a href="ref_m_gc.html#GC.enable">enable</a></code>
+<code class="module_module_method"><a href="ref_m_gc.html#GC.start">start</a></code>
+</td><td>
+<code class="module_instance_method"><a href="ref_m_gc.html#GC.garbage_collect">garbage_collect</a></code>
+</td></tr><tr><th>
+	<code class="modulename"><a href="ref_m_kernel.html#Kernel" id="Kernel">Kernel</a></code>
+</th><td>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.Array">Array</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.Float">Float</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.Integer">Integer</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.String">String</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel._bq">` (backquote)</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.abort">abort</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.at_exit">at_exit</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.autoload">autoload</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.binding">binding</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.block_given_qm">block_given?</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.callcc">callcc</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.caller">caller</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.catch">catch</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.chomp">chomp</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.chomp_oh">chomp!</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.chop">chop</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.chop_oh">chop!</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.eval">eval</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.exec">exec</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.exit">exit</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.exit_oh">exit!</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.fail">fail</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.fork">fork</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.format">format</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.gets">gets</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.global_variables">global_variables</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.gsub">gsub</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.gsub_oh">gsub!</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.iterator_qm">iterator?</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.lambda">lambda</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.load">load</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.local_variables">local_variables</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.loop">loop</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.open">open</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.p">p</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.print">print</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.printf">printf</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.proc">proc</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.putc">putc</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.puts">puts</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.raise">raise</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.rand">rand</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.readline">readline</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.readlines">readlines</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.require">require</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.scan">scan</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.select">select</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.set_trace_func">set_trace_func</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.singleton_method_added">singleton_method_added</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.sleep">sleep</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.split">split</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.sprintf">sprintf</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.srand">srand</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.sub">sub</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.sub_oh">sub!</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.syscall">syscall</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.system">system</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.test">test</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.throw">throw</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.trace_var">trace_var</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.trap">trap</a></code>
+<code class="module_module_method"><a href="ref_m_kernel.html#Kernel.untrace_var">untrace_var</a></code>
+</td><td>
+</td></tr><tr><th>
+	<code class="modulename"><a href="ref_m_marshal.html#Marshal" id="Marshal">Marshal</a></code>
+</th><td>
+<code class="module_module_method"><a href="ref_m_marshal.html#Marshal.dump">dump</a></code>
+<code class="module_module_method"><a href="ref_m_marshal.html#Marshal.load">load</a></code>
+<code class="module_module_method"><a href="ref_m_marshal.html#Marshal.restore">restore</a></code>
+</td><td>
+</td></tr><tr><th>
+	<code class="modulename"><a href="ref_m_math.html#Math" id="Math">Math</a></code>
+</th><td>
+<code class="module_module_method"><a href="ref_m_math.html#Math.atan2">atan2</a></code>
+<code class="module_module_method"><a href="ref_m_math.html#Math.cos">cos</a></code>
+<code class="module_module_method"><a href="ref_m_math.html#Math.exp">exp</a></code>
+<code class="module_module_method"><a href="ref_m_math.html#Math.frexp">frexp</a></code>
+<code class="module_module_method"><a href="ref_m_math.html#Math.ldexp">ldexp</a></code>
+<code class="module_module_method"><a href="ref_m_math.html#Math.log">log</a></code>
+<code class="module_module_method"><a href="ref_m_math.html#Math.log10">log10</a></code>
+<code class="module_module_method"><a href="ref_m_math.html#Math.sin">sin</a></code>
+<code class="module_module_method"><a href="ref_m_math.html#Math.sqrt">sqrt</a></code>
+<code class="module_module_method"><a href="ref_m_math.html#Math.tan">tan</a></code>
+</td><td>
+</td></tr><tr><th>
+	<code class="modulename"><a href="ref_m_objectspace.html#ObjectSpace" id="ObjectSpace">ObjectSpace</a></code>
+</th><td>
+<code class="module_module_method"><a href="ref_m_objectspace.html#ObjectSpace._id2ref">_id2ref</a></code>
+<code class="module_module_method"><a href="ref_m_objectspace.html#ObjectSpace.define_finalizer">define_finalizer</a></code>
+<code class="module_module_method"><a href="ref_m_objectspace.html#ObjectSpace.each_object">each_object</a></code>
+<code class="module_module_method"><a href="ref_m_objectspace.html#ObjectSpace.garbage_collect">garbage_collect</a></code>
+<code class="module_module_method"><a href="ref_m_objectspace.html#ObjectSpace.undefine_finalizer">undefine_finalizer</a></code>
+</td><td>
+</td></tr><tr><th>
+	<code class="modulename"><a href="ref_m_process.html#Process" id="Process">Process</a></code>
+</th><td>
+<code class="module_module_method"><a href="ref_m_process.html#Process.egid">egid</a></code>
+<code class="module_module_method"><a href="ref_m_process.html#Process.egid_eq">egid=</a></code>
+<code class="module_module_method"><a href="ref_m_process.html#Process.euid">euid</a></code>
+<code class="module_module_method"><a href="ref_m_process.html#Process.euid_eq">euid=</a></code>
+<code class="module_module_method"><a href="ref_m_process.html#Process.exit_oh">exit!</a></code>
+<code class="module_module_method"><a href="ref_m_process.html#Process.fork">fork</a></code>
+<code class="module_module_method"><a href="ref_m_process.html#Process.getpgid">getpgid</a></code>
+<code class="module_module_method"><a href="ref_m_process.html#Process.getpgrp">getpgrp</a></code>
+<code class="module_module_method"><a href="ref_m_process.html#Process.getpriority">getpriority</a></code>
+<code class="module_module_method"><a href="ref_m_process.html#Process.gid">gid</a></code>
+<code class="module_module_method"><a href="ref_m_process.html#Process.gid_eq">gid=</a></code>
+<code class="module_module_method"><a href="ref_m_process.html#Process.kill">kill</a></code>
+<code class="module_module_method"><a href="ref_m_process.html#Process.pid">pid</a></code>
+<code class="module_module_method"><a href="ref_m_process.html#Process.ppid">ppid</a></code>
+<code class="module_module_method"><a href="ref_m_process.html#Process.setpgid">setpgid</a></code>
+<code class="module_module_method"><a href="ref_m_process.html#Process.setpgrp">setpgrp</a></code>
+<code class="module_module_method"><a href="ref_m_process.html#Process.setpriority">setpriority</a></code>
+<code class="module_module_method"><a href="ref_m_process.html#Process.setsid">setsid</a></code>
+<code class="module_module_method"><a href="ref_m_process.html#Process.uid">uid</a></code>
+<code class="module_module_method"><a href="ref_m_process.html#Process.uid_eq">uid=</a></code>
+<code class="module_module_method"><a href="ref_m_process.html#Process.wait">wait</a></code>
+<code class="module_module_method"><a href="ref_m_process.html#Process.wait2">wait2</a></code>
+<code class="module_module_method"><a href="ref_m_process.html#Process.waitpid">waitpid</a></code>
+<code class="module_module_method"><a href="ref_m_process.html#Process.waitpid2">waitpid2</a></code>
+</td><td>
+</td></tr>
+</tbody></table>
+</div>
+
+<div id="menubot" class="menu">
+	<a href="ospace.html" class="prev">&lt; Previous</a><a href="lib_standard.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="builtins.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

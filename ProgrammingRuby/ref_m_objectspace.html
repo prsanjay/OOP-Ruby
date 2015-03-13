@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>ObjectSpace</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_m_objectspace',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="module" id="ObjectSpace">module <strong>ObjectSpace</strong></h1>
+
+<p>The <code class="module">ObjectSpace</code> module contains a number of routines that   interact with the garbage collection facility and allow you to   traverse all living objects with an iterator.</p>
+
+<p><code class="module">ObjectSpace</code> also provides support for  object finalizers, procs that will be called when a specific object is about to be destroyed by garbage collection.</p>
+
+<div><code class="block">include ObjectSpace
+
+a = "A"
+b = "B"
+c = "C"
+
+define_finalizer(a, proc {|id| puts "Finalizer one on #{id}" })
+define_finalizer(a, proc {|id| puts "Finalizer two on #{id}" })
+define_finalizer(b, proc {|id| puts "Finalizer three on #{id}" })</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Finalizer three on 537767360
+Finalizer one on 537767510
+Finalizer two on 537767510</code></div>
+
+<h2 id="modulemethods">module methods</h2>
+<dl class="methodlist">
+	<dt id="ObjectSpace._id2ref">_id2ref</dt>
+		<dd class="callseq">ObjectSpace._id2ref( <i class="obj">anId</i> )  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Converts an object id to a reference to the object.
+      May not be
+      called on an object id passed as a parameter to a finalizer.
+
+<div><code class="block">s = "I am a string" <span class="output"><span class="outputmark">&rarr;</span> "I am a string"</span>
+r = ObjectSpace._id2ref(s.id) <span class="output"><span class="outputmark">&rarr;</span> "I am a string"</span>
+r == s <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="ObjectSpace.define_finalizer">define_finalizer</dt>
+		<dd class="callseq">ObjectSpace.define_finalizer( <i class="obj">anObject</i>, <i class="obj">aProc</i>=proc() )</dd>
+		<dd class="desc">Adds <i class="obj">aProc</i> as a finalizer, to be called when <i class="obj">anObject</i>
+      is about to be destroyed.
+
+		</dd>
+
+	<dt id="ObjectSpace.each_object">each_object</dt>
+		<dd class="callseq">ObjectSpace.each_object( [ <i class="obj">aClassOrMod</i>] ) {| anObj | block } &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Calls the block once for each living, nonimmediate
+      object in this Ruby process.
+      If <i class="obj">aClassOrMod</i> is specified, calls the block for only those
+      classes or modules that match (or are a subclass of)
+      <i class="obj">aClassOrMod</i>.
+      Returns the number of objects found.
+
+<div><code class="block">a = 102.7
+b = 95
+ObjectSpace.each_object(Numeric) {|x| p x }
+print "Total count: ", ObjectSpace.each_object {} ,"\n"</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">102.7
+2.718281828
+3.141592654
+Total count: 372</code></div>
+
+		</dd>
+
+	<dt id="ObjectSpace.garbage_collect">garbage_collect</dt>
+		<dd class="callseq">ObjectSpace.garbage_collect   &rarr; <code>nil</code></dd>
+		<dd class="desc">Initiates garbage collection (see module <code class="module"><a href="ref_m_gc.html">GC</a></code>).</dd>
+
+	<dt id="ObjectSpace.undefine_finalizer">undefine_finalizer</dt>
+		<dd class="callseq">ObjectSpace.undefine_finalizer( <i class="obj">anObject</i> )</dd>
+		<dd class="desc">Removes all finalizers for <i class="obj">anObject</i>.</dd>
+</dl>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_m_objectspace.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

@@ -1,0 +1,461 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Containers, Blocks, and Iterators</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	<a href="tut_classes.html" class="prev">&lt; Previous</a><a href="tut_stdtypes.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'tut_containers',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+<h1 id="containersblocksanditerators">Containers, Blocks, and Iterators</h1>
+
+<p>A jukebox with one song is unlikely to be popular (except perhaps in some very, very scary bars), so pretty soon we'll have to start thinking about producing a catalog of available songs and a playlist of songs waiting to be played. Both of these are containers: objects that hold references to one or more other objects.</p>
+
+<p>Both the catalog and the playlist need a similar set of methods: add a song, remove a song, return a list of songs, and so on. The playlist may perform additional tasks, such as inserting advertising every so often or keeping track of cumulative play time, but we'll worry about these things later. In the meantime, it seems like a good idea to develop some kind of generic <code class="class">SongList</code> class, which we can specialize into catalogs and playlists.</p>
+
+<h2 id="containers">Containers</h2>
+<p>Before we start implementing, we'll need to work out how to store the list of songs inside a <code class="class">SongList</code> object. We have three obvious choices. We could use the Ruby <code class="class">Array</code> type, use the Ruby <code class="class">Hash</code> type, or create our own list structure. Being lazy, for now we'll look at arrays and hashes, and choose one of these for our class.</p>
+
+<h3 id="arrays">Arrays</h3>
+<p>The class <code class="class">Array</code> holds a collection of object references. Each object reference occupies a position in the array, identified by a non-negative integer index.</p>
+<p>You can create arrays using literals or by explicitly creating an <code class="class">Array</code> object. A literal array is simply a list of objects between square brackets.</p>
+
+<div><code class="block">a = [ 3.14159, "pie", 99 ]
+a.type <span class="output"><span class="outputmark">&rarr;</span> Array</span>
+a.length <span class="output"><span class="outputmark">&rarr;</span> 3</span>
+a[0] <span class="output"><span class="outputmark">&rarr;</span> 3.14159</span>
+a[1] <span class="output"><span class="outputmark">&rarr;</span> "pie"</span>
+a[2] <span class="output"><span class="outputmark">&rarr;</span> 99</span>
+a[3] <span class="output"><span class="outputmark">&rarr;</span> nil</span>
+
+b = Array.new
+b.type <span class="output"><span class="outputmark">&rarr;</span> Array</span>
+b.length <span class="output"><span class="outputmark">&rarr;</span> 0</span>
+b[0] = "second"
+b[1] = "array"
+b <span class="output"><span class="outputmark">&rarr;</span> ["second", "array"]</span></code></div>
+
+
+<p>Arrays are indexed using the <code>[]</code> operator. As with most Ruby operators, this is actually a method (in class <code class="class">Array</code>) and hence can be overridden in subclasses. As the example shows, array indices start at zero. Index an array with a single integer, and it returns the object at that position or returns <code>nil</code> if nothing's there. Index an array with a negative integer, and it counts from the end. This is shown in <a href="tut_containers.html#figure_4.1">Figure 4.1</a>.</p>
+
+<div class="figure" id="figure_41">Figure 4.1 not available...</div>
+
+<div><code class="block">a = [ 1, 3, 5, 7, 9 ]
+a[-1] <span class="output"><span class="outputmark">&rarr;</span> 9</span>
+a[-2] <span class="output"><span class="outputmark">&rarr;</span> 7</span>
+a[-99] <span class="output"><span class="outputmark">&rarr;</span> nil</span></code></div>
+
+
+<p>You can also index arrays with a pair of numbers, <code>[start, count]</code>. This returns a new array consisting of references to <code>count</code> objects starting at position <code>start</code>.</p>
+
+<div><code class="block">a = [ 1, 3, 5, 7, 9 ]
+a[1, 3] <span class="output"><span class="outputmark">&rarr;</span> [3, 5, 7]</span>
+a[3, 1] <span class="output"><span class="outputmark">&rarr;</span> [7]</span>
+a[-3, 2] <span class="output"><span class="outputmark">&rarr;</span> [5, 7]</span></code></div>
+
+
+<p>Finally, you can index arrays using ranges, in which start and end positions are separated by two or three periods. The two-period form includes the end position, while the three-period form does not.</p>
+
+<div><code class="block">a = [ 1, 3, 5, 7, 9 ]
+a[1..3] <span class="output"><span class="outputmark">&rarr;</span> [3, 5, 7]</span>
+a[1...3] <span class="output"><span class="outputmark">&rarr;</span> [3, 5]</span>
+a[3..3] <span class="output"><span class="outputmark">&rarr;</span> [7]</span>
+a[-3..-1] <span class="output"><span class="outputmark">&rarr;</span> [5, 7, 9]</span></code></div>
+
+
+<p>The <code>[]</code> operator has a corresponding <code>[]=</code> operator, which lets you set elements in the array. If used with a single integer index, the element at that position is replaced by whatever is on the right-hand side of the assignment. Any gaps that result will be filled with <code>nil</code>.</p>
+
+
+<div><code class="block">a = [ 1, 3, 5, 7, 9 ] <span class="output"><span class="outputmark">&rarr;</span> [1, 3, 5, 7, 9]</span>
+a[1] = 'bat' <span class="output"><span class="outputmark">&rarr;</span> [1, "bat", 5, 7, 9]</span>
+a[-3] = 'cat' <span class="output"><span class="outputmark">&rarr;</span> [1, "bat", "cat", 7, 9]</span>
+a[3]  = [ 9, 8 ] <span class="output"><span class="outputmark">&rarr;</span> [1, "bat", "cat", [9, 8], 9]</span>
+a[6]  = 99 <span class="output"><span class="outputmark">&rarr;</span> [1, "bat", "cat", [9, 8], 9, nil, 99]</span></code></div>
+
+
+<p>If the index to <code>[]=</code> is two numbers (a start and a length) or a range, then those elements in the original array are replaced by whatever is on the right-hand side of the assignment. If the length is zero, the right-hand side is inserted into the array before the start position; no elements are removed. If the right-hand side is itself an array, its elements are used in the replacement. The array size is automatically adjusted if the index selects a different number of elements than are available on the right-hand side of the assignment.</p>
+
+<div><code class="block">a = [ 1, 3, 5, 7, 9 ] <span class="output"><span class="outputmark">&rarr;</span> [1, 3, 5, 7, 9]</span>
+a[2, 2] = 'cat' <span class="output"><span class="outputmark">&rarr;</span> [1, 3, "cat", 9]</span>
+a[2, 0] = 'dog' <span class="output"><span class="outputmark">&rarr;</span> [1, 3, "dog", "cat", 9]</span>
+a[1, 1] = [ 9, 8,  7 ] <span class="output"><span class="outputmark">&rarr;</span> [1, 9, 8, 7, "dog", "cat", 9]</span>
+a[0..3] = [] <span class="output"><span class="outputmark">&rarr;</span> ["dog", "cat", 9]</span>
+a[5]    = 99 <span class="output"><span class="outputmark">&rarr;</span> ["dog", "cat", 9, nil, nil, 99]</span></code></div>
+
+<p>Arrays have a large number of other useful methods. Using these, you can treat arrays as stacks, sets, queues, dequeues, and fifos. A complete list of array methods is available in the reference for <code class="class"><a href="ref_c_array.html">Array</a></code>.</p>
+
+<h3 id="hashes">Hashes</h3>
+<p>Hashes (sometimes known as associative arrays or dictionaries) are similar to arrays, in that they are indexed collectives of object references.</p>
+<p>However, while you index arrays with integers, you can index a hash with objects of any type: strings, regular expressions, and so on. When you store a value in a hash, you actually supply two objects&mdash;the key and the value. You can subsequently retrieve the value by indexing the hash with the same key. The values in a hash can be any objects of any type. The example that follows uses hash literals: a list of <em>key</em> <code>=&gt;</code> <em>value</em> pairs between braces.</p>
+
+<div><code class="block">h = { 'dog' =&gt; 'canine', 'cat' =&gt; 'feline', 'donkey' =&gt; 'asinine' }
+
+h.length <span class="output"><span class="outputmark">&rarr;</span> 3</span>
+h['dog'] <span class="output"><span class="outputmark">&rarr;</span> "canine"</span>
+h['cow'] = 'bovine'
+h[12]    = 'dodecine'
+h['cat'] = 99
+h <span class="output" style="width:52em"><span class="outputmark">&rarr;</span> {"cow"=&gt;"bovine", "cat"=&gt;99, 12=&gt;"dodecine", "donkey"=&gt;"asinine", "dog"=&gt;"canine"}</span></code></div>
+
+
+<p>Compared with arrays, hashes have one significant advantage: they can use any object as an index. However, they also have a significant disadvantage: their elements are not ordered, so you cannot easily use a hash as a stack or a queue.</p>
+<p>You'll find that hashes are one of the most commonly used data structures in Ruby. A full list of the methods implemented by class <code class="class">Hash</code> is available in the library reference for <code class="class"><a href="ref_c_hash.html">Hash</a></code>.</p>
+
+<h3 id="implementingasonglistcontainer">Implementing a SongList Container</h3>
+<p>After that little diversion into arrays and hashes, we're now ready to implement the jukebox's <code class="class">SongList</code>.  Let's invent a basic list of methods we need in our <code class="class">SongList</code>. We'll want to add to it as we go along, but it will do for now.</p>
+<dl>
+  <dt>append( aSong ) &rarr; list</dt><dd>
+  Append the given song to the list.
+  </dd><dt>deleteFirst() &rarr; aSong</dt><dd>
+  Remove the first song from the list, returning that song.
+  </dd><dt>deleteLast() &rarr; aSong</dt><dd>
+  Remove the last song from the list, returning that song.
+  </dd><dt>[ anIndex ] &rarr; aSong</dt><dd>
+  Return the song identified by <code class="obj">anIndex</code>, which may be an
+  integer index or a song title.
+</dd></dl>
+<p>This list gives us a clue to the implementation. The ability to append songs at the end, and remove them from both the front and end, suggests a dequeue&mdash;a double-ended queue&mdash;which we know we can implement using an <code class="class">Array</code>. Similarly, the ability to return a song at an integer position in the list is supported by arrays.</p>
+<p>However, there's also the need to be able to retrieve songs by title, which might suggest using a hash, with the title as a key and the song as a value. Could we use a hash? Well, possibly, but there are problems. First a hash is unordered, so we'd probably need to use an ancillary array to keep track of the list. A bigger problem is that a hash does not support multiple keys with the same value. That would be a problem for our playlist, where the same song might be queued up for playing multiple times. So, for now we'll stick with an array of songs, searching it for titles when needed. If this becomes a performance bottleneck, we can always add some kind of hash-based lookup later.</p>
+<p>We'll start our class with a basic <code class="method">initialize</code> method, which creates the <code class="class">Array</code> we'll use to hold the songs and stores a reference to it in the instance variable <var>@songs</var>.</p>
+
+<div><code class="block">class SongList
+  def initialize
+    @songs = Array.new
+  end
+end</code></div>
+
+<p>The <code class="class_instance_method"><span class="class">SongList</span>#<span class="method">append</span></code> method adds the given song to the end of the <var>@songs</var> array. It also returns <code class="obj">self</code>, a reference to the current <code class="class">SongList</code> object. This is a useful convention, as it lets us chain together multiple calls to <code class="method">append</code>. We'll see an example of this later.</p>
+
+<div><code class="block">class SongList
+  def append(aSong)
+    @songs.push(aSong)
+    self
+  end
+end</code></div>
+
+<p>Then we'll add the <code class="method">deleteFirst</code> and <code class="method">deleteLast</code> methods, trivially implemented using <code class="class_instance_method"><a href="ref_c_array.html#Array.shift"><span class="class">Array</span>#<span class="method">shift</span></a></code> and <code class="class_instance_method"><a href="ref_c_array.html#Array.pop"><span class="class">Array</span>#<span class="method">pop</span></a></code>, respectively.</p>
+
+<div><code class="block">class SongList
+  def deleteFirst
+    @songs.shift
+  end
+  def deleteLast
+    @songs.pop
+  end
+end</code></div>
+
+<p>At this point, a quick test might be in order. First, we'll append four songs to the list. Just to show off, we'll use the fact that <code class="method">append</code> returns the <code class="class">SongList</code> object to chain together these method calls.</p>
+
+<div><code class="block">list = SongList.new
+list.
+  append(Song.new('title1', 'artist1', 1)).
+  append(Song.new('title2', 'artist2', 2)).
+  append(Song.new('title3', 'artist3', 3)).
+  append(Song.new('title4', 'artist4', 4))</code></div>
+
+<p>Then we'll check that songs are taken from the start and end of the list correctly, and that <code>nil</code> is returned when the list becomes empty.</p>
+
+<div><code class="block">list.deleteFirst <span class="output"><span class="outputmark">&rarr;</span> Song: title1--artist1 (1)</span>
+list.deleteFirst <span class="output"><span class="outputmark">&rarr;</span> Song: title2--artist2 (2)</span>
+list.deleteLast <span class="output"><span class="outputmark">&rarr;</span> Song: title4--artist4 (4)</span>
+list.deleteLast <span class="output"><span class="outputmark">&rarr;</span> Song: title3--artist3 (3)</span>
+list.deleteLast <span class="output"><span class="outputmark">&rarr;</span> nil</span></code></div>
+
+
+<p>So far so good. Our next method is <code>[]</code>, which accesses elements by index. If the index is a number (which we check using <code class="class_instance_method"><a href="ref_c_object.html#Object.kind_of_qm"><span class="class">Object</span>#<span class="method">kind_of?</span></a></code>), we just return the element at that position.</p>
+
+<div><code class="block">class SongList
+  def [](key)
+    if key.kind_of?(Integer)
+      @songs[key]
+    else
+      # ...
+    end
+  end
+end</code></div>
+
+<p>Again, testing this is pretty trivial.</p>
+
+<div><code class="block">list[0] <span class="output"><span class="outputmark">&rarr;</span> Song: title1--artist1 (1)</span>
+list[2] <span class="output"><span class="outputmark">&rarr;</span> Song: title3--artist3 (3)</span>
+list[9] <span class="output"><span class="outputmark">&rarr;</span> nil</span></code></div>
+
+
+<p>Now we need to add the facility that lets us look up a song by title. This is going to involve scanning through the songs in the list, checking the title of each. To do this, we first need to spend a couple of pages looking at one of Ruby's neatest features: iterators.</p>
+
+<h2 id="blocksanditerators">Blocks and Iterators</h2>
+<p>So, our next problem with <code class="class">SongList</code> is to implement the code in method <code class="method">[]</code> that takes a string and searches for a song with that title. This seems straightforward: we have an array of songs, so we just go through it one element at a time, looking for a match.</p>
+
+<div><code class="block">class SongList
+  def [](key)
+    if key.kind_of?(Integer)
+      return @songs[key]
+    else
+      for i in 0...@songs.length
+        return @songs[i] if key == @songs[i].name
+      end
+    end
+    return nil
+  end
+end</code></div>
+
+<p>This works, and it looks comfortingly familiar: a <code>for</code> loop iterating over an array. What could be more natural?</p>
+<p>It turns out there <em>is</em> something more natural. In a way, our <code class="keyword">for</code> loop is somewhat too intimate with the array; it asks for a length, then retrieves values in turn until it finds a match. Why not just ask the array to apply a test to each of its members? That's just what the <code>find</code> method in <code class="class">Array</code> does.</p>
+
+<div><code class="block">class SongList
+  def [](key)
+    if key.kind_of?(Integer)
+      result = @songs[key]
+    else
+      result = @songs.find { |aSong| key == aSong.name }
+    end
+    return result
+  end
+end</code></div>
+
+<p>We could use <code>if</code> as a statement modifier to shorten the code even more.</p>
+
+<div><code class="block">class SongList
+  def [](key)
+    return @songs[key] if key.kind_of?(Integer)
+    return @songs.find { |aSong| aSong.name == key }
+  end
+end</code></div>
+<p>The method <code class="method">find</code> is an iterator&mdash;a method that invokes a block of code repeatedly. Iterators and code blocks are among the more interesting features of Ruby, so let's spend a while looking into them (and in the process we'll find out exactly what that line of code in our <code>[]</code> method actually does).</p>
+
+<h3 id="implementingiterators">Implementing Iterators</h3>
+<p>A Ruby iterator is simply a method that can invoke a block of code. At first sight, a block in Ruby looks just like a block in C, Java, or Perl. Unfortunately, in this case looks are deceiving&mdash;a Ruby block <em>is</em> a way of grouping statements, but not in the conventional way.</p>
+<p>First, a block may appear only in the source adjacent to a method call; the block is written starting on the same line as the method's last parameter. Second, the code in the block is not executed at the time it is encountered. Instead, Ruby remembers the context in which the block appears (the local variables, the current object, and so on), and then enters the method. This is where the magic starts.</p>
+<p>Within the method, the block may be invoked, almost as if it were a method itself, using the <code class="keyword">yield</code> statement. Whenever a <code class="keyword">yield</code> is executed, it invokes the code in the block. When the block exits, control picks back up immediately after the <code class="keyword">yield</code>. <span class="footnote">Programming-language buffs will be pleased to know that the keyword <code class="keyword">yield</code> was chosen to echo the <code class="keyword">yield</code>   function in Liskov's language CLU, a language that is over 20   years old and yet contains features that still haven't been widely exploited by the CLU-less.</span>  Let's start with a trivial example.</p>
+
+<div><code class="block">def threeTimes
+  yield
+  yield
+  yield
+end
+threeTimes { puts "Hello" }</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Hello
+Hello
+Hello</code></div>
+
+<p>The block (the code between the braces) is associated with the call to the method <code class="method">threeTimes</code>. Within this method, <code class="keyword">yield</code> is called three times in a row. Each time, it invokes the code in the block, and a cheery greeting is printed. What makes blocks interesting, however, is that you can pass parameters to them and receive values back from them. For example, we could write a simple function that returns members of the Fibonacci series up to a certain value. <span class="footnote">The basic Fibonacci series is a sequence of integers,   starting with two 1's, in which each subsequent term is the sum of the two preceding terms. The series is sometimes used in sorting algorithms and in analyzing natural phenomena.</span></p>
+
+<div><code class="block" id="fibonacci">def fibUpTo(max)
+  i1, i2 = 1, 1        # parallel assignment
+  while i1 &lt;= max
+    yield i1
+    i1, i2 = i2, i1+i2
+  end
+end
+fibUpTo(1000) { |f| print f, " " }</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987</code></div>
+
+<p>In this example, the <code class="keyword">yield</code> statement has a parameter. This value is passed to the associated block. In the definition of the block, the argument list appears between vertical bars. In this instance, the variable <var>f</var> receives the value passed to the <code class="keyword">yield</code>, so the block prints successive members of the series. (This example also shows parallel assignment in action. We'll come back to this in the section &ldquo;<a href="tut_expressions.html#parallelassignment">Parallel Assignment</a>.&rdquo;)  Although it is common to pass just one value to a block, this is not a requirement; a block may have any number of arguments. What happens if a block has a different number of parameters than are given to the yield? By a staggering coincidence, the rules we discuss under parallel assignment come into play (with a slight twist: multiple parameters passed to a <code class="keyword">yield</code> are converted to an array if the block has just one argument).</p>
+<p>Parameters to a block may be existing local variables; if so, the new value of the variable will be retained after the block completes.  This may lead to unexpected behavior, but there is also a performance gain to be had by using variables that already exist. <span class="footnote">For more information on this and other &ldquo;gotchas,&rdquo; see the section &ldquo;<a href="trouble.html#butitdoesntwork">But It Doesn't Work!</a>&rdquo;; more performance information can be found in the section &ldquo;<a href="trouble.html#butitstooslow">But It's Too Slow!</a>&rdquo;.</span></p>
+<p>A block may also return a value to the method. The value of the last expression evaluated in the block is passed back to the method as the value of the <code>yield</code>. This is how the <code class="method">find</code> method used by class <code class="class">Array</code> works. <span class="footnote">(The <code class="method">find</code> method is actually defined in module <code class="module">Enumerable</code>, which is mixed into class <code class="class">Array</code>.)</span> Its implementation would look something like the following.</p>
+
+<div><code class="block">class Array
+  def find
+    for i in 0...size
+      value = self[i]
+      return value if yield(value)
+    end
+    return nil
+  end
+end
+
+[1, 3, 5, 7, 9].find {|v| v*v &gt; 30 } <span class="output"><span class="outputmark">&rarr;</span> 7</span></code></div>
+
+
+<p>This passes successive elements of the array to the associated block. If the block returns <code class="const">true</code>, the method returns the corresponding element. If no element matches, the method returns <code>nil</code>. The example shows the benefit of this approach to iterators. The <code class="class">Array</code> class does what it does best, accessing array elements, leaving the application code to concentrate on its particular requirement (in this case, finding an entry that meets some mathematical criteria).</p>
+<p>Some iterators are common to many types of Ruby collections. We've looked at <code class="method">find</code> already. Two others are <code class="method">each</code> and <code class="method">collect</code>. <code class="method">each</code> is probably the simplest iterator&mdash;all it does is yield successive elements of its collection.</p>
+
+<div><code class="block">[ 1, 3, 5 ].each { |i| puts i }</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">1
+3
+5</code></div>
+<p>The <code class="method">each</code> iterator has a special place in Ruby; in &ldquo;<a href="tut_expressions.html#forin">For ... In</a>&rdquo; we'll describe how it's used as the basis of the language's <code class="keyword">for</code> loop, in the section &ldquo;<a href="tut_modules.html#iteratorsandtheenumerablemodule">Iterators and the Enumerable Module</a>&rdquo; we'll see how defining an <code class="method">each</code> method can add a whole lot more functionality to your class for free.</p>
+<p>Another common iterator is <code class="method">collect</code>, which takes each element from the collection and passes it to the block. The results returned by the block are used to construct a new array.  For instance:</p>
+
+<div><code class="block">["H", "A", "L"].collect { |x| x.succ } <span class="output"><span class="outputmark">&rarr;</span> ["I", "B", "M"]</span></code></div>
+
+
+
+<h3 id="rubycomparedwithcandjava">Ruby Compared with C++ and Java</h3>
+<p>It's worth spending a paragraph comparing Ruby's approach to iterators to that of C++ and Java. In the Ruby approach, the iterator is simply a method, identical to any other, that happens to call <code class="keyword">yield</code> whenever it generates a new value. The thing that uses the iterator is simply a block of code associated with this method. There is no need to generate helper classes to carry the iterator state, as in Java and C++. In this, as in many other ways, Ruby is a transparent language. When you write a Ruby program, you concentrate on getting the job done, not on building scaffolding to support the language itself.</p>
+<p>Iterators are not limited to accessing existing data in arrays and hashes. As we saw in the Fibonacci example, an iterator can return derived values. This capability is used by the Ruby input/output classes, which implement an iterator interface returning successive lines (or bytes) in an I/O stream.</p>
+
+<div><code class="block">f = File.open("testfile")
+f.each do |line|
+  print line
+end
+f.close</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">This is line one
+This is line two
+This is line three
+And so on...</code></div>
+<p>Let's look at just one more iterator implementation. The Smalltalk language also supports iterators over collections. If you ask Smalltalk programmers to sum the elements in an array, it's likely that they'd use the <code class="method">inject</code> function.</p>
+
+<div><code class="block">sumOfValues              "Smalltalk method"
+    ^self values
+          inject: 0
+          into: [ :sum :element | sum + element value]
+
+sumOfValues              "Smalltalk method"
+    ^self values
+          inject: 0
+          into: [ :sum :element | sum + element value]</code></div>
+<p><code class="method">inject</code> works like this. The first time the associated block is called, <var>sum</var> is set to <code class="method">inject</code>'s parameter (zero in this case), and <var>element</var> is set to the first element in the array. The second and subsequent times the block is called, <var>sum</var> is set to the value returned by the block on the previous call. This way, <var>sum</var> can be used to keep a running total. The final value of <code class="method">inject</code> is the value returned by the block the last time it was called.</p>
+<p>Ruby does not have an <code class="method">inject</code> method, but it's easy to write one. In this case we'll add it to the <code class="class">Array</code> class, while in &ldquo;<a href="tut_modules.html#mixins">Mixins</a>&rdquo; we'll see how to make it more generally available.</p>
+
+<div><code class="block">class Array
+  def inject(n)
+     each { |value| n = yield(n, value) }
+     n
+  end
+  def sum
+    inject(0) { |n, value| n + value }
+  end
+  def product
+    inject(1) { |n, value| n * value }
+  end
+end
+[ 1, 2, 3, 4, 5 ].sum <span class="output"><span class="outputmark">&rarr;</span> 15</span>
+[ 1, 2, 3, 4, 5 ].product <span class="output"><span class="outputmark">&rarr;</span> 120</span></code></div>
+
+
+<p>Although blocks are often the target of an iterator, they also have other uses. Let's look at a few.</p>
+
+<h3 id="blocksfortransactions">Blocks for Transactions</h3>
+<p>Blocks can be used to define a chunk of code that must be run under some kind of transactional control. For example, you'll often open a file, do something with its contents, and then want to ensure that the file is closed when you finish. Although you can do this using conventional code, there's an argument for making the file responsible for closing itself. We can do this with blocks. A naive implementation (ignoring error handling) might look something like the following.</p>
+
+<div><code class="block">class File
+  def File.openAndProcess(*args)
+	f = File.open(*args)
+	yield f
+	f.close()
+  end
+end
+
+File.openAndProcess("testfile", "r") do |aFile|
+  print while aFile.gets
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">This is line one
+This is line two
+This is line three
+And so on...</code></div>
+
+<p>This small example illustrates a number of techniques. The <code class="method">openAndProcess</code> method is a <em>class method</em>&mdash;it may be called independent of any particular <code class="class">File</code> object. We want it to take the same arguments as the conventional <code class="class_class_method"><a href="ref_c_file.html#File.open"><span class="class">File</span>.<span class="method">open</span></a></code> method, but we don't really care what those arguments are. Instead, we specified the arguments as <code>*args</code>, meaning &ldquo;collect the actual parameters passed to the method into an array.&rdquo; We then call <code>File.open</code>, passing it <code>*args</code> as a parameter. This expands the array back into individual parameters. The net result is that <code>openAndProcess</code> transparently passes whatever parameters it received to <code class="class_class_method"><a href="ref_c_file.html#File.open"><span class="class">File</span>.<span class="method">open</span></a></code>.</p>
+<p>Once the file has been opened, <code>openAndProcess</code> calls <code class="method">yield</code>, passing the open file object to the block. When the block returns, the file is closed. In this way, the responsibility for closing an open file has been passed from the user of file objects back to the files themselves.</p>
+<p>Finally, this example uses <code class="keyword">do</code>...<code class="keyword">end</code> to define a block. The only difference between this notation and using braces to define blocks is precedence: <code class="keyword">do</code>...<code class="keyword">end</code> binds lower than &ldquo;{...}&rdquo;. We discuss the impact of this in &ldquo;<a href="language.html#blocksclosuresandprocobjects">Blocks, Closures, and Proc Objects</a>.&rdquo;</p>
+<p>The technique of having files manage their own lifecycle is so useful that the class <code class="class">File</code> supplied with Ruby supports it directly. If <code class="class_class_method"><a href="ref_c_file.html#File.open"><span class="class">File</span>.<span class="method">open</span></a></code> has an associated block, then that block will be invoked with a file object, and the file will be closed when the block terminates. This is interesting, as it means that <code class="class_class_method"><a href="ref_c_file.html#File.open"><span class="class">File</span>.<span class="method">open</span></a></code> has two different behaviors: when called with a block, it executes the block and closes the file. When called without a block, it returns the file object. This is made possible by the method <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.block_given_qm"><span class="class">Kernel</span>::<span class="method">block_given?</span></a></code>, which returns <code class="const">true</code> if a block is associated with the current method. Using it, you could implement <code class="class_class_method"><a href="ref_c_file.html#File.open"><span class="class">File</span>.<span class="method">open</span></a></code> (again, ignoring error handling) using something like the following.</p>
+
+<div><code class="block">class File
+  def File.myOpen(*args)
+    aFile = File.new(*args)
+    # If there's a block, pass in the file and close
+    # the file when it returns
+    if block_given?
+      yield aFile
+      aFile.close
+      aFile = nil
+    end
+    return aFile
+  end
+end</code></div>
+
+<h3 id="blockscanbeclosures">Blocks Can Be Closures</h3>
+<p>Let's get back to our jukebox for a moment (remember the jukebox?). At some point we'll be working on the code that handles the user interface&mdash;the buttons that people press to select songs and control the jukebox. We'll need to associate actions with those buttons: press <span class="smallcaps">stop</span> and the music stops. It turns out that Ruby's blocks are a convenient way to do this. Let's start out by assuming that the people who made the hardware implemented a Ruby extension that gives us a basic button class. (We talk about extending Ruby beginning in Chapter 17, &ldquo;<a href="ext_ruby.html">Extending Ruby</a>.&rdquo;)</p>
+
+<div><code class="block">bStart = Button.new("Start")
+bPause = Button.new("Pause")
+# ...</code></div>
+
+<p>What happens when the user presses one of our buttons? In the <code class="class">Button</code> class, the hardware folks rigged things so that a callback method, <code class="method">buttonPressed</code>, will be invoked. The obvious way of adding functionality to these buttons is to create subclasses of <code class="class">Button</code> and have each subclass implement its own <code class="method">buttonPressed</code> method.</p>
+
+<div><code class="block">class StartButton &lt; Button
+  def initialize
+    super("Start")       # invoke Button's initialize
+  end
+  def buttonPressed
+    # do start actions...
+  end
+end
+
+bStart = StartButton.new</code></div>
+
+<p>There are two problems here. First, this will lead to a large number of subclasses. If the interface to <code class="class">Button</code> changes, this could involve us in a lot of maintenance. Second, the actions performed when a button is pressed are expressed at the wrong level; they are not a feature of the button, but are a feature of the jukebox that uses the buttons. We can fix both of these problems using blocks.</p>
+
+<div><code class="block">class JukeboxButton &lt; Button
+  def initialize(label, &amp;action)
+    super(label)
+    @action = action
+  end
+  def buttonPressed
+    @action.call(self)
+  end
+end
+
+bStart = JukeboxButton.new("Start") { songList.start }
+bPause = JukeboxButton.new("Pause") { songList.pause }</code></div>
+
+<p>The key to all this is the second parameter to <code class="class_instance_method"><span class="class">JukeboxButton</span>#<span class="method">initialize</span></code>. If the last parameter in a method definition is prefixed with an ampersand (such as <code>&amp;action</code>), Ruby looks for a code block whenever that method is called. That code block is converted to an object of class <code class="class">Proc</code> and assigned to the parameter. You can then treat the parameter as any other variable. In our example, we assigned it to the instance variable <var>@action</var>. When the callback method <code class="method">buttonPressed</code> is invoked, we use the <code class="class_instance_method"><a href="ref_c_proc.html#Proc.call"><span class="class">Proc</span>#<span class="method">call</span></a></code> method on that object to invoke the block.</p>
+<p>So what exactly do we have when we create a <code class="class">Proc</code> object? The interesting thing is that it's more than just a chunk of code. Associated with a block (and hence a <code class="class">Proc</code> object) is all the context in which the block was <em>defined</em>: the value of <code class="const">self</code>, and the methods, variables, and constants in scope. Part of the magic of Ruby is that the block can still use all this original scope information even if the environment in which it was defined would otherwise have disappeared.  In other languages, this facility is called a <em>closure</em>.</p>
+<p>Let's look at a contrived example. This example uses the method <code class="method">proc</code>, which converts a block to a <code class="class">Proc</code> object.</p>
+
+<div><code class="block">def nTimes(aThing)
+  return proc { |n| aThing * n }
+end
+
+p1 = nTimes(23)
+p1.call(3) <span class="output"><span class="outputmark">&rarr;</span> 69</span>
+p1.call(4) <span class="output"><span class="outputmark">&rarr;</span> 92</span>
+p2 = nTimes("Hello ")
+p2.call(3) <span class="output"><span class="outputmark">&rarr;</span> "Hello Hello Hello "</span></code></div>
+
+
+<p>The method <code class="method">nTimes</code> returns a <code class="class">Proc</code> object that references the method's parameter, <code>aThing</code>. Even though that parameter is out of scope by the time the block is called, the parameter remains accessible to the block.</p>
+
+
+
+
+<div id="menubot" class="menu">
+	<a href="tut_classes.html" class="prev">&lt; Previous</a><a href="tut_stdtypes.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="tut_containers.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

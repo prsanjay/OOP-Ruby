@@ -1,0 +1,760 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Standard Types</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	<a href="tut_containers.html" class="prev">&lt; Previous</a><a href="tut_methods.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'tut_stdtypes',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+<h1 id="standardtypes">Standard Types</h1>
+
+<p>So far we've been having fun implementing pieces of our jukebox code, but we've been negligent. We've looked at arrays, hashes, and procs, but we haven't really covered the other basic types in Ruby: numbers, strings, ranges, and regular expressions. Let's spend a few pages on these basic building blocks now.</p>
+
+<h2 id="numbers">Numbers</h2>
+<p>Ruby supports integers and floating point numbers. Integers can be any length (up to a maximum determined by the amount of free memory on your system). Integers within a certain range (normally -2<sup>30</sup> to 2<sup>30</sup>-1 or -2<sup>62</sup> to 2<sup>62</sup>-1) are held internally in binary form, and are objects of class <code class="class">Fixnum</code>.  Integers outside this range are stored in objects of class <code class="class">Bignum</code> (currently implemented as a variable-length set of short integers).  This process is transparent, and Ruby automatically manages the conversion back and forth.</p>
+
+<div><code class="block">num = 8
+7.times do
+  print num.type, " ", num, "\n"
+  num *= num
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Fixnum 8
+Fixnum 64
+Fixnum 4096
+Fixnum 16777216
+Bignum 281474976710656
+Bignum 79228162514264337593543950336
+Bignum 6277101735386680763835789423207666416102355444464034512896</code></div>
+<p>You write integers using an optional leading sign, an optional base indicator (<code>0</code> for octal, <code>0x</code> for hex, or <code>0b</code> for binary), followed by a string of digits in the appropriate base. Underscore characters are ignored in the digit string.</p>
+
+<div><code class="block">123456                    # Fixnum
+123_456                   # Fixnum (underscore ignored)
+-543                      # Negative Fixnum
+123_456_789_123_345_789   # Bignum
+0xaabb                    # Hexadecimal
+0377                      # Octal
+-0b101_010                # Binary (negated)</code></div>
+<p>You can also get the integer value corresponding to an ASCII character or escape sequence by preceding it with a question mark. Control and meta combinations can also be generated using ?\C-<em>x</em>, ?\M-<em>x</em>, and ?\M-\C-<em>x</em>. The control version of a value is the same as &ldquo;<code>value &amp; 0x9f</code>&rdquo;. The meta version of a value is &ldquo;<code>value | 0x80</code>&rdquo;. Finally, the sequence ?\C-? generates an ASCII delete, <code>0177</code>.</p>
+
+<div><code class="block">?a                        # character code
+?\n                       # code for a newline (0x0a)
+?\C-a                     # control a = ?A &amp; 0x9f = 0x01
+?\M-a                     # meta sets bit 7
+?\M-\C-a                  # meta and control a
+?\C-?                     # delete character</code></div>
+<p>A numeric literal with a decimal point and/or an exponent is turned into a <code class="class">Float</code> object, corresponding to the native architecture's <code>double</code> data type. You must follow the decimal point with a digit, as <code>1.e3</code> tries to invoke the method <code class="method">e3</code> in class <code class="class">Fixnum</code>.</p>
+<p>All numbers are objects, and respond to a variety of messages (listed in full starting on pages 290, 313, 315, 323, and 349). So, unlike (say) C++, you find the absolute value of a number by writing <code>aNumber.abs</code>, not <code>abs(aNumber)</code>.</p>
+<p>Integers also support several useful iterators. We've seen one already&mdash;<code>7.times</code> in the code example at the start of this chapter. Others include <code class="method">upto</code> and <code class="method">downto</code>, for iterating up and down between two integers, and <code class="method">step</code>, which is more like a traditional <code>for</code> loop.</p>
+
+<div><code class="block">  3.times        { print "X " }
+  1.upto(5)      { |i| print i, " " }
+  99.downto(95)  { |i| print i, " " }
+  50.step(80, 5) { |i| print i, " " }</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">X X X 1 2 3 4 5 99 98 97 96 95 50 55 60 65 70 75 80</code></div>
+<p>Finally, a warning for Perl users. Strings that contain numbers are not automatically converted into numbers when used in expressions. This tends to bite most often when reading numbers from a file. The following code (probably) doesn't do what was intended.</p>
+
+<div><code class="block">DATA.each do |line|
+  vals = line.split    # split line, storing tokens in val
+  print vals[0] + vals[1], " "
+end</code></div>
+<p>Feed it a file containing</p>
+
+<div><code class="block">3 4
+5 6
+7 8</code></div>
+<p>and you'll get the output &ldquo;34 56 78.&rdquo; What happened?</p>
+<p>The problem is that the input was read as strings, not numbers. The plus operator concatenates strings, so that's what we see in the output. To fix this, use the <code class="class_instance_method"><a href="ref_c_string.html#String.to_i"><span class="class">String</span>#<span class="method">to_i</span></a></code> method to convert the string to an integer.</p>
+
+<div><code class="block">DATA.each do |line|
+  vals = line.split
+  print vals[0].to_i + vals[1].to_i, " "
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">7 11 15</code></div>
+
+<h2 id="strings">Strings</h2>
+<p>Ruby strings are simply sequences of 8-bit bytes. They normally hold printable characters, but that is not a requirement; a string can also hold binary data. Strings are objects of class <code class="class">String</code>.</p>
+<p>Strings are often created using string literals&mdash;sequences of characters between delimiters. Because binary data is otherwise difficult to represent within program source, you can place various escape sequences in a string literal. Each is replaced with the corresponding binary value as the program is compiled. The type of string delimiter determines the degree of substitution performed. Within single-quoted strings, two consecutive backslashes are replaced by a single backslash, and a backslash followed by a single quote becomes a single quote.</p>
+
+<div><code class="block">'escape using "\\"' <span class="output"><span class="outputmark">&rarr;</span> escape using "\"</span>
+'That\'s right' <span class="output"><span class="outputmark">&rarr;</span> That's right</span></code></div>
+
+
+
+<p>Double-quoted strings support a boatload more escape sequences.  The most common is probably &ldquo;\n&rdquo;, the newline character. <a href="language.html#table_18.2">Table 18.2</a> gives the complete list. In addition, you can substitute the value of any Ruby expression into a string using the sequence <code>#{</code> <em>expr</em> <code>}</code>. If the expression is just a global variable, a class variable, or an instance variable, you can omit the braces.</p>
+
+<div><code class="block">"Seconds/day: #{24*60*60}" <span class="output"><span class="outputmark">&rarr;</span> Seconds/day: 86400</span>
+"#{'Ho! '*3}Merry Christmas" <span class="output"><span class="outputmark">&rarr;</span> Ho! Ho! Ho! Merry Christmas</span>
+"This is line #$." <span class="output"><span class="outputmark">&rarr;</span> This is line 3</span></code></div>
+
+
+
+<p>There are three more ways to construct string literals: <code>%q</code>, <code>%Q</code>, and &ldquo;here documents.&rdquo;</p>
+<p><code>%q</code> and <code>%Q</code> start delimited single- and double-quoted strings.</p>
+
+<div><code class="block">%q/general single-quoted string/ <span class="output"><span class="outputmark">&rarr;</span> general single-quoted string</span>
+%Q!general double-quoted string! <span class="output"><span class="outputmark">&rarr;</span> general double-quoted string</span>
+%Q{Seconds/day: #{24*60*60}} <span class="output"><span class="outputmark">&rarr;</span> Seconds/day: 86400</span></code></div>
+
+
+
+<p>The character following the &ldquo;q&rdquo; or &ldquo;Q&rdquo; is the delimiter. If it is an opening bracket, brace, parenthesis, or less-than sign, the string is read until the matching close symbol is found. Otherwise the string is read until the next occurrence of the same delimiter.</p>
+<p>Finally, you can construct a string using a <em>here document</em>.</p>
+
+<div><code class="block">aString = &lt;&lt;END_OF_STRING
+    The body of the string
+    is the input lines up to
+    one ending with the same
+    text that followed the '&lt;&lt;'
+END_OF_STRING</code></div>
+<p>A here document consists of lines in the source up to, but not including, the terminating string that you specify after the <code>&lt;&lt;</code> characters. Normally, this terminator must start in the first column. However, if you put a minus sign after the  <code>&lt;&lt;</code> characters, you can indent the terminator.</p>
+
+<div><code class="block">print &lt;&lt;-STRING1, &lt;&lt;-STRING2
+   Concat
+   STRING1
+      enate
+      STRING2</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">     Concat
+        enate</code></div>
+
+<h3 id="workingwithstrings">Working with Strings</h3>
+<p><code class="class">String</code> is probably the largest built-in Ruby class, with over 75 standard methods. We won't go through them all here; the library reference has a complete list. Instead, we'll look at some common string idioms&mdash;things that are likely to pop up during day-to-day programming.</p>
+<p>Let's get back to our jukebox. Although it's designed to be connected to the Internet, it also holds copies of some popular songs on a local hard drive. That way, if a squirrel chews through our 'net connection we'll still be able to entertain the customers.</p>
+<p>For historical reasons (are there any other kind?), the list of songs is stored as rows in a flat file. Each row holds the name of the file containing the song, the song's duration, the artist, and the title, all in vertical-bar-separated fields. A typical file might start:</p>
+
+<div><code class="block">/jazz/j00132.mp3  | 3:45 | Fats     Waller     | Ain't Misbehavin'
+/jazz/j00319.mp3  | 2:58 | Louis    Armstrong  | Wonderful World
+/bgrass/bg0732.mp3| 4:09 | Strength in Numbers | Texas Red
+         :                  :           :                   :
+
+/jazz/j00132.mp3  | 3:45 | Fats     Waller     | Ain't Misbehavin'
+/jazz/j00319.mp3  | 2:58 | Louis    Armstrong  | Wonderful World
+/bgrass/bg0732.mp3| 4:09 | Strength in Numbers | Texas Red
+         :                  :           :                   :</code></div>
+<p>Looking at the data, it's clear that we'll be using some of class <code class="class">String</code>'s many methods to extract and clean up the fields before we create <code class="class">Song</code> objects based on them. At a minimum, we'll need to:</p>
+<ul>
+	<li>break the line into fields,</li>
+	<li> convert the running time from mm:ss to seconds, and</li>
+	<li> remove those extra spaces from the artist's name.</li>
+</ul>
+
+<p>Our first task is to split each line into fields, and <code class="class_instance_method"><a href="ref_c_string.html#String.split"><span class="class">String</span>#<span class="method">split</span></a></code> will do the job nicely. In this case, we'll pass <code class="method">split</code> a regular expression, <code>/\s*\|\s*/</code>, which splits the line into tokens wherever <code class="method">split</code> finds a vertical bar, optionally surrounded by spaces.  And, because the line read from the file has a trailing newline, we'll use <code class="class_instance_method"><a href="ref_c_string.html#String.chomp"><span class="class">String</span>#<span class="method">chomp</span></a></code> to strip it off just before we apply the split.</p>
+
+<div><code class="block">songs = SongList.new
+
+songFile.each do |line|
+  file, length, name, title = line.chomp.split(/\s*\|\s*/)
+  songs.append Song.new(title, name, length)
+end
+puts songs[1]</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Song: Wonderful World--Louis    Armstrong (2:58)</code></div>
+<p>Unfortunately, whoever created the original file entered the artists' names in columns, so some of them contain extra spaces. These will look ugly on our high-tech, super-twist, flat-panel Day-Glo display, so we'd better remove these extra spaces before we go much further. There are many ways of doing this, but probably the simplest is <code class="class_instance_method"><a href="ref_c_string.html#String.squeeze"><span class="class">String</span>#<span class="method">squeeze</span></a></code>, which trims runs of repeated characters. We'll use the <code class="method">squeeze!</code> form of the method, which alters the string in place.</p>
+
+<div><code class="block">songs = SongList.new
+
+songFile.each do |line|
+  file, length, name, title = line.chomp.split(/\s*\|\s*/)
+  name.squeeze!(" ")
+  songs.append Song.new(title, name, length)
+end
+puts songs[1]</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Song: Wonderful World--Louis Armstrong (2:58)</code></div>
+<p>Finally, there's the minor matter of the time format: the file says 2:58, and we want the number of seconds, 178. We could use <code class="method">split</code> again, this time splitting the time field around the colon character.</p>
+
+<div><code class="block">mins, secs = length.split(/:/)</code></div>
+<p>Instead, we'll use a related method. <code class="class_instance_method"><a href="ref_c_string.html#String.scan"><span class="class">String</span>#<span class="method">scan</span></a></code> is similar to <code class="method">split</code> in that it breaks a string into chunks based on a pattern. However, unlike <code class="method">split</code>, with <code class="method">scan</code> you specify the pattern that you want the chunks to match. In this case, we want to match one or more digits for both the minutes and seconds component. The pattern for one or more digits is <code>/\d+/</code>.</p>
+
+<div><code class="block">songs = SongList.new
+songFile.each do |line|
+  file, length, name, title = line.chomp.split(/\s*\|\s*/)
+  name.squeeze!(" ")
+  mins, secs = length.scan(/\d+/)
+  songs.append Song.new(title, name, mins.to_i*60+secs.to_i)
+end
+puts songs[1]</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Song: Wonderful World--Louis Armstrong (178)</code></div>
+<p>Our jukebox has a keyword search capability. Given a word from a song title or an artist's name, it will list all matching tracks. Type in &ldquo;fats,&rdquo; and it might come back with songs by Fats Domino, Fats Navarro, and Fats Waller, for example. We'll implement this by creating an indexing class. Feed it an object and some strings, and it will index that object under every word (of two or more characters) that occurs in those strings. This will illustrate a few more of class <code class="class">String</code>'s many methods.</p>
+
+<div><code class="block">class WordIndex
+  def initialize
+    @index = Hash.new(nil)
+  end
+  def index(anObject, *phrases)
+    phrases.each do |aPhrase|
+      aPhrase.scan /\w[-\w']+/ do |aWord|   # extract each word
+        aWord.downcase!
+        @index[aWord] = [] if @index[aWord].nil?
+        @index[aWord].push(anObject)
+      end
+    end
+  end
+  def lookup(aWord)
+    @index[aWord.downcase]
+  end
+end</code></div>
+<p>The <code class="class_instance_method"><a href="ref_c_string.html#String.scan"><span class="class">String</span>#<span class="method">scan</span></a></code> method extracts elements from a string that match a regular expression. In this case, the pattern &ldquo;<code>\w[-\w']+</code>&rdquo; matches any character that can appear in a word, followed by one or more of the things specified in the brackets (a hyphen, another word character, or a single quote). We'll talk more about regular expressions in the section &ldquo;<a href="tut_stdtypes.html#regularexpressions">Regular Expressions</a>.&rdquo; To make our searches case insensitive, we map both the words we extract and the words used as keys during the lookup to lowercase. Note the exclamation mark at the end of the first <code class="method">downcase!</code> method name. As with the <code class="method">squeeze!</code> method we used previously, this is an indication that the method will modify the receiver in place, in this case converting the string to lowercase. <span class="footnote">There's a minor bug   in this code example: the song &ldquo;Gone, Gone, Gone&rdquo; would get   indexed three times. Can you come up with a fix?</span></p>
+<p>We'll extend our <code class="class">SongList</code> class to index songs as they're added, and add a method to look up a song given a word.</p>
+
+<div><code class="block">class SongList
+  def initialize
+    @songs = Array.new
+    @index = WordIndex.new
+  end
+  def append(aSong)
+    @songs.push(aSong)
+    @index.index(aSong, aSong.name, aSong.artist)
+    self
+  end
+  def lookup(aWord)
+    @index.lookup(aWord)
+  end
+end</code></div>
+<p>Finally, we'll test it all.</p>
+
+<div><code class="block">songs = SongList.new
+songFile.each do |line|
+  file, length, name, title = line.chomp.split(/\s*\|\s*/)
+  name.squeeze!(" ")
+  mins, secs = length.scan(/\d+/)
+  songs.append Song.new(title, name, mins.to_i*60+secs.to_i)
+end
+puts songs.lookup("Fats")
+puts songs.lookup("ain't")
+puts songs.lookup("RED")
+puts songs.lookup("WoRlD")</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Song: Ain't Misbehavin'--Fats Waller (225)
+Song: Ain't Misbehavin'--Fats Waller (225)
+Song: Texas Red--Strength in Numbers (249)
+Song: Wonderful World--Louis Armstrong (178)</code></div>
+<p>We could spend the next 50 pages looking at all the methods in class <code class="class">String</code>. However, let's move on instead to look at a simpler datatype: ranges.</p>
+
+<h2 id="ranges">Ranges</h2>
+<p>Ranges occur everywhere: January to December, 0 to 9, rare to well-done, lines 50 through 67, and so on.  If Ruby is to help us model reality, it seems natural for it to support these ranges. In fact, Ruby goes one better: it actually uses ranges to implement three separate features: sequences, conditions, and intervals.</p>
+
+<h3 id="rangesassequences">Ranges as Sequences</h3>
+<p>The first and perhaps most natural use of ranges is to express a sequence. Sequences have a start point, an end point, and a way to produce successive values in the sequence. In Ruby, these sequences are created using the &ldquo;..&rdquo; and &ldquo;...&rdquo; range operators. The two-dot form creates an inclusive range, while the three-dot form creates a range that excludes the specified high value.</p>
+
+<div><code class="block">1..10
+'a'..'z'
+0...anArray.length</code></div>
+<p>In Ruby, unlike in some earlier versions of Perl, ranges are not represented internally as lists: the sequence 1..100000 is held as a <code class="class">Range</code> object containing references to two <code class="class">Fixnum</code> objects.  If you need to, you can convert a range to a list using the <code class="method">to_a</code> method.</p>
+
+<div><code class="block">(1..10).to_a <span class="output"><span class="outputmark">&rarr;</span> [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]</span>
+('bar'..'bat').to_a <span class="output"><span class="outputmark">&rarr;</span> ["bar", "bas", "bat"]</span></code></div>
+
+
+
+<p>Ranges implement methods that let you iterate over them and test their contents in a variety of ways.</p>
+
+<div><code class="block">digits = 0..9
+digits.include?(5) <span class="output"><span class="outputmark">&rarr;</span> true</span>
+digits.min <span class="output"><span class="outputmark">&rarr;</span> 0</span>
+digits.max <span class="output"><span class="outputmark">&rarr;</span> 9</span>
+digits.reject {|i| i &lt; 5 } <span class="output"><span class="outputmark">&rarr;</span> [5, 6, 7, 8, 9]</span>
+digits.each do |digit|
+  dial(digit)
+end</code></div>
+
+
+
+<p>So far we've shown ranges of numbers and strings. However, as you'd expect from an object-oriented language, Ruby can create ranges based on objects that you define. The only constraints are that the objects must respond to <code class="method">succ</code> by returning the next object in sequence and the objects must be comparable using <code>&lt;=&gt;</code>, the general comparison operator. Sometimes called the spaceship operator, <code>&lt;=&gt;</code> compares two values, returning -1, 0, or +1 depending on whether the first is less than, equal to, or greater than the second.</p>
+<p>Here's a simple class that represents rows of &ldquo;#&rdquo; signs. We might use it as a text-based stub when testing the jukebox volume control.</p>
+
+<div><code class="block">class VU
+
+  include Comparable
+
+  attr :volume
+
+  def initialize(volume)  # 0..9
+    @volume = volume
+  end
+
+  def inspect
+    '#' * @volume
+  end
+
+  # Support for ranges
+
+  def &lt;=&gt;(other)
+    self.volume &lt;=&gt; other.volume
+  end
+
+  def succ
+    raise(IndexError, "Volume too big") if @volume &gt;= 9
+    VU.new(@volume.succ)
+  end
+end</code></div>
+<p>We can test it by creating a range of <code class="class">VU</code> objects.</p>
+
+<div><code class="block">medium = VU.new(4)..VU.new(7)
+medium.to_a <span class="output"><span class="outputmark">&rarr;</span> [####, #####, ######, #######]</span>
+medium.include?(VU.new(3)) <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+
+
+
+<h3 id="rangesasconditions">Ranges as Conditions</h3>
+<p>As well as representing sequences, ranges may also be used as conditional expressions. For example, the following code fragment prints sets of lines from standard input, where the first line in each set contains the word &ldquo;start&rdquo; and the last line the word &ldquo;end.&rdquo;</p>
+
+<div><code class="block">while gets
+  print if /start/../end/
+end</code></div>
+
+<p>Behind the scenes, the range keeps track of the state of each of the tests.  We'll show some examples of this in the section &ldquo;<a href="tut_expressions.html#loops">Loops</a>.&rdquo;.</p>
+
+<h3 id="rangesasintervals">Ranges as Intervals</h3>
+<p>A final use of the versatile range is as an interval test: seeing if some value falls within the interval represented by the range. This is done using <code>===</code>, the case equality operator.</p>
+
+<div><code class="block">(1..10)    === 5 <span class="output"><span class="outputmark">&rarr;</span> true</span>
+(1..10)    === 15 <span class="output"><span class="outputmark">&rarr;</span> false</span>
+(1..10)    === 3.14159 <span class="output"><span class="outputmark">&rarr;</span> true</span>
+('a'..'j') === 'c' <span class="output"><span class="outputmark">&rarr;</span> true</span>
+('a'..'j') === 'z' <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+
+
+<p>The <a href="tut_expressions.html#caseexpressions">example of a case expression</a> shows this test in action, determining a jazz style given a year.</p>
+
+<h2 id="regularexpressions">Regular Expressions</h2>
+<p>Back in &ldquo;<a href="tut_stdtypes.html#workingwithstrings">Working with Strings</a>&rdquo; when we were creating a song list from a file, we used a regular expression to match the field delimiter in the input file. We claimed that the expression <code>line.split(/\s*\|\s*/)</code> matched a vertical bar surrounded by optional whitespace. Let's explore regular expressions in more detail to see why this claim is true.</p>
+<p>Regular expressions are used to match patterns against strings. Ruby provides built-in support that makes pattern matching and substitution convenient and concise. In this section we'll work through all the main features of regular expressions. There are some details we won't cover: have a look at &ldquo;<a href="language.html#regularexpressions">Regular Expressions</a>&rdquo; in Chapter 18 for more information.</p>
+<p>Regular expressions are objects of type <code>Regexp</code>. They can be created by calling the constructor explicitly or by using the literal forms /<em>pattern</em>/ and %r\<em>pattern</em>\.</p>
+
+<div><code class="block">a = Regexp.new('^\s*[a-z]') <span class="output"><span class="outputmark">&rarr;</span> /^\s*[a-z]/</span>
+b = /^\s*[a-z]/ <span class="output"><span class="outputmark">&rarr;</span> /^\s*[a-z]/</span>
+c = %r{^\s*[a-z]} <span class="output"><span class="outputmark">&rarr;</span> /^\s*[a-z]/</span></code></div>
+
+
+
+<p>Once you have a regular expression object, you can match it against a string using <code>Regexp#match(<code class="obj">aString</code>)</code> or the match operators <code>=~</code> (positive match) and <code>!~</code> (negative match). The match operators are defined for both <code>String</code> and <code>Regexp</code> objects. If both operands of the match operator are <code>Strings</code>, the one on the right will be converted to a regular expression.</p>
+
+<div><code class="block">a = "Fats Waller"
+a =~ /a/ <span class="output"><span class="outputmark">&rarr;</span> 1</span>
+a =~ /z/ <span class="output"><span class="outputmark">&rarr;</span> nil</span>
+a =~ "ll" <span class="output"><span class="outputmark">&rarr;</span> 7</span></code></div>
+
+
+
+<p>The match operators return the character position at which the match occurred. They also have the side effect of setting a whole load of Ruby variables. <var>$&amp;</var> receives the part of the string that was matched by the pattern, <var>$`</var> receives the part of the string that preceded the match, and <var>$'</var> receives the string after the match. We can use this to write a method, <code class="method">showRE</code>, which illustrates where a particular pattern matches.</p>
+
+<div><code class="block">def showRE(a,re)
+  if a =~ re
+    "#{$`}&lt;&lt;#{$&amp;}&gt;&gt;#{$'}"
+  else
+    "no match"
+  end
+end
+
+showRE('very interesting', /t/) <span class="output"><span class="outputmark">&rarr;</span> very in&lt;&lt;t&gt;&gt;eresting</span>
+showRE('Fats Waller', /ll/) <span class="output"><span class="outputmark">&rarr;</span> Fats Wa&lt;&lt;ll&gt;&gt;er</span></code></div>
+
+
+
+<p>The match also sets the thread-global variables <var>$~</var> and <var>$1</var> through <var>$9</var>. The variable <var>$~</var> is a <code class="class"><a href="ref_c_matchdata.html">MatchData</a></code> object that holds everything you might want to know about the match. <var>$1</var> and so on hold the values of parts of the match. We'll talk about these later. And for people who cringe when they see these Perl-like variable names, stay tuned. There's good news at the end of the chapter.</p>
+
+<h3 id="patterns">Patterns</h3>
+<p>Every regular expression contains a pattern, which is used to match the regular expression against a string.</p>
+<p>Within a pattern, all characters except ., |, (, ), [, {, +, \, ^, $, *, and ? match themselves.</p>
+
+<div><code class="block">showRE('kangaroo', /angar/) <span class="output"><span class="outputmark">&rarr;</span> k&lt;&lt;angar&gt;&gt;oo</span>
+showRE('!@%&amp;-_=+', /%&amp;/) <span class="output"><span class="outputmark">&rarr;</span> !@&lt;&lt;%&amp;&gt;&gt;-_=+</span></code></div>
+
+
+
+<p>If you want to match one of these special characters literally, precede it with a backslash. This explains part of the pattern we used to split the song line, <code>/\s*\|\s*/</code>. The <code>\|</code> means &ldquo;match a vertical bar.&rdquo; Without the backslash, the &ldquo;<code>|</code>&rdquo; would have meant <em>alternation</em> (which we'll describe later).</p>
+
+<div><code class="block">showRE('yes | no', /\|/) <span class="output"><span class="outputmark">&rarr;</span> yes &lt;&lt;|&gt;&gt; no</span>
+showRE('yes (no)', /\(no\)/) <span class="output"><span class="outputmark">&rarr;</span> yes &lt;&lt;(no)&gt;&gt;</span>
+showRE('are you sure?', /e\?/) <span class="output"><span class="outputmark">&rarr;</span> are you sur&lt;&lt;e?&gt;&gt;</span></code></div>
+
+
+
+<p>A backslash followed by an alphanumeric character is used to introduce a special match construct, which we'll cover later. In addition, a regular expression may contain <code>#{...}</code> expression substitutions.</p>
+
+<h4 id="anchors">Anchors</h4>
+<p>By default, a regular expression will try to find the first match for the pattern in a string. Match <code>/iss/</code> against the string &ldquo;Mississippi,&rdquo; and it will find the substring &ldquo;iss&rdquo; starting at position one. But what if you want to force a pattern to match only at the start or end of a string?</p>
+<p>The patterns <code>^</code> and <code>$</code> match the beginning and end of a line, respectively.  These are often used to <em>anchor</em> a pattern match: for example, <code>/^option/</code> matches the word &ldquo;option&rdquo; only if it appears at the start of a line. The sequence <code>\A</code> matches the beginning of a string, and <code>\z</code> and <code>\Z</code> match the end of a string.  (Actually, <code>\Z</code> matches the end of a string <em>unless</em> the string ends with a &ldquo;\n&rdquo;, it which case it matches just before the &ldquo;\n&rdquo;.)</p>
+
+<div><code class="block">showRE("this is\nthe time", /^the/) <span class="output"><span class="outputmark">&rarr;</span> this is\n&lt;&lt;the&gt;&gt; time</span>
+showRE("this is\nthe time", /is$/) <span class="output"><span class="outputmark">&rarr;</span> this &lt;&lt;is&gt;&gt;\nthe time</span>
+showRE("this is\nthe time", /\Athis/) <span class="output"><span class="outputmark">&rarr;</span> &lt;&lt;this&gt;&gt; is\nthe time</span>
+showRE("this is\nthe time", /\Athe/) <span class="output"><span class="outputmark">&rarr;</span> no match</span></code></div>
+
+
+
+<p>Similarly, the patterns <code>\b</code> and <code>\B</code> match word boundaries and nonword boundaries, respectively. Word characters are letters, numbers, and underscore.</p>
+
+<div><code class="block">showRE("this is\nthe time", /\bis/) <span class="output"><span class="outputmark">&rarr;</span> this &lt;&lt;is&gt;&gt;\nthe time</span>
+showRE("this is\nthe time", /\Bis/) <span class="output"><span class="outputmark">&rarr;</span> th&lt;&lt;is&gt;&gt; is\nthe time</span></code></div>
+
+
+
+
+<h4 id="characterclasses">Character Classes</h4>
+<p>A character class is a set of characters between brackets: <code>[</code><em>characters</em><code>]</code> matches any single character between the brackets. <code>[aeiou]</code> will match a vowel, <code>[,.:;!?]</code> matches punctuation, and so on. The significance of the special regular expression characters&mdash;<code>.|()[{+^$*?</code>&mdash;is turned off inside the brackets. However, normal string substitution still occurs, so (for example) <code>\b</code> represents a backspace character and <code>\n</code> a newline (see <a href="language.html#table_18.2">Table 18.2</a>). In addition, you can use the abbreviations shown in <a href="tut_stdtypes.html#table_5.1">Table 5.1</a>, so that (for example) <code>\s</code> matches any whitespace character, not just a literal space.</p>
+
+<div><code class="block">showRE('It costs $12.', /[aeiou]/) <span class="output"><span class="outputmark">&rarr;</span> It c&lt;&lt;o&gt;&gt;sts $12.</span>
+showRE('It costs $12.', /[\s]/) <span class="output"><span class="outputmark">&rarr;</span> It&lt;&lt; &gt;&gt;costs $12.</span></code></div>
+
+
+
+<p>Within the brackets, the sequence c<sub>1</sub>-c<sub>2</sub> represents all the characters between c<sub>1</sub> and c<sub>2</sub>, inclusive.</p>
+<p>If you want to include the literal characters <code>]</code> and <code>-</code> within a character class, they must appear at the start.</p>
+
+<div><code class="block">a = 'Gamma [Design Patterns-page 123]'
+showRE(a, /[]]/) <span class="output"><span class="outputmark">&rarr;</span> Gamma [Design Patterns-page 123&lt;&lt;]&gt;&gt;</span>
+showRE(a, /[B-F]/) <span class="output"><span class="outputmark">&rarr;</span> Gamma [&lt;&lt;D&gt;&gt;esign Patterns-page 123]</span>
+showRE(a, /[-]/) <span class="output"><span class="outputmark">&rarr;</span> Gamma [Design Patterns&lt;&lt;-&gt;&gt;page 123]</span>
+showRE(a, /[0-9]/) <span class="output"><span class="outputmark">&rarr;</span> Gamma [Design Patterns-page &lt;&lt;1&gt;&gt;23]</span></code></div>
+
+
+
+<p>Put a <code>^</code> immediately after the opening bracket to negate a character class: <code>[^a-z]</code> matches any character that isn't a lowercase alphabetic.</p>
+<p>Some character classes are used so frequently that Ruby provides abbreviations for them. These abbreviations are listed in <a href="tut_stdtypes.html#table_5.1">Table 5.1</a>&mdash;they may be used both within brackets and in the body of a pattern.</p>
+
+<div><code class="block">showRE('It costs $12.', /\s/) <span class="output"><span class="outputmark">&rarr;</span> It&lt;&lt; &gt;&gt;costs $12.</span>
+showRE('It costs $12.', /\d/) <span class="output"><span class="outputmark">&rarr;</span> It costs $&lt;&lt;1&gt;&gt;2.</span></code></div>
+
+
+
+<table class="figure" id="table_5.1">
+	<caption>Table 5.1 : Character class abbreviations</caption>
+	<thead>
+		<tr>
+		  <th>Sequence</th>
+		  <th>As [ ... ]</th>
+		  <th>Meaning</th>
+		</tr>
+	</thead><tbody>
+		<tr class="firstRow">
+		  <td><code>\d</code></td>
+		  <td>[0-9]</td>
+		  <td>Digit character</td>
+		</tr>
+		<tr>
+		  <td><code>\D</code></td>
+		  <td>[^0-9]</td>
+		  <td>Nondigit</td>
+		</tr>
+		<tr>
+		  <td><code>\s</code></td>
+		  <td>[\s\t\r\n\f]</td>
+		  <td>Whitespace character</td>
+		</tr>
+		<tr>
+		  <td><code>\S</code></td>
+		  <td>[^\s\t\r\n\f]</td>
+		  <td>Nonwhitespace character</td>
+		</tr>
+		<tr>
+		  <td><code>\w</code></td>
+		  <td>[A-Za-z0-9_]</td>
+		  <td>Word character</td>
+		</tr>
+		<tr>
+		  <td><code>\W</code></td>
+		  <td>[^A-Za-z0-9_]</td>
+		  <td>Nonword character</td>
+		</tr>
+	</tbody>
+</table>
+
+
+<p>Finally, a period (&ldquo;.&rdquo;) appearing outside brackets represents any character except a newline (and in multiline mode it matches a newline, too).</p>
+
+<div><code class="block">a = 'It costs $12.'
+showRE(a, /c.s/) <span class="output"><span class="outputmark">&rarr;</span> It &lt;&lt;cos&gt;&gt;ts $12.</span>
+showRE(a, /./) <span class="output"><span class="outputmark">&rarr;</span> &lt;&lt;I&gt;&gt;t costs $12.</span>
+showRE(a, /\./) <span class="output"><span class="outputmark">&rarr;</span> It costs $12&lt;&lt;.&gt;&gt;</span></code></div>
+
+
+
+
+<h4 id="repetition">Repetition</h4>
+<p>When we specified the pattern that split the song list line, <code>/\s*\|\s*/</code>, we said we wanted to match a vertical bar surrounded by an arbitrary amount of whitespace. We now know that the <code>\s</code> sequences match a single whitespace character, so it seems likely that the asterisks somehow mean &ldquo;an arbitrary amount.&rdquo; In fact, the asterisk is one of a number of modifiers that allow you to match multiple occurrences of a pattern.</p>
+<p>If <em>r</em> stands for the immediately preceding regular expression within a pattern, then:</p>
+
+
+<table>
+<tr>
+  <td><em>r</em><code>*</code></td>
+  <td>matches zero or more occurrences of <em>r</em>.</td>
+</tr>
+<tr>
+  <td><em>r</em><code>+</code></td>
+  <td>matches one or more occurrences of <em>r</em>.</td>
+</tr>
+<tr>
+  <td><em>r</em><code>?</code></td>
+  <td>matches zero or one occurrence of <em>r</em>.</td>
+</tr>
+<tr>
+  <td><em>r</em><code>{m,n}</code></td>
+  <td>matches at least &ldquo;m&rdquo; and at most &ldquo;n&rdquo; occurrences of <em>r</em>.</td>
+</tr>
+<tr>
+  <td><em>r</em><code>{m,}</code></td>
+  <td>matches at least &ldquo;m&rdquo; occurrences of <em>r</em>.</td>
+</tr>
+</table>
+
+
+<p>These repetition constructs have a high precedence&mdash;they bind only to the immediately preceding regular expression in the pattern. <code>/ab+/</code> matches an &ldquo;a&rdquo; followed by one or more &ldquo;b&rdquo;s, not a sequence of &ldquo;ab&rdquo;s. You have to be careful with the <code>*</code> construct too&mdash;the pattern /a*/ will match any string; every string has zero or more &ldquo;a&rdquo;s.</p>
+<p>These patterns are called <em>greedy</em>, because by default they will match as much of the string as they can. You can alter this behavior, and have them match the minimum, by adding a question mark suffix.</p>
+
+<div><code class="block">a = "The moon is made of cheese"
+showRE(a, /\w+/) <span class="output"><span class="outputmark">&rarr;</span> &lt;&lt;The&gt;&gt; moon is made of cheese</span>
+showRE(a, /\s.*\s/) <span class="output"><span class="outputmark">&rarr;</span> The&lt;&lt; moon is made of &gt;&gt;cheese</span>
+showRE(a, /\s.*?\s/) <span class="output"><span class="outputmark">&rarr;</span> The&lt;&lt; moon &gt;&gt;is made of cheese</span>
+showRE(a, /[aeiou]{2,99}/) <span class="output"><span class="outputmark">&rarr;</span> The m&lt;&lt;oo&gt;&gt;n is made of cheese</span>
+showRE(a, /mo?o/) <span class="output"><span class="outputmark">&rarr;</span> The &lt;&lt;moo&gt;&gt;n is made of cheese</span></code></div>
+
+
+
+
+<h4 id="alternation">Alternation</h4>
+<p>We know that the vertical bar is special, because our line splitting pattern had to escape it with a backslash. That's because an unescaped vertical bar &ldquo;|&rdquo; matches either the regular expression that precedes it or the regular expression that follows it.</p>
+
+<div><code class="block">a = "red ball blue sky"
+showRE(a, /d|e/) <span class="output"><span class="outputmark">&rarr;</span> r&lt;&lt;e&gt;&gt;d ball blue sky</span>
+showRE(a, /al|lu/) <span class="output"><span class="outputmark">&rarr;</span> red b&lt;&lt;al&gt;&gt;l blue sky</span>
+showRE(a, /red ball|angry sky/) <span class="output"><span class="outputmark">&rarr;</span> &lt;&lt;red ball&gt;&gt; blue sky</span></code></div>
+
+
+
+<p>There's a trap for the unwary here, as &ldquo;|&rdquo; has a very low precedence. The last example above matches &ldquo;red ball&rdquo; or &ldquo;angry sky&rdquo;, not &ldquo;red ball sky&rdquo; or &ldquo;red angry sky&rdquo;. To match &ldquo;red ball sky&rdquo; or &ldquo;red angry sky&rdquo;, you'd need to override the default precedence using grouping.</p>
+
+<h4 id="grouping">Grouping</h4>
+<p>You can use parentheses to group terms within a regular expression. Everything within the group is treated as a single regular expression.</p>
+
+<div><code class="block">showRE('banana', /an*/) <span class="output"><span class="outputmark">&rarr;</span> b&lt;&lt;an&gt;&gt;ana</span>
+showRE('banana', /(an)*/) <span class="output"><span class="outputmark">&rarr;</span> &lt;&lt;&gt;&gt;banana</span>
+showRE('banana', /(an)+/) <span class="output"><span class="outputmark">&rarr;</span> b&lt;&lt;anan&gt;&gt;a</span></code></div>
+
+
+
+
+<div><code class="block">a = 'red ball blue sky'
+showRE(a, /blue|red/) <span class="output"><span class="outputmark">&rarr;</span> &lt;&lt;red&gt;&gt; ball blue sky</span>
+showRE(a, /(blue|red) \w+/) <span class="output"><span class="outputmark">&rarr;</span> &lt;&lt;red ball&gt;&gt; blue sky</span>
+showRE(a, /(red|blue) \w+/) <span class="output"><span class="outputmark">&rarr;</span> &lt;&lt;red ball&gt;&gt; blue sky</span>
+showRE(a, /red|blue \w+/) <span class="output"><span class="outputmark">&rarr;</span> &lt;&lt;red&gt;&gt; ball blue sky</span></code></div>
+
+
+
+
+<div><code class="block">showRE(a, /red (ball|angry) sky/) <span class="output"><span class="outputmark">&rarr;</span> no match</span>
+a = 'the red angry sky'
+showRE(a, /red (ball|angry) sky/) <span class="output"><span class="outputmark">&rarr;</span> the &lt;&lt;red angry sky&gt;&gt;</span></code></div>
+
+
+
+<p>Parentheses are also used to collect the results of pattern matching. Ruby counts opening parentheses, and for each stores the result of the partial match between it and the corresponding closing parenthesis.   You can use this partial match both within the remainder of the pattern and in your Ruby program. Within the pattern, the sequence <code>\1</code> refers to the match of the first group, <code>\2</code> the second group, and so on. Outside the pattern, the special variables <code>$1</code>, <code>$2</code>, and so on, serve the same purpose.</p>
+
+<div><code class="block">"12:50am" =~ /(\d\d):(\d\d)(..)/ <span class="output"><span class="outputmark">&rarr;</span> 0</span>
+"Hour is #$1, minute #$2" <span class="output"><span class="outputmark">&rarr;</span> "Hour is 12, minute 50"</span>
+"12:50am" =~ /((\d\d):(\d\d))(..)/ <span class="output"><span class="outputmark">&rarr;</span> 0</span>
+"Time is #$1" <span class="output"><span class="outputmark">&rarr;</span> "Time is 12:50"</span>
+"Hour is #$2, minute #$3" <span class="output"><span class="outputmark">&rarr;</span> "Hour is 12, minute 50"</span>
+"AM/PM is #$4" <span class="output"><span class="outputmark">&rarr;</span> "AM/PM is am"</span></code></div>
+
+
+
+<p>The ability to use part of the current match later in that match allows you to look for various forms of repetition.</p>
+
+<div><code class="block"># match duplicated letter
+showRE('He said "Hello"', /(\w)\1/) <span class="output"><span class="outputmark">&rarr;</span> He said "He&lt;&lt;ll&gt;&gt;o"</span>
+# match duplicated substrings
+showRE('Mississippi', /(\w+)\1/) <span class="output"><span class="outputmark">&rarr;</span> M&lt;&lt;ississ&gt;&gt;ippi</span></code></div>
+
+
+
+<p>You can also use back references to match delimiters.</p>
+
+<div><code class="block">showRE('He said "Hello"', /(["']).*?\1/) <span class="output"><span class="outputmark">&rarr;</span> He said &lt;&lt;"Hello"&gt;&gt;</span>
+showRE("He said 'Hello'", /(["']).*?\1/) <span class="output"><span class="outputmark">&rarr;</span> He said &lt;&lt;'Hello'&gt;&gt;</span></code></div>
+
+
+
+
+<h3 id="patternbasedsubstitution">Pattern-Based Substitution</h3>
+<p>Sometimes finding a pattern in a string is good enough. If a friend challenges you to find a word that contains the letters a, b, c, d, and e in order, you could search a word list with the pattern <code>/a.*b.*c.*d.*e/</code> and find &ldquo;absconded&rdquo; and &ldquo;ambuscade.&rdquo; That has to be worth something.</p>
+<p>However, there are times when you need to change things based on a pattern match. Let's go back to our song list file. Whoever created it entered all the artists' names in lowercase. When we display them on our jukebox's screen, they'd look better in mixed case. How can we change the first character of each word to uppercase?</p>
+<p>The methods <code class="class_instance_method"><a href="ref_c_string.html#String.sub"><span class="class">String</span>#<span class="method">sub</span></a></code> and <code class="class_instance_method"><a href="ref_c_string.html#String.gsub"><span class="class">String</span>#<span class="method">gsub</span></a></code> look for a portion of a string matching their first argument and replace it with their second argument. <code class="class_instance_method"><a href="ref_c_string.html#String.sub"><span class="class">String</span>#<span class="method">sub</span></a></code> performs one replacement, while <code class="class_instance_method"><a href="ref_c_string.html#String.gsub"><span class="class">String</span>#<span class="method">gsub</span></a></code> replaces every occurrence of the match. Both routines return a new copy of the <code>String</code> containing the substitutions. Mutator versions <code class="class_instance_method"><a href="ref_c_string.html#String.sub_oh"><span class="class">String</span>#<span class="method">sub!</span></a></code> and <code class="class_instance_method"><a href="ref_c_string.html#String.gsub_oh"><span class="class">String</span>#<span class="method">gsub!</span></a></code> modify the original string.</p>
+
+<div><code class="block">a = "the quick brown fox"
+a.sub(/[aeiou]/,  '*') <span class="output"><span class="outputmark">&rarr;</span> "th* quick brown fox"</span>
+a.gsub(/[aeiou]/, '*') <span class="output"><span class="outputmark">&rarr;</span> "th* q**ck br*wn f*x"</span>
+a.sub(/\s\S+/,  &rdquo;) <span class="output"><span class="outputmark">&rarr;</span> "the brown fox"</span>
+a.gsub(/\s\S+/, &rdquo;) <span class="output"><span class="outputmark">&rarr;</span> "the"</span></code></div>
+
+
+
+<p>The second argument to both functions can be either a <code>String</code> or a block. If a block is used, the block's value is substituted into the <code class="class">String</code>.</p>
+
+<div><code class="block">a = "the quick brown fox"
+a.sub(/^./) { $&amp;.upcase } <span class="output"><span class="outputmark">&rarr;</span> "The quick brown fox"</span>
+a.gsub(/[aeiou]/) { $&amp;.upcase } <span class="output"><span class="outputmark">&rarr;</span> "thE qUIck brOwn fOx"</span></code></div>
+
+
+
+<p>So, this looks like the answer to converting our artists' names. The pattern that matches the first character of a word is <code>\b\w</code>&mdash;look for a word boundary followed by a word character. Combine this with <code class="method">gsub</code> and we can hack the artists' names.</p>
+
+<div><code class="block">def mixedCase(aName)
+  aName.gsub(/\b\w/) { $&amp;.upcase }
+end
+
+mixedCase("fats waller") <span class="output"><span class="outputmark">&rarr;</span> "Fats Waller"</span>
+mixedCase("louis armstrong") <span class="output"><span class="outputmark">&rarr;</span> "Louis Armstrong"</span>
+mixedCase("strength in numbers") <span class="output"><span class="outputmark">&rarr;</span> "Strength In Numbers"</span></code></div>
+
+
+
+
+<h4 id="backslashsequencesinthesubstitution">Backslash Sequences in the Substitution</h4>
+<p>Earlier we noted that the sequences <code>\1</code>, <code>\2</code>, and so on are available in the pattern, standing for the <em>n</em>th group matched so far. The same sequences are available in the second argument of <code class="method">sub</code> and <code>gsub</code>.</p>
+
+<div><code class="block">"fred:smith".sub(/(\w+):(\w+)/, '\2, \1') <span class="output"><span class="outputmark">&rarr;</span> "smith, fred"</span>
+"nercpyitno".gsub(/(.)(.)/, '\2\1') <span class="output"><span class="outputmark">&rarr;</span> "encryption"</span></code></div>
+
+
+
+<p>There are additional backslash sequences that work in substitution strings: <code>\&amp;</code> (last match), <code>\+</code> (last matched group), <code>\`</code> (string prior to match), <code>\'</code> (string after match), and <code>\\</code> (a literal backslash). It gets confusing if you want to include a literal backslash in a substitution.  The obvious thing is to write</p>
+
+<div><code class="block">str.gsub(/\\/, '\\\\')</code></div>
+<p>Clearly, this code is trying to replace each backslash in <var>str</var> with two. The programmer doubled up the backslashes in the replacement text, knowing that they'd be converted to &ldquo;<code>\\</code>&rdquo; in syntax analysis. However, when the substitution occurs, the regular expression engine performs another pass through the string, converting &ldquo;<code>\\</code>&rdquo; to &ldquo;<code>\</code>&rdquo;, so the net effect is to replace each single backslash with another single backslash. You need to write <code>gsub(/\\/, '\\\\\\\\')</code>!</p>
+
+<div><code class="block">str = 'a\b\c' <span class="output"><span class="outputmark">&rarr;</span> "a\b\c"</span>
+str.gsub(/\\/, '\\\\\\\\') <span class="output"><span class="outputmark">&rarr;</span> "a\\b\\c"</span></code></div>
+
+
+
+<p>However, using the fact that <code>\&amp;</code> is replaced by the matched string, you could also write</p>
+
+<div><code class="block">str = 'a\b\c' <span class="output"><span class="outputmark">&rarr;</span> "a\b\c"</span>
+str.gsub(/\\/, '\&amp;\&amp;') <span class="output"><span class="outputmark">&rarr;</span> "a\\b\\c"</span></code></div>
+
+
+
+<p>If you use the block form of <code class="method">gsub</code>, the string for substitution is analyzed only once (during the syntax pass) and the result is what you intended.</p>
+
+<div><code class="block">str = 'a\b\c' <span class="output"><span class="outputmark">&rarr;</span> "a\b\c"</span>
+str.gsub(/\\/) { '\\\\' } <span class="output"><span class="outputmark">&rarr;</span> "a\\b\\c"</span></code></div>
+
+
+
+<p>Finally, as an example of the wonderful expressiveness of combining regular expressions with code blocks, consider the following code fragment from the CGI library module, written by Wakou Aoyama. The code takes a string containing <acronym>HTML</acronym> escape sequences and converts it into normal ASCII. Because it was written for a Japanese audience, it uses the &ldquo;n&rdquo; modifier on the regular expressions, which turns off wide-character processing. It also illustrates Ruby's <code class="keyword">case</code> expression, which we discuss in &ldquo;<a href="tut_expressions.html#caseexpressions">Case Expressions</a>.&rdquo;</p>
+
+<div><code class="block">def unescapeHTML(string)
+  str = string.dup
+  str.gsub!(/&amp;(.*?);/n) {
+    match = $1.dup
+    case match
+    when /\Aamp\z/ni           then '&amp;'
+    when /\Aquot\z/ni          then '"'
+    when /\Agt\z/ni            then '&gt;'
+    when /\Alt\z/ni            then '&lt;'
+    when /\A#(\d+)\z/n         then Integer($1).chr
+    when /\A#x([0-9a-f]+)\z/ni then $1.hex.chr
+    end
+  }
+  str
+end
+
+puts unescapeHTML("1&amp;lt;2 &amp;amp;&amp;amp; 4&amp;gt;3")
+puts unescapeHTML("&amp;quot;A&amp;quot; = &amp;#65; = &amp;#x41;")</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">1&lt;2 &amp;&amp; 4&gt;3
+"A" = A = A</code></div>
+
+<h3 id="objectorientedregularexpressions">Object-Oriented Regular Expressions</h3>
+<p>We have to admit that while all these weird variables are very convenient to use, they aren't very object oriented, and they're certainly cryptic. And didn't we say that everything in Ruby was an object? What's gone wrong here?</p>
+<p>Nothing, really. It's just that when Matz designed Ruby, he produced a fully object-oriented regular expression handling system. He then made it look familiar to Perl programmers by wrapping all these $-variables on top of it all. The objects and classes are still there, underneath the surface.  So let's spend a while digging them out.</p>
+<p>We've already come across one class: regular expression literals create instances of class <code class="class"><a href="ref_c_regexp.html">Regexp</a></code>.</p>
+
+<div><code class="block">re = /cat/
+re.type <span class="output"><span class="outputmark">&rarr;</span> Regexp</span></code></div>
+
+
+
+<p>The method <code class="class_instance_method"><a href="ref_c_regexp.html#Regexp.match"><span class="class">Regexp</span>#<span class="method">match</span></a></code> matches a regular expression against a string. If unsuccessful, the method returns <code>nil</code>. On success, it returns an instance of class <code class="class"><a href="ref_c_matchdata.html">MatchData</a></code>. And that <code class="class">MatchData</code> object gives you access to all available information about the match. All that good stuff that you can get from the $-variables is bundled in a handy little object.</p>
+
+<div><code class="block">re = /(\d+):(\d+)/     # match a time hh:mm
+md = re.match("Time: 12:34am")
+md.type <span class="output"><span class="outputmark">&rarr;</span> MatchData</span>
+md[0]         # == $&amp; <span class="output"><span class="outputmark">&rarr;</span> "12:34"</span>
+md[1]         # == $1 <span class="output"><span class="outputmark">&rarr;</span> "12"</span>
+md[2]         # == $2 <span class="output"><span class="outputmark">&rarr;</span> "34"</span>
+md.pre_match  # == $` <span class="output"><span class="outputmark">&rarr;</span> "Time: "</span>
+md.post_match # == $' <span class="output"><span class="outputmark">&rarr;</span> "am"</span></code></div>
+
+
+
+<p>Because the match data is stored in its own object, you can keep the results of two or more pattern matches available at the same time, something you can't do using the $-variables. In the next example, we're matching the same <code class="class">Regexp</code> object against two strings. Each match returns a unique <code class="class">MatchData</code> object, which we verify by examining the two subpattern fields.</p>
+
+<div><code class="block">re = /(\d+):(\d+)/     # match a time hh:mm
+md1 = re.match("Time: 12:34am")
+md2 = re.match("Time: 10:30pm")
+md1[1, 2] <span class="output"><span class="outputmark">&rarr;</span> ["12", "34"]</span>
+md2[1, 2] <span class="output"><span class="outputmark">&rarr;</span> ["10", "30"]</span></code></div>
+
+
+
+<p>So how do the $-variables fit in? Well, after every pattern match, Ruby stores a reference to the result (<code>nil</code> or a <code class="class">MatchData</code> object) in a thread-local variable (accessible using <var>$~</var>). All the other regular expression variables are then derived from this object. Although we can't really think of a use for the following code, it demonstrates that all the other <code class="class">MatchData</code>-related $-variables are indeed slaved off the value in <var>$~</var>.</p>
+
+<div><code class="block">re = /(\d+):(\d+)/
+md1 = re.match("Time: 12:34am")
+md2 = re.match("Time: 10:30pm")
+[ $1, $2 ]   # last successful match <span class="output"><span class="outputmark">&rarr;</span> ["10", "30"]</span>
+$~ = md1
+[ $1, $2 ]   # previous successful match <span class="output"><span class="outputmark">&rarr;</span> ["12", "34"]</span></code></div>
+
+
+
+<p>Having said all this, we have to 'fess up. Andy and Dave normally use the $-variables rather than worrying about <code class="class">MatchData</code> objects. For everyday use, they just end up being more convenient. Sometimes we just can't help being pragmatic.</p>
+
+
+<div id="menubot" class="menu">
+	<a href="tut_containers.html" class="prev">&lt; Previous</a><a href="tut_methods.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="tut_stdtypes.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

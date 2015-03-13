@@ -1,0 +1,425 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Classes and Objects</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	<a href="language.html" class="prev">&lt; Previous</a><a href="taint.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'classes',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 id="classesandobjects">Classes and Objects</h1>
+<p>Classes and objects are obviously central to Ruby, but at first sight they can seem a little confusing. There seem to be a lot of concepts: classes, objects, class objects, instance methods, class methods, and singleton classes. In reality, however, Ruby has just a single underlying class and object structure, which we'll discuss in this chapter. In fact, the basic model is so simple, we can describe it in a single paragraph.</p>
+<p>A Ruby object has three components: a set of flags, some instance variables, and an associated class. A Ruby class is an object of class <code class="class">Class</code>, which contains all the object things plus a list of methods and a reference to a superclass (which is itself another class). All method calls in Ruby nominate a receiver (which is by default <var>self</var>, the current object). Ruby finds the method to invoke by looking at the list of methods in the receiver's class. If it doesn't find the method there, it looks in the superclass, and then in the superclass's superclass, and so on. If the method cannot be found in the receiver's class or any of its ancestors, Ruby invokes the method <code class="method">method_missing</code> on the original receiver.</p>
+<p>And that's it&mdash;the entire explanation. On to the next chapter.</p>
+<p>&ldquo;But wait,&rdquo; you cry, &ldquo;I spent good money on this chapter. What about all this other stuff&mdash;singleton classes, class methods, and so on. How do they work?&rdquo;</p>
+<p>Good question.</p>
+
+<h2 id="howclassesandobjectsinteract">How Classes and Objects Interact</h2>
+<p>All class/object interactions are explained using the simple model given above: objects reference classes, and classes reference zero or more superclasses. However, the implementation details can get a tad tricky.</p>
+<p>We've found that the simplest way of visualizing all this is to draw the actual objects that Ruby implements. So, in the following pages we'll look at all the possible combinations of classes and objects. Note that these are not class diagrams in the UML sense; we're showing structures in memory and pointers between them.</p>
+
+<h3 id="yourbasiceverydayobject">Your Basic, Everyday Object</h3>
+<p>Let's start by looking at an object created from a simple class. <a href="classes.html#figure_19.1">Figure 19.1</a> shows an object referenced by a variable, <code>lucille</code>, the object's class, <code class="class">Guitar</code>, and that class's superclass, <code class="class">Object</code>. Notice how the object's class reference (called <code>klass</code> for historical reasons that really bug Andy) points to the class object, and how the <code>super</code> pointer from that class references the parent class.</p>
+
+<div class="figure" id="figure_19.1">Figure 19.1 not available...</div>
+
+<p>If we invoke the method <code>lucille.play()</code>, Ruby goes to the receiver, <code>lucille</code>, and follows the <code>klass</code> reference to the class object for <code class="class">Guitar</code>. It searches the method table, finds <code>play</code>, and invokes it.</p>
+
+<p>If instead we call <code>lucile.display()</code>, Ruby starts off the same way, but cannot find <code>display</code> in the method table in the class <code>Guitar</code>. It then follows the <code>super</code> reference to <code>Guitar</code>'s superclass, <code>Object</code>, where it find and executes the method.</p>
+
+<h2 id="whatsthemeta">What's the Meta?</h2>
+
+<p>Astute readers (yup, that's all of you) will have noticed that the <code>klass</code> members of <code class="class">Class</code> objects point to nothing meaningful in <a href="classes.html#figure_19.1">Figure 19.1</a>. We now have all the information we need to work out what they <em>should</em> reference.</p>
+
+<p>When you say <code>lucille.play()</code>, Ruby follows <code>lucille</code>'s <code>klass</code> pointer to find a class object in which to search for methods. So what happens when you invoke a class method, such as <code>Guitar.strings(...)</code>? Here the receiver is the class object itself, <code class="class">Guitar</code>. So, to be consistent, we need to stick the methods in some other class, referenced from <code class="class">Guitar</code>'s <code>klass</code> pointer. This new class will contain all of <code class="class">Guitar</code>'s class methods. It's called a <em>metaclass</em>. We'll denote the metaclass of <code class="class">Guitar</code> as <code class="class">Guitar&prime;</code>. But that's not the whole story. Buecause <code class="class">Guitar</code> is a subclass of <code class="class">Object</code>, its metaclass <code class="class">Guitar&prime;</code> will be a subclass of <code class="class">Object</code>'s metaclass, <code class="class">Object&prime;</code>. In <a href="classes.html#figure_19.2">Figure 19.2</a>, we show these additional metaclasses.</p>
+
+<p>When Ruby executes <code>Guitar.strings()</code>, it follows the same process as before: it goes to the receiver, class <code class="class">Guitar</code>, follows the <code>klass</code> reference to class <code class="class">Guitar&prime;</code>, and finds the method.</p>
+
+<p>Finally, note that an &ldquo;S&rdquo; has crept into the flags in class <code class="class">Guitar&prime;</code>. The classes that Ruby creates automatically are marked internally as <em>singleton classes</em>. Singleton classes are treated slightly differently within Ruby. The most obvious difference from the outside is that they are effectively invisible: they will never appear in a list of objects returned from methods such as <code class="class_instance_method"><a href="ref_c_module.html#Module.ancestors"><span class="class">Module</span>#<span class="method">ancestors</span></a></code> or <code class="module_module_method"><a href="ref_m_objectspace.html#ObjectSpace.each_object"><span class="class">ObjectSpace</span>::<span class="method">each_object</span></a></code>.</p>
+
+<h3 id="objectspecificclasses">Object-Specific Classes</h3>
+<p>Ruby allows you to create a class tied to a particular object. In the following example, we create two <code class="class">String</code> objects. We then associate an anonymous class with one of them, overriding one of the methods in the object's base class and adding a new method.</p>
+
+<div><code class="block">a = "hello"
+b = a.dup
+
+class &lt;&lt;a
+  def to_s
+    "The value is '#{self}'"
+  end
+  def twoTimes
+    self + self
+  end
+end
+
+a.to_s <span class="output"><span class="outputmark">&rarr;</span> "The value is 'hello'"</span>
+a.twoTimes <span class="output"><span class="outputmark">&rarr;</span> "hellohello"</span>
+b.to_s <span class="output"><span class="outputmark">&rarr;</span> "hello"</span></code></div>
+
+
+<p>This example uses the &ldquo;<code>class &lt;&lt;</code><code class="obj">obj</code>&rdquo; notation, which
+basically says &ldquo;build me a new class just for object <code class="obj">obj</code>.&rdquo; We
+could also have written it as:</p>
+
+<div><code class="block">a = "hello"
+b = a.dup
+def a.to_s
+  "The value is '#{self}'"
+end
+def a.twoTimes
+  self + self
+end
+
+a.to_s <span class="output"><span class="outputmark">&rarr;</span> "The value is 'hello'"</span>
+a.twoTimes <span class="output"><span class="outputmark">&rarr;</span> "hellohello"</span>
+b.to_s <span class="output"><span class="outputmark">&rarr;</span> "hello"</span></code></div>
+
+
+<p>The effect is the same in both cases: a class is added to the object
+&ldquo;<code>a</code>&rdquo;. This gives us a strong hint about the Ruby implementation: a singleton class is created and inserted as <code>a</code>'s direct class. <code>a</code>'s original class, <code class="class">String</code>, is made this singleton's superclass. The before and after pictures are shown in <a href="classes.html#figure_19.3">Figure 19.3</a>.</p>
+<p>Ruby performs a slight optimization with these singleton classes. If an object's <code>klass</code> reference already points to a singleton class, a new one will not be created. This means that the first of the two method definitions in the previous example will create a singleton class, but the second will simply add a method to it.</p>
+
+<div class="figure">Figure not available...</div>
+
+<h3 id="mixinmodules">Mixin Modules</h3>
+<p>When a class includes a module, that module's instance methods become available as instance methods of the class. It's almost as if the module becomes a superclass of the class that uses it. Not surprisingly, that's about how it works. When you include a module, Ruby creates an anonymous proxy class that references that module, and inserts that proxy as the direct superclass of the class that did the including. The proxy class contains references to the instance variables and methods of the module. This is important: the same module may be included in many different classes, and will appear in many different inheritance chains. However, thanks to the proxy class, there is still only one underlying module: change a method definition in that module, and it will change in all classes that include that module, both past and future.</p>
+
+<div><code class="block">module SillyModule
+  def hello
+    "Hello."
+  end
+end
+class SillyClass
+  include SillyModule
+end
+s = SillyClass.new
+s.hello <span class="output"><span class="outputmark">&rarr;</span> "Hello."</span>
+
+
+module SillyModule
+  def hello
+    "Hi, there!"
+  end
+end
+s.hello <span class="output"><span class="outputmark">&rarr;</span> "Hi, there!"</span></code></div>
+
+
+<p>The relationship between classes and the modules they include is shown in <a href="classes.html#figure_19.4">Figure 19.4</a>. If multiple modules are included, they are added to the chain in order.</p>
+<div class="figure">Figure not available...</div>
+<p>If a module itself includes other modules, a chain of proxy classes will be added to any class that includes that module, one proxy for each module that is directly or indirectly included.</p>
+
+<h3 id="extendingobjects">Extending Objects</h3>
+<p>Just as you can define an anonymous class for an object using &ldquo;<code>class &lt;&lt;<code class="obj">obj</code></code>&rdquo;, you can mix a module into an object using <code class="class_instance_method"><a href="ref_c_object.html#Object.extend"><span class="class">Object</span>#<span class="method">extend</span></a></code>. For example:</p>
+
+<div><code class="block">module Humor
+  def tickle
+    "hee, hee!"
+  end
+end
+
+a = "Grouchy"
+a.extend Humor
+a.tickle <span class="output"><span class="outputmark">&rarr;</span> "hee, hee!"</span></code></div>
+
+
+<p>There is an interesting trick with <code class="method">extend</code>. If you use it within a class definition, the module's methods become class methods.</p>
+
+<div><code class="block">module Humor
+  def tickle
+    "hee, hee!"
+  end
+end
+
+class Grouchy
+  include Humor
+  extend  Humor
+end
+
+Grouchy.tickle <span class="output"><span class="outputmark">&rarr;</span> "hee, hee!"</span>
+a = Grouchy.new
+a.tickle <span class="output"><span class="outputmark">&rarr;</span> "hee, hee!"</span></code></div>
+
+
+<p>This is because calling <code class="method">extend</code> is equivalent to <code>self.extend</code>, so the methods are added to <code>self</code>, which in a class definition is the class itself.</p>
+
+<h2 id="classandmoduledefinitions">Class and Module Definitions</h2>
+<p>Having exhausted the combinations of classes and objects, we can (thankfully) get back to programming by looking at the nuts and bolts of class and module definitions.</p>
+<p>In languages such as C++ and Java, class definitions are processed at compile time: the compiler loads up symbol tables, works out how much storage to allocate, constructs dispatch tables, and does all those other obscure things we'd rather not think too hard about.</p>
+<p>Ruby is different. In Ruby, class and module definitions are executable code. Although parsed at compile time, the classes and modules are created at runtime, when the definition is encountered. (The same is also true of method definitions.) This allows you to structure your programs far more dynamically than in most conventional languages. You can make decisions once, when the class is being defined, rather than each time that objects of the class are used. The class in the following example decides as it is being defined what version of a decryption routine to create.</p>
+
+<div><code class="block">class MediaPlayer
+  include Tracing if $DEBUGGING
+
+  if ::EXPORT_VERSION
+    def decrypt(stream)
+      raise "Decryption not available"
+    end
+  else
+    def decrypt(stream)
+      # ...
+    end
+  end
+
+end</code></div>
+<p>If class definitions are executable code, this implies that they execute in the context of some object: <var>self</var> must reference <em>something</em>. Let's find out what it is.</p>
+
+<div><code class="block">class Test
+  puts "Type of self = #{self.type}"
+  puts "Name of self = #{self.name}"
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Type of self = Class
+Name of self = Test</code></div>
+<p>This means that a class definition is executed with that class as the current object. Referring back to the <a href="classes.html#whatsthemeta">section about metaclasses</a>, we can see that this means that methods in the metaclass and its superclasses will be available during the execution of the method definition. We can check this out.</p>
+
+<div><code class="block">class Test
+  def Test.sayHello
+	puts "Hello from #{name}"
+  end
+
+  sayHello
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Hello from Test</code></div>
+<p>In this example we define a class method, <code class="class_class_method"><span class="class">Test</span>.<span class="method">sayHello</span></code>, and then call it in the body of the class definition. Within <code>sayHello</code>, we call <code class="method">name</code>, an instance method of class <code class="class">Module</code>. Because <code class="class">Module</code> is an ancestor of <code class="class">Class</code>, its instance methods can be called without an explicit receiver within a class definition.</p>
+<p>In fact, many of the directives that you use when defining a class or module, things such as <code class="method">alias_method</code>, <code class="method">attr</code>, and <code class="method">public</code>, are simply methods in class <code class="class">Module</code>. This opens up some interesting possibilities&mdash;you can extend the functionality of class and module definitions by writing Ruby code. Let's look at a couple of examples.</p>
+<p>As a first example, let's look at adding a basic documentation facility to modules and classes. This would allow us to associate a string with modules and classes that we write, a string that is accessible as the program is running. We'll choose a simple syntax.</p>
+
+<div><code class="block">class Example
+  doc "This is a sample documentation string"
+  # .. rest of class
+end</code></div>
+<p>We need to make <code class="method">doc</code> available to any module or class, so we need to make it an instance method of class <code class="class">Module</code>.</p>
+
+<div><code class="block">class Module
+  @@docs = Hash.new(nil)
+  def doc(str)
+    @@docs[self.name] = str
+  end
+
+  def Module::doc(aClass)
+    # If we're passed a class or module, convert to string
+    # ('&lt;=' for classes checks for same class or subtype)
+    aClass = aClass.name if aClass.type &lt;= Module
+    @@docs[aClass] || "No documentation for #{aClass}"
+  end
+end
+
+class Example
+  doc "This is a sample documentation string"
+  # .. rest of class
+end
+
+module Another
+  doc &lt;&lt;-edoc
+    And this is a documentation string
+    in a module
+  edoc
+  # rest of module
+end
+
+puts Module::doc(Example)
+puts Module::doc("Another")</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">This is a sample documentation string
+      And this is a documentation string
+      in a module</code></div>
+<p>The second example is a performance enhancement based on Tadayoshi Funaba's <code><a href="lib_standard.html#Date">Date</a></code> module. Say we have a class that represents some underlying quantity (in this case, a date).  The class may have many attributes that present the same underlying date in different ways: as a Julian day number, as a string, as a [year, month, day] triple, and so on. Each value represents the same date and may involve a fairly complex calculation to derive. We therefore would like to calculate each attribute only once, when it is first accessed.</p>
+<p>The manual way would be to add a test to each accessor:</p>
+
+<div><code class="block">class ExampleDate
+  def initialize(dayNumber)
+    @dayNumber = dayNumber
+  end
+
+  def asDayNumber
+    @dayNumber
+  end
+
+  def asString
+    unless @string
+      # complex calculation
+      @string = result
+    end
+    @string
+  end
+
+  def asYMD
+    unless @ymd
+      # another calculation
+      @ymd = [ y, m, d ]
+    end
+    @ymd
+  end
+  # ...
+end</code></div>
+<p>This is a clunky technique&mdash;let's see if we can come up with something sexier.</p>
+<p>What we're aiming for is a directive that indicates that the body of a particular method should be invoked only once. The value returned by that first call should be cached. Thereafter, calling that same method should return the cached value without reevaluating the method body again. This is similar to Eiffel's <code>once</code> modifier for routines. We'd like to be able to write something like:</p>
+
+<div><code class="block">class ExampleDate
+  def asDayNumber
+    @dayNumber
+  end
+
+  def asString
+    # complex calculation
+  end
+
+  def asYMD
+    # another calculation
+    [ y, m, d ]
+  end
+
+  once :asString, :asYMD
+end</code></div>
+<p>We can use <code>once</code> as a directive by writing it as a class method of <code class="class">ExampleDate</code>, but what should it look like internally?  The trick is to have it rewrite the methods whose names it is passed. For each method, it creates an alias for the original code, then creates a new method with the same name. This new method does two things. First, it invokes the original method (using the alias) and stores the resulting value in an instance variable. Second, it redefines itself, so that on subsequent calls it simply returns the value of the instance variable directly. Here's  Tadayoshi Funaba's code, slightly reformatted.</p>
+
+<div><code class="block">def ExampleDate.once(*ids)
+  for id in ids
+    module_eval &lt;&lt;-"end_eval"
+      alias_method :__#{id.to_i}__, #{id.inspect}
+      def #{id.id2name}(*args, &amp;block)
+        def self.#{id.id2name}(*args, &amp;block)
+          @__#{id.to_i}__
+        end
+        @__#{id.to_i}__ = __#{id.to_i}__(*args, &amp;block)
+      end
+    end_eval
+  end
+end</code></div>
+<p>This code uses <code>module_eval</code> to execute a block of code in the context of the calling module (or, in this case, the calling class). The original method is renamed <em>__nnn__</em>, where the <em>nnn</em> part is the integer representation of the method name's symbol id. The code uses the same name for the caching instance variable. The bulk of the code is a method that dynamically redefines itself. Note that this redefinition uses the fact that methods may contain nested singleton method definitions, a clever trick.</p>
+<p>Understand this code, and you'll be well on the way to true Ruby mastery.</p>
+<p>However, we can take it further. Look in the <code class="method">date</code> module, and you'll see method <code>once</code> written slightly differently.</p>
+
+<div><code class="block">class Date
+  class &lt;&lt; self
+    def once(*ids)
+      # ...
+    end
+  end
+  # ...
+end</code></div>
+<p>The interesting thing here is the inner class definition,
+&ldquo;<code>class &lt;&lt; self</code>&rdquo;. This defines a class based on the object <code class="const">self</code>, and <code class="const">self</code> happens to be the class object for <code class="class">Date</code>. The result? Every method within the inner class definition is automatically a class method of <code class="class">Date</code>.</p>
+<p>The <code class="method">once</code> feature is generally applicable&mdash;it should work for any class. If you took <code class="method">once</code> and made it a private instance method of class <code class="class">Module</code>, it would be available for use in any Ruby class.</p>
+
+<h3 id="classnamesareconstants">Class Names Are Constants</h3>
+<p>We've said that when you invoke a class method, all you're doing is sending a message to the <code class="class">Class</code> object itself. When you say something such as <code>String.new("gumby")</code>, you're sending the message <code class="method">new</code> to the object that is class <code class="class">String</code>. But how does Ruby know to do this? After all, the receiver of a message should be an object reference, which implies that there must be a constant called &ldquo;String&rdquo; somewhere containing a reference to the <code class="class">String</code> object. <span class="footnote">(It will be a constant, not a variable,
+  because &ldquo;String&rdquo; starts with an uppercase letter.)</span> And in fact, that's exactly what happens. All the built-in classes, along with the classes you define, have a corresponding global constant with the same name as the class. This is both straightforward and subtle. The subtlety comes from the fact that there are actually two things named (for example) <code class="class">String</code> in the system. There's a <em>constant</em> that references an object of class <code class="class">String</code>, and there's the object itself.</p>
+<p>The fact that class names are just constants means that you can treat classes just like any other Ruby object: you can copy them, pass them to methods, and use them in expressions.</p>
+
+<div><code class="block">def factory(klass, *args)
+  klass.new(*args)
+end
+
+factory(String, "Hello") <span class="output"><span class="outputmark">&rarr;</span> "Hello"</span>
+factory(Dir,    ".") <span class="output"><span class="outputmark">&rarr;</span> #&lt;Dir:0x401b51bc&gt;</span>
+
+flag = true
+(flag ? Array : Hash)[1, 2, 3, 4] <span class="output"><span class="outputmark">&rarr;</span> [1, 2, 3, 4]</span>
+flag = false
+(flag ? Array : Hash)[1, 2, 3, 4] <span class="output"><span class="outputmark">&rarr;</span> {1=&gt;2, 3=&gt;4}</span></code></div>
+
+
+
+<h2 id="toplevelexecutionenvironment">Top-Level Execution Environment</h2>
+<p>Many times in this book we've claimed that everything in Ruby is an object. However, there's one thing that we've used time and time again that appears to contradict this&mdash;the top-level Ruby execution environment.</p>
+
+<div><code class="block">puts "Hello, World"</code></div>
+<p>Not an object in sight. We may as well be writing some variant of Fortran or QW-Basic.  But dig deeper, and you'll come across objects and classes lurking in even the simplest code.</p>
+<p>We know that the literal <code>"Hello, World"</code> generates a Ruby <code class="class">String</code>, so there's one object. We also know that the bare method call to <code class="method">puts</code> is effectively the same as <code>self.puts</code>. But what is &ldquo;self&rdquo;?</p>
+
+<div><code class="block">self.type <span class="output"><span class="outputmark">&rarr;</span> Object</span></code></div>
+
+
+<p>At the top level, we're executing code in the context of some predefined object. When we define methods, we're actually creating (private) singleton methods for this object. Instance variables belong to this object. And because we're in the context of <code class="class">Object</code>, we can use all of <code class="class">Object</code>'s methods (including those mixed-in from <code class="module">Kernel</code>) in function form. This explains why we can call <code class="module">Kernel</code> methods such as <code class="method">puts</code> at the top level (and indeed throughout Ruby): these methods are part of every object.</p>
+
+<h2 id="inheritanceandvisibility">Inheritance and Visibility</h2>
+<p>There's one last wrinkle to class inheritance, and it's fairly obscure.</p>
+<p>Within a class definition, you can change the visibility of a method in an ancestor class. For example, you can do something like:</p>
+
+<div><code class="block">class Base
+  def aMethod
+    puts "Got here"
+  end
+  private :aMethod
+end
+
+class Derived1 &lt; Base
+  public :aMethod
+end
+
+class Derived2 &lt; Base
+end</code></div>
+<p>In this example, you would be able to invoke <code class="method">aMethod</code> in instances of class <code class="class">Derived1</code>, but not via instances of <code class="class">Base</code> or <code class="class">Derived2</code>.</p>
+<p>So how does Ruby pull off this feat of having one method with two different visibilities? Simply put, it cheats.</p>
+<p>If a subclass changes the visibility of a method in a parent, Ruby effectively inserts a hidden proxy method in the subclass that invokes the original method using <code class="keyword">super</code>. It then sets the visibility of that proxy to whatever you requested. This means that the code:</p>
+
+<div><code class="block">class Derived1 &lt; Base
+  public :aMethod
+end</code></div>
+<p>is effectively the same as:</p>
+
+<div><code class="block">class Derived1 &lt; Base
+  def aMethod(*args)
+    super
+  end
+  public :aMethod
+end</code></div>
+<p>The call to <code class="keyword">super</code> can access the parent's method regardless of
+its visibility, so the rewrite allows the subclass to override its
+parent's visibility rules. Pretty scary, eh?</p>
+
+<h2 id="freezingobjects">Freezing Objects</h2>
+<p>There are times when you've worked hard to make your object exactly right, and you'll be damned if you'll let anyone just change it. Perhaps you need to pass some kind of opaque object between two of your classes via some third-party object, and you want to make sure it arrives unmodified. Perhaps you want to use an object as a hash key, and need to make sure that no one modifies it while it's being used. Perhaps something is corrupting one of your objects, and you'd like Ruby to raise an exception as soon as the change occurs.</p>
+<p>Ruby provides a very simple mechanism to help with this. Any object can be <em>frozen</em> by invoking <code class="class_instance_method"><a href="ref_c_object.html#Object.freeze"><span class="class">Object</span>#<span class="method">freeze</span></a></code>. A frozen object may not be modified: you can't change its instance variables (directly or indirectly), you can't associate singleton methods with it, and, if it is a class or module, you can't add, delete, or modify its methods. Once frozen, an object stays frozen: there is no <code class="class_instance_method"><a href="ref_c_object.html#Object.thaw"><span class="class">Object</span>#<span class="method">thaw</span></a></code>. You can test to see if an object is frozen using <code class="class_instance_method"><a href="ref_c_object.html#Object.frozen_qm"><span class="class">Object</span>#<span class="method">frozen?</span></a></code>.</p>
+<p>What happens when you copy a frozen object? That depends on the method you use. If you call an object's <code class="method">clone</code> method, the entire object state (including whether it is frozen) is copied to the new object. On the other hand, <code class="method">dup</code> typically copies only the object's contents&mdash;the new copy will not inherit the frozen status.</p>
+
+<div><code class="block">str1 = "hello"
+str1.freeze <span class="output"><span class="outputmark">&rarr;</span> "hello"</span>
+str1.frozen? <span class="output"><span class="outputmark">&rarr;</span> true</span>
+str2 = str1.clone
+str2.frozen? <span class="output"><span class="outputmark">&rarr;</span> true</span>
+str3 = str1.dup
+str3.frozen? <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+
+<p>Although freezing objects may initially seem like a good idea, you might want to hold off doing it until you come across a real need. Freezing is one of those ideas that looks essential on paper but isn't used much in practice.</p>
+
+
+<div id="menubot" class="menu">
+	<a href="language.html" class="prev">&lt; Previous</a><a href="taint.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="classes.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

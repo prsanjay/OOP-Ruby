@@ -1,0 +1,1585 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Network and Web Libraries</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	<a href="lib_patterns.html" class="prev">&lt; Previous</a><a href="lib_windows.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'lib_network',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+
+<h1 id="networkandweblibraries">Network and Web Libraries</h1>
+
+<p>Ruby provides two levels of access to network services. At a low level, you can access the basic socket support in the underlying operating system, which allows you to implement clients and servers for both connection-oriented and connectionless protocols. These are documented in the next section.</p>
+
+<p>Ruby also has libraries that provide higher-level access to specific application-level network protocols, such as FTP, HTTP, and so on. These are documented starting in the section &ldquo;<a href="lib_network.html#higherlevelaccess"></a>.&rdquo;</p>
+
+<p>Finally, the <code class="class">CGI</code> libraries, documented in &ldquo;<a href="lib_network.html#cgidevelopment">CGI Development</a>,&rdquo; provide server-side developers with a convenient interface for developing Web applications.</p>
+
+<h1 id="socketlevelaccess">Socket-Level Access</h1>
+
+<p>Sockets are the endpoints of a bidirectional communications channel. Sockets may communicate within a process, between processes on the same machine, or between processes on different continents. Sockets may be implemented over a number of different channel types: Unix domain sockets, TCP, UDP, and so on. The socket library provides specific classes for handling the common transports as well as a generic interface for handling the rest. All functionality in the socket library is accessible through a single extension library. Access it using</p>
+
+<div><code class="block">require 'socket'</code></div>
+
+<p>Sockets have their own vocabulary:</p>
+
+<dl>
+	<dt><strong>domain</strong></dt>
+	<dd>The family of protocols that will be used as the transport mechanism. These values are constants such as <code>PF_INET</code>, <code>PF_UNIX</code>, <code>PF_X25</code>, and so on.</dd>
+	
+	<dt><strong>type</strong></dt>
+	<dd>The type of communications between the two endpoints, typically <code>SOCK_STREAM</code> for connection-oriented protocols and <code>SOCK_DGRAM</code> for connectionless protocols.</dd>
+	
+	<dt><strong>protocol</strong></dt>
+	<dd>Typically zero, this may be used to identify a variant of a protocol within a domain and type.</dd>
+	
+	<dt><strong>hostName</strong></dt>
+	<dd>The identifier of a network interface:
+	  <ul>
+	  <li>a string, which can be a host name, a dotted-quad address, or an IPV6 address in colon (and possibly dot) notation,
+	  </li><li>the string &ldquo;&lt;broadcast&gt;&rdquo;, which specifies an <code>INADDR_BROADCAST</code> address,
+	  </li><li>a zero-length string, which specifies <code>INADDR_ANY</code>, or
+	  </li><li>an <code class="class">Integer</code>, interpreted as a binary address in host byte order.
+	  </li></ul></dd>
+	
+	<dt><strong>port</strong></dt>
+	<dd>(sometimes called <b>service</b>) Each server listens for clients calling on one or more ports. A port may be a <code class="class">Fixnum</code> port number, a string containing a port number, or the name of a service. </dd>
+</dl>
+
+<p>Sockets are children of class <code class="class">IO</code>. Once a socket has been successfully opened, the conventional I/O methods may be used. However, greater efficiency is sometimes obtained by using socket-specific methods. As with other I/O classes, socket I/O blocks by default. The hierarchy of the socket classes is shown in <a href="lib_network.html#figure_26.1">Figure 26.1</a>.</p>
+
+<p>For more information on the use of sockets, see your operating system documentation. You'll also find a comprehensive treatment in W. Richard Stevens, <em>Unix Network Programming, Volumes 1 and 2</em>.</p>
+
+
+<hr class="classbreak">
+
+
+<h1 id="BasicSocket" class="class">class <strong>BasicSocket</strong> &lt; IO</h1>  
+
+<p><code class="class">BasicSocket</code> is an abstract base class for all other socket classes.</p>
+
+<p>This class and its subclasses often manipulate addresses using something called a <code>struct sockaddr</code>,   which is effectively an opaque binary string. <span class="footnote">(In reality, it maps onto the underlying C-language <code>struct sockaddr</code> set of structures, documented in the man pages and in the books by Stevens.)</span></p>
+    
+<h2 class="refsubsection" id="BasicSocket.classmethods">BasicSocket class methods</h2>
+<dl class="methodlist">
+	<dt id="BasicSocket.do_not_reverse_lookup">do_not_reverse_lookup</dt>
+		<dd class="callseq">BasicSocket.do_not_reverse_lookup  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns the value of the global reverse lookup flag. If set to 
+      <code class="const">true</code>, queries on remote addresses will return the
+      numeric address but not the host name.</dd>
+
+	<dt id="BasicSocket.do_not_reverse_lookup_eq">do_not_reverse_lookup=</dt>
+		<dd class="callseq">BasicSocket.do_not_reverse_lookup = <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Sets the global reverse lookup flag.</dd>
+
+	<dt id="BasicSocket.lookup_order">lookup_order</dt>
+		<dd class="callseq">BasicSocket.lookup_order  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc"><p>Returns the global address lookup order, one of:</p>
+
+		  <table><thead><tr>
+			<th>Order</th>
+			<th>Families Searched</th>
+		</tr></thead>
+		<tr class="firstRow">
+		  <td><code>LOOKUP_UNSP</code></td>
+		  <td><code>AF_UNSPEC</code></td>
+		</tr>
+		<tr>
+		  <td><code>LOOKUP_INET</code></td>
+		  <td><code>AF_INET</code>, <code>AF_INET6</code>, <code>AF_UNSPEC</code></td>
+		</tr>
+		<tr>
+		  <td><code>LOOKUP_INET6</code></td>
+		  <td><code>AF_INET6</code>, <code>AF_INET</code>, <code>AF_UNSPEC</code></td>
+		</tr>
+		</table></dd>
+
+	<dt id="BasicSocket.lookup_order_eq">lookup_order=</dt>
+		<dd class="callseq">BasicSocket.lookup_order = <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Sets the global address lookup order.</dd>
+</dl>
+
+<h2 class="refsubsection" id="BasicSocket.instancemethods">BasicSocket instance methods</h2>
+<dl class="methodlist">
+	<dt id="BasicSocket.close_read">close_read</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.close_read  &rarr; <code>nil</code></dd>
+		<dd class="desc">Closes the readable connection on this socket.</dd>
+
+	<dt id="BasicSocket.close_write">close_write</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.close_write  &rarr; <code>nil</code></dd>
+		<dd class="desc">Closes the writable connection on this socket.</dd>
+
+	<dt id="BasicSocket.getpeername">getpeername</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.getpeername  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns the <code>struct sockaddr</code> structure associated with the other end of this socket connection.</dd>
+
+	<dt id="BasicSocket.getsockname">getsockname</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.getsockname  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns the <code>struct sockaddr</code> structure associated with <i class="obj">aSession</i>.</dd>
+
+	<dt id="BasicSocket.getsockopt">getsockopt</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.getsockopt( <i class="obj">level</i>, <i class="obj">optname</i> )  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns the value of the specified option.</dd>
+
+	<dt id="BasicSocket.recv">recv</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.recv( <i class="obj">len</i>, <i>[</i>, <i class="obj">flags</i><i>]</i> )  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Receives up to <i class="obj">len</i> bytes from <i class="obj">aSession</i>.</dd>
+
+	<dt id="BasicSocket.send">send</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.send( <i class="obj">aString</i>, <i class="obj">flags</i>, <i>[</i>, <i class="obj">to</i><i>]</i> )  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Sends <i class="obj">aString</i> over <i class="obj">aSession</i>. If specified, <i class="obj">to</i> is a <code>struct sockaddr</code> specifying the recipient address. <i class="obj">flags</i> are the sum or one or more of the <code>MSG_</code> options (listed under <a href="lib_network.html#Socket.classconstants"><code>Socket</code> constants</a>). Returns the number of characters sent.</dd>
+
+	<dt id="BasicSocket.setsockopt">setsockopt</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.setsockopt( <i class="obj">level</i>, <i class="obj">optname</i>, <i class="obj">optval</i> )  &rarr; 0</dd>
+		<dd class="desc">Sets a socket option. <i class="obj">level</i> is one of the socket-level options (listed under <a href="lib_network.html#Socket.classconstants"><code>Socket</code> constants</a>). <i class="obj">optname</i> and <i class="obj">optval</i> are protocol specific&mdash;see your system documentation for details.</dd>
+
+	<dt id="BasicSocket.shutdown">shutdown</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.shutdown( <i class="obj">how</i>=2 )  &rarr; 0</dd>
+		<dd class="desc">Shuts down the receive (<i class="obj">how</i> == 0), or send (<i class="obj">how</i> == 1), or both (<i class="obj">how</i> == 2), parts of this socket.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="IPSocket" class="class">class <strong>IPSocket</strong> &lt; BasicSocket</h1>  
+
+<p>Class <code class="class">IPSocket</code> is a base class for sockets using IP as their transport. <code class="class">TCPSocket</code> and <code class="class">UDPSocket</code> are based on this class.</p>
+
+
+<h2 class="refsubsection" id="IPSocket.classmethods">IPSocket class methods</h2>
+<dl class="methodlist">
+	<dt id="IPSocket.getaddress">getaddress</dt>
+		<dd class="callseq">IPSocket.getaddress( <i class="obj">hostName</i> )  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns the dotted-quad IP address of <i class="obj">hostName</i>.
+
+<div><code class="block">a = IPSocket.getaddress('www.ruby-lang.org')
+a <span class="output"><span class="outputmark">&rarr;</span> "210.251.121.214"</span></code></div></dd>
+</dl>
+
+<h2 class="refsubsection" id="IPSocket.instancemethods">IPSocket instance methods</h2>
+<dl class="methodlist">
+	<dt id="IPSocket.addr">addr</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.addr  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns the domain, port, name, and IP address of <i class="obj">aSession</i> as a four-element array. The name will be returned as an address if the <code>do_not_reverse_lookup</code> flag is <code class="const">true</code>.
+
+<div><code class="block">u = UDPSocket.new
+u.bind('localhost', 8765)
+u.addr  <span class="output2"><span class="outputmark">&rarr;</span> ["AF_INET", 8765, "localhost", "127.0.0.1"]</span>
+BasicSocket.do_not_reverse_lookup = true
+u.addr  <span class="output2"><span class="outputmark">&rarr;</span> ["AF_INET", 8765, "127.0.0.1", "127.0.0.1"]</span></code></div></dd>
+
+	<dt id="IPSocket.peeraddr">peeraddr</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.peeraddr  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns the domain, port, name, and IP address of the peer.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="TCPSocket" class="class">class <strong>TCPSocket</strong> &lt; IPSocket</h1>  
+
+<div><code class="block">t = TCPSocket.new('localhost', 'ftp')
+t.gets   <span class="output2"><span class="outputmark">&rarr;</span> "220 zip.local.thomases.com FTP server (Version 6.5/OpenBSD, linux port 0.3.2) ready.\r\n"</span>
+t.close  <span class="output2"><span class="outputmark">&rarr;</span> nil</span></code></div>
+
+
+<h2 class="refsubsection" id="TCPSocket.classmethods">TCPSocket class methods</h2>
+<dl class="methodlist">
+	<dt id="TCPSocket.gethostbyname">gethostbyname</dt>
+		<dd class="callseq">TCPSocket.gethostbyname( <i class="obj">hostName</i> )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Looks up <i class="obj">hostName</i> and returns its canonical name, an array containing any aliases, the address type (<code>AF_INET</code>), and the dotted-quad IP address.
+
+<div><code class="block">a = TCPSocket.gethostbyname('ns.pragprog.com')
+a  <span class="output2"><span class="outputmark">&rarr;</span> ["pragprog.com", [], 2, "216.87.136.211"]</span></code></div></dd>
+
+	<dt id="TCPSocket.new">new</dt>
+		<dd class="callseq">TCPSocket.new( <i class="obj">hostName</i>, <i class="obj">port</i> )  &rarr; <i class="obj">aSession</i></dd>
+		<dd class="desc">Opens a TCP connection to <i class="obj">hostName</i> on the <i class="obj">port</i>.</dd>
+
+	<dt id="TCPSocket.open">open</dt>
+		<dd class="callseq">TCPSocket.open( <i class="obj">hostName</i>, <i class="obj">port</i> )  &rarr; <i class="obj">aSession</i></dd>
+		<dd class="desc">Synonym for <code class="class_class_method"><span class="class">TCPSocket</span>.<span class="method">new</span></code>.</dd>
+</dl>
+
+<h2 class="refsubsection" id="TCPSocket.instancemethods">TCPSocket instance methods</h2>
+<dl class="methodlist">
+	<dt id="TCPSocket.recvfrom">recvfrom</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.recvfrom( <i class="obj">len</i> <i>[</i>, <i class="obj">flags</i><i>]</i> )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Receives up to <i class="obj">len</i> bytes on the connection. <i class="obj">flags</i> is zero or more of the <code>MSG_</code> options (listed under <a href="lib_network.html#Socket.classconstants"><code>Socket</code> constants</a>). Returns a two-element array. The first element is the received data, the second is an array containing information about the peer.
+
+<div><code class="block">t = TCPSocket.new('localhost', 'ftp')
+data = t.recvfrom(30)
+data</code></div></dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="SOCKSSocket" class="class">class <strong>SOCKSSocket</strong> &lt; TCPSocket</h1>    
+
+<p>Class <code class="class">SOCKSSocket</code> supports connections based on the SOCKS protocol.</p>
+
+
+<h2 class="refsubsection" id="SOCKSSocket.classmethods">SOCKSSocket class methods</h2>
+<dl class="methodlist">
+	<dt id="SOCKSSocket.new">new</dt>
+		<dd class="callseq">SOCKSSocket.new( <i class="obj">hostName</i>, <i class="obj">port</i> )  &rarr; <i class="obj">aSession</i></dd>
+		<dd class="desc">Opens a SOCKS connection to <i class="obj">port</i> on <i class="obj">hostName</i>.</dd>
+
+	<dt id="SOCKSSocket.open">open</dt>
+		<dd class="callseq">SOCKSSocket.open( <i class="obj">hostName</i>, <i class="obj">port</i> )  &rarr; <i class="obj">aSession</i></dd>
+		<dd class="desc">Synonym for <code class="class_class_method"><span class="class">SOCKSSocket</span>.<span class="method">new</span></code>.</dd>
+</dl>
+
+<h2 class="refsubsection" id="SOCKSSocket.instancemethods">SOCKSSocket instance methods</h2>
+<dl class="methodlist">
+	<dt id="SOCKSSocket.close">close</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.close  &rarr; <code>nil</code></dd>
+		<dd class="desc">Closes this SOCKS connection.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="TCPServer" class="class">class <strong>TCPServer</strong> &lt; TCPSocket</h1>    
+
+<p>A <code class="class">TCPServer</code> accepts incoming TCP connections. Here is a Web server that listens on a given port and returns the time.</p>
+
+<div><code class="block">require 'socket'
+port = (ARGV[0] || 80).to_i
+server = TCPServer.new('localhost', port)
+while (session = server.accept)
+  puts "Request: #{session.gets}"
+  session.print "HTTP/1.1 200/OK\r\nContent-type: text/html\r\n\r\n"
+  session.print "&lt;html&gt;&lt;body&gt;&lt;h1&gt;#{Time.now}&lt;/h1&gt;&lt;/body&gt;&lt;/html&gt;\r\n"
+  session.close
+end</code></div>
+
+
+<h2 class="refsubsection" id="TCPServer.classmethods">TCPServer class methods</h2>
+<dl class="methodlist">
+	<dt id="TCPServer.new">new</dt>
+		<dd class="callseq">TCPServer.new( <i>[</i><i class="obj">hostName</i>,<i>]</i> <i class="obj">port</i> )  &rarr; <i class="obj">aSession</i></dd>
+		<dd class="desc">Creates a new socket on the given interface (identified by <i class="obj">hostName</i> and port). If <i class="obj">hostName</i> is omitted, the server will listen on all interfaces on the current host (equivalent to an address of 0.0.0.0).</dd>
+
+	<dt id="TCPServer.open">open</dt>
+		<dd class="callseq">TCPServer.open( <i>[</i><i class="obj">hostName</i>,<i>]</i> <i class="obj">port</i> )  &rarr; <i class="obj">aSession</i></dd>
+		<dd class="desc">Synonym for <code class="class_class_method"><span class="class">TCPServer</span>.<span class="method">new</span></code>.</dd>
+</dl>
+
+<h2 class="refsubsection" id="TCPServer.instancemethods">TCPServer instance methods</h2>
+<dl class="methodlist">
+	<dt id="TCPServer.accept">accept</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.accept  &rarr; <i class="obj">aTCPSocket</i></dd>
+		<dd class="desc">Waits for a connection on <i class="obj">aSession</i>, and returns a new <code class="class">TCPSocket</code> connected to the caller. See the example at the start of this class.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="UDPSocket" class="class">class <strong>UDPSocket</strong> &lt; IPSocket</h1>  
+
+<p>UDP sockets send and receive datagrams. In order to receive data, a socket must be bound to a particular port. You have two choices when sending data: you can connect to a remote UDP socket and thereafter send datagrams to that port, or you can specify a host and port for use with every packet you send. This example is a UDP server that prints the message it receives. It is called by both connectionless and connection-based clients.</p>
+
+<div><code class="block">require 'socket'
+
+$port = 4321
+
+sThread = Thread.start do     # run server in a thread
+  server = UDPSocket.open
+  server.bind(nil, $port)
+  2.times { p server.recvfrom(64) }
+end
+
+# Ad-hoc client
+UDPSocket.open.send("ad hoc", 0, 'localhost', $port)
+
+# Connection based client
+sock = UDPSocket.open
+sock.connect('localhost', $port)
+sock.send("connection-based", 0)
+sThread.join</code></div>
+
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">["ad hoc", ["AF_INET", 33224, "localhost", "127.0.0.1"]]
+["connection-based", ["AF_INET", 33225, "localhost", "127.0.0.1"]]</code></div>
+
+
+<h2 class="refsubsection" id="UDPSocket.classmethods">UDPSocket class methods</h2>
+<dl class="methodlist">
+	<dt id="UDPSocket.new">new</dt>
+		<dd class="callseq">UDPSocket.new( <i class="obj">family</i> = <code>AF_INET</code> )  &rarr; <i class="obj">aSession</i></dd>
+		<dd class="desc">Creates an endpoint for UDP communications, optionally specifying the address family.</dd>
+
+	<dt id="UDPSocket.open">open</dt>
+		<dd class="callseq">UDPSocket.open( <i class="obj">family</i> = <code>AF_INET</code> )  &rarr; <i class="obj">aSession</i></dd>
+		<dd class="desc">Synonym for <code class="class_class_method"><span class="class">UDPSocket</span>.<span class="method">new</span></code>.</dd>
+</dl>
+
+<h2 class="refsubsection" id="UDPSocket.instancemethods">UDPSocket instance methods</h2>
+<dl class="methodlist">
+	<dt id="UDPSocket.bind">bind</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.bind( <i class="obj">hostName</i>, <i class="obj">port</i> )  &rarr; 0</dd>
+		<dd class="desc">Associates the local end of the UDP connection with a given <i class="obj">hostName</i> and <i class="obj">port</i>. Must be used by servers to establish an accessible endpoint.</dd>
+
+	<dt id="UDPSocket.connect">connect</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.connect( <i class="obj">hostName</i>, <i class="obj">port</i> )  &rarr; 0</dd>
+		<dd class="desc">Creates a connection to the given <i class="obj">hostName</i> and <i class="obj">port</i>. Subsequent <code class="class_instance_method"><span class="class">UDPSocket</span>#<span class="method">send</span></code> requests that don't override the recipient will use this connection. Multiple <code>connect</code> requests may be issued on <i class="obj">aSession</i>: the most recent will be used by <code>send</code>.</dd>
+
+	<dt id="UDPSocket.recvfrom">recvfrom</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.recvfrom( <i class="obj">len</i> <i>[</i>, <i class="obj">flags</i><i>]</i> )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Receives up to <i class="obj">len</i> bytes from <i class="obj">aSession</i>. <i class="obj">flags</i> is zero or more of the <code>MSG_</code> options (listed under <a href="lib_network.html#Socket.classconstants"><code>Socket</code> constants</a>). The result is a two-element array containing the received data and information on the sender. See the example at the start of the documentation for this class.</dd>
+
+	<dt id="UDPSocket.send">send</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.send( <i class="obj">aString</i>, <i class="obj">flags</i> )  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="callseq"><i class="obj">aSession</i>.send( <i class="obj">aString</i>, <i class="obj">flags</i>, <i class="obj">hostName</i>, <i class="obj">port</i> )  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">The two-parameter form sends <i class="obj">aString</i> on an existing connection. The four-parameter form sends <i class="obj">aString</i> to <i class="obj">port</i> on <i class="obj">hostName</i>.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="UNIXSocket" class="class">class <strong>UNIXSocket</strong> &lt; BasicSocket</h1>    
+
+<p>Class <code class="class">UNIXSocket</code> supports interprocess communications using the Unix domain protocol. Although the underlying protocol supports both datagram and stream connections, the Ruby library provides only a stream-based connection.</p>
+
+<div><code class="block">require 'socket'
+
+$path = "/tmp/sample"
+
+sThread = Thread.start do        # run server in a thread
+  sock = UNIXServer.open($path)
+  s1 = sock.accept
+  p s1.recvfrom(124)
+end
+
+client = UNIXSocket.open($path)
+client.send("hello", 0)
+client.close
+
+sThread.join</code></div>
+
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">["hello", ["AF_UNIX", ""]]</code></div>
+
+
+<h2 class="refsubsection" id="UNIXSocket.classmethods">UNIXSocket class methods</h2>
+<dl class="methodlist">
+	<dt id="UNIXSocket.new">new</dt>
+		<dd class="callseq">UNIXSocket.new( <i class="obj">path</i> )  &rarr; <i class="obj">aSession</i></dd>
+		<dd class="desc">Opens a new domain socket on <i class="obj">path</i>, which must be a pathname.</dd>
+
+	<dt id="UNIXSocket.open">open</dt>
+		<dd class="callseq">UNIXSocket.open( <i class="obj">path</i> )  &rarr; <i class="obj">aSession</i></dd>
+		<dd class="desc">Synonym for <code class="class_class_method"><span class="class">UNIXSocket</span>.<span class="method">new</span></code>.</dd>
+</dl>
+
+<h2 class="refsubsection" id="UNIXSocket.instancemethods">UNIXSocket instance methods</h2>
+<dl class="methodlist">
+	<dt id="UNIXSocket.addr">addr</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.addr  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns the address family and path of this socket.</dd>
+
+	<dt id="UNIXSocket.path">path</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.path  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns the path of this domain socket.</dd>
+
+	<dt id="UNIXSocket.peeraddr">peeraddr</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.peeraddr  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns the address family and path of the server end of the connection.</dd>
+
+	<dt id="UNIXSocket.recvfrom">recvfrom</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.recvfrom( <i class="obj">len</i> <i>[</i>, <i class="obj">flags</i><i>]</i> )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Receives up to <i class="obj">len</i> bytes from <i class="obj">aSession</i>. <i class="obj">flags</i> is zero or more of the <code>MSG_</code> options (listed under <a href="lib_network.html#Socket.classconstants"><code>Socket</code> constants</a>). The first element of the returned array is the received data, and the second contains (minimal) information on the sender.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="UNIXServer" class="class">class <strong>UNIXServer</strong> &lt; UNIXSocket</h1>  
+
+<p>Class <code class="class">UNIXServer</code> provides a simple Unix domain socket server. See <code class="class">UNIXSocket</code> for example code.</p>
+
+
+<h2 class="refsubsection" id="UNIXServer.classmethods">UNIXServer class methods</h2>
+<dl class="methodlist">
+	<dt id="UNIXServer.new">new</dt>
+		<dd class="callseq">UNIXServer.new( <i class="obj">path</i> )  &rarr; <i class="obj">aSession</i></dd>
+		<dd class="desc">Creates a server on the given <i class="obj">path</i>. The corresponding file 
+      must not exist at the time of the call.</dd>
+
+	<dt id="UNIXServer.open">open</dt>
+		<dd class="callseq">UNIXServer.open( <i class="obj">path</i> )  &rarr; <i class="obj">aSession</i></dd>
+		<dd class="desc">Synonym for <code class="class_class_method"><span class="class">UNIXServer</span>.<span class="method">new</span></code>.</dd>
+</dl>
+
+<h2 class="refsubsection" id="UNIXServer.instancemethods">UNIXServer instance methods</h2>
+<dl class="methodlist">
+	<dt id="UNIXServer.accept">accept</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.accept  &rarr; <i class="obj">aUnixSocket</i></dd>
+		<dd class="desc">Waits for a connection on the server socket and returns a new socket object for that connection. See the example for <code class="class"><a href="lib_network.html#UNIXSocket">UNIXSocket</a></code>.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="Socket" class="class">class <strong>Socket</strong> &lt; BasicSocket</h1>  
+
+<p>Class <code class="class">Socket</code> provides access to the underlying operating system socket implementation.  It can be used to provide more operating system-specific functionality than the protocol-specific socket classes, but at the expense of greater complexity. In particular, the class handles addresses using <code>struct sockaddr</code> structures packed into Ruby strings, which can be a joy to manipulate.</p>
+
+<h2 class="refsubsection" id="Socket.classconstants">class constants</h2>
+
+<p>Class <code class="class">Socket</code> defines constants for use throughout the socket library. Individual constants are available only on architectures that support the related facility.</p>
+
+<dl>
+	<dt>Types:</dt>
+	<dd><code>SOCK_DGRAM</code>, <code>SOCK_PACKET</code>, <code>SOCK_RAW</code>, <code>SOCK_RDM</code>, <code>SOCK_SEQPACKET</code>, <code>SOCK_STREAM</code>.</dd>
+	
+	<dt>Protocol families:</dt>
+	<dd><code>PF_APPLETALK</code>, <code>PF_AX25</code>, <code>PF_INET6</code>, <code>PF_INET</code>, <code>PF_IPX</code>, <code>PF_UNIX</code>, <code>PF_UNSPEC</code>.</dd>
+	
+	<dt>Address families:</dt>
+	<dd><code>AF_APPLETALK</code>, <code>AF_AX25</code>, <code>AF_INET6</code>, <code>AF_INET</code>, <code>AF_IPX</code>, <code>AF_UNIX</code>, <code>AF_UNSPEC</code>.</dd>
+	
+	<dt>Lookup-order options:</dt>
+	<dd><code>LOOKUP_INET6</code>, <code>LOOKUP_INET</code>, <code>LOOKUP_UNSPEC</code>.</dd>
+	
+	<dt>Send/receive options:</dt>
+	<dd><code>MSG_DONTROUTE</code>, <code>MSG_OOB</code>, <code>MSG_PEEK</code>.</dd>
+	
+	<dt>Socket-level options:</dt>
+	<dd><code>SOL_ATALK</code>, <code>SOL_AX25</code>, <code>SOL_IPX</code>, <code>SOL_IP</code>, <code>SOL_SOCKET</code>, <code>SOL_TCP</code>, <code>SOL_UDP</code>.</dd>
+	
+	<dt>Socket options:</dt>
+	<dd><code>SO_BROADCAST</code>, <code>SO_DEBUG</code>, <code>SO_DONTROUTE</code>, <code>SO_ERROR</code>, <code>SO_KEEPALIVE</code>, <code>SO_LINGER</code>, <code>SO_NO_CHECK</code>, <code>SO_OOBINLINE</code>, <code>SO_PRIORITY</code>, <code>SO_RCVBUF</code>, <code>SO_REUSEADDR</code>, <code>SO_SNDBUF</code>, <code>SO_TYPE</code>.</dd>
+	
+	<dt>QOS options:</dt>
+	<dd><code>SOPRI_BACKGROUND</code>, <code>SOPRI_INTERACTIVE</code>, <code>SOPRI_NORMAL</code>.</dd>
+	
+	<dt>Multicast options:</dt>
+	<dd><code>IP_ADD_MEMBERSHIP</code>, <code>IP_DEFAULT_MULTICAST_LOOP</code>, <code>IP_DEFAULT_MULTICAST_TTL</code>, <code>IP_MAX_MEMBERSHIPS</code>, <code>IP_MULTICAST_IF</code>, <code>IP_MULTICAST_LOOP</code>, <code>IP_MULTICAST_TTL</code>.</dd>
+	
+	<dt>TCP options:</dt>
+	<dd><code>TCP_MAXSEG</code>, <code>TCP_NODELAY</code>.</dd>
+	
+	<dt><code>getaddrinfo</code> error codes:</dt>
+	<dd><code>EAI_ADDRFAMILY</code>, <code>EAI_AGAIN</code>, <code>EAI_BADFLAGS</code>, <code>EAI_BADHINTS</code>, <code>EAI_FAIL</code>, <code>EAI_FAMILY</code>, <code>EAI_MAX</code>, <code>EAI_MEMORY</code>, <code>EAI_NODATA</code>, <code>EAI_NONAME</code>, <code>EAI_PROTOCOL</code>, <code>EAI_SERVICE</code>, <code>EAI_SOCKTYPE</code>, <code>EAI_SYSTEM</code>.</dd>
+	
+	<dt><code>ai_flags</code> values:</dt>
+	<dd><code>AI_ALL</code>, <code>AI_CANONNAME</code>, <code>AI_MASK</code>, <code>AI_NUMERICHOST</code>, <code>AI_PASSIVE</code>, <code>AI_V4MAPPED_CFG</code>.</dd>
+</dl>
+
+
+<h2 class="refsubsection" id="Socket.classmethods">Socket class methods</h2>
+<dl class="methodlist">
+	<dt id="Socket.for_fd">for_fd</dt>
+		<dd class="callseq">Socket.for_fd( <i class="obj">anFD</i> )  &rarr; <i class="obj">aSession</i></dd>
+		<dd class="desc">Wraps an already open file descriptor into a socket object.</dd>
+
+	<dt id="Socket.getaddrinfo">getaddrinfo</dt>
+		<dd class="callseq">Socket.getaddrinfo( <i class="obj">hostName</i>, <i class="obj">port</i>,</dd>
+		<dd class="callseq"><i>[</i><i class="obj">family</i> <i>[</i><i class="obj">socktype</i> <i>[</i><i class="obj">protocol</i> <i>[</i><i class="obj">flags</i><i>]</i><i>]</i><i>]</i><i>]</i> )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns an array of arrays describing the given host and port (optionally qualified as shown). Each subarray contains the address family, port number, host name, host IP address, protocol family, socket type, and protocol.
+
+<div><code class="block">for line in Socket.getaddrinfo('www.microsoft.com', 'http')
+  puts line.join(", ")
+end</code></div>
+
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">AF_INET, 80, microsoft.net, 207.46.130.149, 2, 1, 6
+AF_INET, 80, microsoft.net, 207.46.131.137, 2, 1, 6
+AF_INET, 80, microsoft.com, 207.46.230.218, 2, 1, 6
+AF_INET, 80, microsoft.com, 207.46.230.219, 2, 1, 6
+AF_INET, 80, microsoft.net, 207.46.130.14, 2, 1, 6</code></div></dd>
+
+	<dt id="Socket.gethostbyaddr">gethostbyaddr</dt>
+		<dd class="callseq">Socket.gethostbyaddr( <i class="obj">addr</i>, <i class="obj">type</i>=<code>AF_INET</code> )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns the host name, address family, and <code>sockaddr</code> component for the given address.
+
+<div><code class="block">a = Socket.gethostbyname("216.87.136.211")
+res = Socket.gethostbyaddr(a[3], a[2])
+res.join(', ')  <span class="output2"><span class="outputmark">&rarr;</span> "pragprog.com, , 2, \330W\210\323"</span></code></div></dd>
+
+	<dt id="Socket.gethostbyname">gethostbyname</dt>
+		<dd class="callseq">Socket.gethostbyname( <i class="obj">hostName</i> )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns a four-element array containing the canonical host name, a subarray of host aliases, the address family, and the address portion of the <code>sockaddr</code> structure.
+
+<div><code class="block">a = Socket.gethostbyname("216.87.136.211")
+a.join(', ')  <span class="output2"><span class="outputmark">&rarr;</span> "pragprog.com, , 2, \330W\210\323"</span></code></div></dd>
+
+	<dt id="Socket.gethostname">gethostname</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.gethostname  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns the name of the current host.</dd>
+
+	<dt id="Socket.getnameinfo">getnameinfo</dt>
+		<dd class="callseq">Socket.getnameinfo( <i class="obj">addr</i> <i>[</i>, <i class="obj">flags</i><i>]</i> )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Looks up the given address, which may be either a string containing a sockaddr or a three- or four-element array. If <i class="obj">sockaddr</i> is an array, it should contain the string address family, the port (or nil), and the host name or IP address. If a fourth element is present and not <code>nil</code>, it will be used as the host name. Returns a canonical hostname (or address) and port number as an array.
+
+<div><code class="block">a = Socket.getnameinfo(["AF_INET", '23', 'www.ruby-lang.org'])
+a   <span class="output2"><span class="outputmark">&rarr;</span> ["helium.ruby-lang.org", "telnet"]</span></code></div></dd>
+
+	<dt id="Socket.getservbyname">getservbyname</dt>
+		<dd class="callseq">Socket.getservbyname( <i class="obj">service</i>, <i class="obj">proto</i>=<code>'tcp'</code> )  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns the port corresponding to the given service and protocol.
+
+<div><code class="block">Socket.getservbyname("telnet") <span class="output"><span class="outputmark">&rarr;</span> 23</span></code></div></dd>
+
+	<dt id="Socket.new">new</dt>
+		<dd class="callseq">Socket.new( <i class="obj">domain</i>, <i class="obj">type</i>, <i class="obj">protocol</i> )  &rarr; <i class="obj">aSession</i></dd>
+		<dd class="desc">Creates a socket using the given parameters.</dd>
+
+	<dt id="Socket.open">open</dt>
+		<dd class="callseq">Socket.open( <i class="obj">domain</i>, <i class="obj">type</i>, <i class="obj">protocol</i> )  &rarr; <i class="obj">aSession</i></dd>
+		<dd class="desc">Synonym for <code class="class_class_method"><span class="class">Socket</span>.<span class="method">new</span></code>.</dd>
+
+	<dt id="Socket.pair">pair</dt>
+		<dd class="callseq">Socket.pair(  <i class="obj">domain</i>, <i class="obj">type</i>, <i class="obj">protocol</i> )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns a pair of connected, anonymous sockets of the given domain,  type, and protocol.</dd>
+
+	<dt id="Socket.socketpair">socketpair</dt>
+		<dd class="callseq">Socket.socketpair(  <i class="obj">domain</i>, <i class="obj">type</i>, <i class="obj">protocol</i> )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Synonym for <code class="class_class_method"><span class="class">Socket</span>.<span class="method">pair</span></code>.</dd>
+</dl>
+
+<h2 class="refsubsection" id="Socket.instancemethods">Socket instance methods</h2>
+<dl class="methodlist">
+	<dt id="Socket.accept">accept</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.accept  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Accepts an incoming connection returning an array containing a new <code class="class">Socket</code> object and a string holding the <code>struct sockaddr</code> information about the caller.</dd>
+
+	<dt id="Socket.bind">bind</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.bind( <i class="obj">sockaddr</i> )  &rarr; 0</dd>
+		<dd class="desc">Binds to the given <code>struct sockaddr</code>, contained in a string.</dd>
+
+	<dt id="Socket.connect">connect</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.connect( <i class="obj">sockaddr</i> )  &rarr; 0</dd>
+		<dd class="desc">Connects to the given <code>struct sockaddr</code>, contained in a string.</dd>
+
+	<dt id="Socket.listen">listen</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.listen( <i class="obj">aFixnum</i> )  &rarr; 0</dd>
+		<dd class="desc">Listens for connections, using the specified <i class="obj">aFixnum</i> as the backlog.</dd>
+
+	<dt id="Socket.recvfrom">recvfrom</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.recvfrom(
+        <i class="obj">len</i> <i>[</i>, <i class="obj">flags</i><i>]</i> )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Receives up to <i class="obj">len</i> bytes from <i class="obj">aSession</i>. <i class="obj">flags</i> is zero or more of the <code>MSG_</code> options. The first element of the result is the data received. The second element contains protocol-specific information on the sender.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="higherlevelaccess">Higher-Level Access</h1>
+
+<p>Ruby provides a set of classes to facilitate writing clients for:</p>
+
+<ul class="brief">
+	<li>File Transfer Protocol (FTP)</li>
+	<li>HyperText Transfer Protocol (HTTP)</li>
+	<li>Post Office Protocol (POP)</li>
+	<li>Simple Mail Transfer Protocol (SMTP)</li>
+	<li>Telnet
+</li></ul>
+
+<p>HTTP, POP, and SMTP are layered on top of a helper class, <code>lib/net/protocol</code>.  Although we don't document the <code class="class">Protocol</code> class here, you should probably study it if you are considering writing your own network client.</p>
+
+
+<hr class="classbreak">
+
+
+<h1 id="NetFTP" class="class">class <strong>Net::FTP</strong> &lt; Object</h1>  
+
+<div><code class="block">require 'net/ftp'
+
+ftp = Net::FTP.new('ftp.netlab.co.jp')
+ftp.login
+files = ftp.chdir('pub/lang/ruby/contrib')
+files = ftp.list('n*')
+ftp.getbinaryfile('nif.rb-0.91.gz', 'nif.gz', 1024)
+ftp.close</code></div>
+
+
+  The <code>net/ftp</code> library implements a File Transfer Protocol (FTP)
+  client.
+
+<h2 class="refsubsection" id="NetFTP.constants">Net::FTP constants</h2>
+
+<table class="constants">
+<tr class="firstRow">
+	<th><code class="constant">FTP_PORT</code></th>
+	<td></td>
+	<td>Default port for FTP connections (21).</td>
+</tr></table>
+
+
+<h2 class="refsubsection" id="NetFTP.classmethods">Net::FTP class methods</h2>
+<dl class="methodlist">
+	<dt id="NetFTP.new">new</dt>
+		<dd class="callseq">FTP.new( <i class="obj">host</i>=<code>nil</code>, <i class="obj">user</i>=<code>nil</code>, <i class="obj">passwd</i>=<code>nil</code>, <i class="obj">acct</i>=<code>nil</code>)  &rarr; <i class="obj">aSession</i></dd>
+		<dd class="desc">Creates and returns a new <code class="class">FTP</code> object. If the host parameter is not <code>nil</code>, a connection is made to that host. Additionally, if the <i class="obj">user</i> parameter is not <code>nil</code>, the given user name, password, and (optionally) account are used to log in. See the description of <code class="class_instance_method"><span class="class">FTP</span>#<span class="method">login</span></code>.</dd>
+
+	<dt id="NetFTP.open">open</dt>
+		<dd class="callseq">FTP.open( <i class="obj">host</i>, <i class="obj">user</i>=<code>nil</code>, <i class="obj">passwd</i>=<code>nil</code>, <i class="obj">acct</i>=<code>nil</code>)  &rarr; <i class="obj">aSession</i></dd>
+		<dd class="desc">A synonym for <code class="class_class_method"><span class="class">FTP</span>.<span class="method">new</span></code>, but with a mandatory <i class="obj">host</i> parameter.</dd>
+</dl>
+
+<h2 class="refsubsection" id="NetFTP.instancemethods">Net::FTP instance methods</h2>
+<dl class="methodlist">
+	<dt id="NetFTP.Servercommands" class="noncode">Server commands</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.acct( <i class="obj">account</i> )</dd>
+		<dd class="callseq"><i class="obj">aSession</i>.chdir( <i class="obj">dir</i> )</dd>
+		<dd class="callseq"><i class="obj">aSession</i>.delete( <i class="obj">remoteFile</i> )</dd>
+		<dd class="callseq"><i class="obj">aSession</i>.mdtm( <i class="obj">remoteFile</i> )  &rarr; <i class="obj">aString</i></dd>
+		<dd class="callseq"><i class="obj">aSession</i>.mkdir( <i class="obj">dir</i> )</dd>
+		<dd class="callseq"><i class="obj">aSession</i>.nlst( <i class="obj">dir</i>=<code>nil</code> )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="callseq"><i class="obj">aSession</i>.rename( <i class="obj">fromname</i>, <i class="obj">toname</i> )</dd>
+		<dd class="callseq"><i class="obj">aSession</i>.rmdir( <i class="obj">dir</i> )</dd>
+		<dd class="callseq"><i class="obj">aSession</i>.pwd  &rarr; <i class="obj">aString</i></dd>
+		<dd class="callseq"><i class="obj">aSession</i>.size( <i class="obj">remoteFile</i> )  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="callseq"><i class="obj">aSession</i>.status  &rarr; <i class="obj">aString</i></dd>
+		<dd class="callseq"><i class="obj">aSession</i>.system  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Issues the corresponding server command and returns the result.</dd>
+
+	<dt id="NetFTP.close">close</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.close</dd>
+		<dd class="desc">Closes the current connection.</dd>
+
+	<dt id="NetFTP.closed_qm">closed?</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.closed?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the current connection is closed.</dd>
+
+	<dt id="NetFTP.connect">connect</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.connect( <i class="obj">host</i>, <i class="obj">port</i>=FTP_PORT )</dd>
+		<dd class="desc">Establishes an FTP connection to <i class="obj">host</i>, optionally overriding the default port. If the environment variable <code>SOCKS_SERVER</code> is set, sets up the connection through a SOCKS proxy. Raises an exception (typically <code class="exception">Errno::ECONNREFUSED</code>) if the connection cannot be established.</dd>
+
+	<dt id="NetFTP.debug_mode">debug_mode</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.debug_mode  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns the current debug mode.</dd>
+
+	<dt id="NetFTP.debug_mode_eq">debug_mode=</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.debug_mode = <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">If the debug mode is <code class="const">true</code>, all traffic to and from the server is written to <var>$stdout</var>.</dd>
+
+	<dt id="NetFTP.dir">dir</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.dir( <i>[</i>pattern<i>]*</i> )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="callseq"><i class="obj">aSession</i>.dir( <i>[</i>pattern<i>]*</i> ) {| line | block }</dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><span class="class">FTP</span>#<span class="method">list</span></code>.</dd>
+
+	<dt id="NetFTP.getbinaryfile">getbinaryfile</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.getbinaryfile( <i class="obj">remotefile</i>, <i class="obj">localfile</i>, <i class="obj">blocksize</i>, <i class="obj">callback</i>=<code>nil</code>)</dd>
+		<dd class="callseq"><i class="obj">aSession</i>.getbinaryfile( <i class="obj">remotefile</i>, <i class="obj">localfile</i>, <i class="obj">blocksize</i> ) {| data | block }</dd>
+		<dd class="desc">Retrieves <i class="obj">remotefile</i> in binary mode, storing the result in <i class="obj">localfile</i>. If <i class="obj">callback</i> or an associated block is supplied, calls it, passing in the retrieved data in <i class="obj">blocksize</i> chunks.</dd>
+
+	<dt id="NetFTP.gettextfile">gettextfile</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.gettextfile( <i class="obj">remotefile</i>, <i class="obj">localfile</i>, <i class="obj">callback</i>=<code>nil</code>)</dd>
+		<dd class="callseq"><i class="obj">aSession</i>.gettextfile( <i class="obj">remotefile</i>, <i class="obj">localfile</i> ) {| data | block }</dd>
+		<dd class="desc">Retrieves <i class="obj">remotefile</i> in ASCII (text) mode, storing the result in <i class="obj">localfile</i>. If <i class="obj">callback</i> or an associated block is supplied, calls it, passing in the retrieved data one line at a time.</dd>
+
+	<dt id="NetFTP.lastresp">lastresp</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.lastresp  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns the host's last response.</dd>
+
+	<dt id="NetFTP.list">list</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.list( <i>[</i>pattern<i>]*</i> )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="callseq"><i class="obj">aSession</i>.list( <i>[</i>pattern<i>]*</i> ) {| line | block }</dd>
+		<dd class="desc">Fetches a directory listing of files matching the given pattern(s). If a block is associated with the call, invokes it with each line of the result. Otherwise, returns the result as an array of strings.</dd>
+
+	<dt id="NetFTP.login">login</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.login( <i class="obj">user</i>="anonymous",
+        <i class="obj">passwd</i>=<code>nil</code>, <i class="obj">acct</i>=<code>nil</code> )  &rarr; aString</dd>
+		<dd class="desc">Logs into the remote host. <i class="obj">aSession</i> must have been previously connected. If <i class="obj">user</i> is the string &ldquo;anonymous&rdquo; and the password is <code>nil</code>, a password of <em>user@host</em> is synthesized. If the <i class="obj">acct</i> parameter is not <code>nil</code>, an FTP <code>ACCT</code> command is sent following the successful login. Raises an exception on error (typically <code class="exception">Net::FTPPermError</code>).</dd>
+
+	<dt id="NetFTP.ls">ls</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.ls( <i>[</i>pattern<i>]*</i> )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="callseq"><i class="obj">aSession</i>.ls( <i>[</i>pattern<i>]*</i> ) {| line | block }</dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><span class="class">FTP</span>#<span class="method">list</span></code>.</dd>
+
+	<dt id="NetFTP.mtime">mtime</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.mtime( <i class="obj">remoteFile</i>, <i class="obj">local</i>=<code class="const">false</code> )  &rarr; <i class="obj">aTime</i></dd>
+		<dd class="desc">Returns the last-modified time of <i class="obj">remoteFile</i>, interpreting the server's response as a GMT time if <i class="obj">local</i> is <code class="const">false</code>, or as a local time otherwise.</dd>
+
+	<dt id="NetFTP.passive">passive</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.passive  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns the state of the <code>passive</code> flag.</dd>
+
+	<dt id="NetFTP.passive_eq">passive=</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.passive = <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Puts the connection into passive mode if <code class="const">true</code>.</dd>
+
+	<dt id="NetFTP.putbinaryfile">putbinaryfile</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.putbinaryfile( <i class="obj">localfile</i>, <i class="obj">remotefile</i>, <i class="obj">blocksize</i>, <i class="obj">callback</i>=<code>nil</code>)</dd>
+		<dd class="callseq"><i class="obj">aSession</i>.putbinaryfile( <i class="obj">localfile</i>, <i class="obj">remotefile</i>, <i class="obj">blocksize</i> ) {| data | block }</dd>
+		<dd class="desc">Transfers <i class="obj">localfile</i> to the server in binary mode, storing the result in <i class="obj">remotefile</i>. If <i class="obj">callback</i> or an associated block is supplied, calls it, passing in the transmitted data in <i class="obj">blocksize</i> chunks.</dd>
+
+	<dt id="NetFTP.puttextfile">puttextfile</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.puttextfile( <i class="obj">localfile</i>, <i class="obj">remotefile</i>, <i class="obj">callback</i>=<code>nil</code>)</dd>
+		<dd class="callseq"><i class="obj">aSession</i>.puttextfile( <i class="obj">localfile</i>, <i class="obj">remotefile</i>, <i class="obj">blocksize</i> ) {| data | block }</dd>
+		<dd class="desc">Transfers <i class="obj">localfile</i> to the server in ASCII (text) mode, storing the result in <i class="obj">remotefile</i>. If <i class="obj">callback</i> or an associated block is supplied, calls it, passing in the transmitted data one line at a time.</dd>
+
+	<dt id="NetFTP.resume">resume</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.resume  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns the status of the <em>resume</em> flag (see <code class="class_instance_method"><span class="class">FTP</span>#<span class="method">resume=</span></code>).  Default is <code class="const">false</code>.</dd>
+
+	<dt id="NetFTP.resume_eq">resume=</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.resume=<i class="obj">aBoolean</i></dd>
+		<dd class="desc">Sets the status of the <em>resume</em> flag.  When <em>resume</em> is <code class="const">true</code>, partially received files will resume where they left off, instead of starting from the beginning again.  This is done by sending a <code>REST</code> command (<code>REST</code>art incomplete transfer) to the server.</dd>
+
+	<dt id="NetFTP.retrbinary">retrbinary</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.retrbinary( <i class="obj">cmd</i>, <i class="obj">blocksize</i> ) {| data | block }</dd>
+		<dd class="desc">Puts the connection into binary (image) mode, issues the given command, and fetches the data returned, passing it to the associated block in chunks of <i class="obj">blocksize</i> characters.  Note that <i class="obj">cmd</i> is a server command (such as &ldquo;RETR myfile&rdquo;).</dd>
+
+	<dt id="NetFTP.retrlines">retrlines</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.retrlines(cmd) {| line | block }</dd>
+		<dd class="desc">Puts the connection into ASCII (text) mode, issues the given command, and passes the resulting data, one line at a time, to the associated block. If no block is given, prints the lines. Note that <i class="obj">cmd</i> is a server command (such as &ldquo;RETR myfile&rdquo;).</dd>
+
+	<dt id="NetFTP.return_code">return_code</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.return_code  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns the return code from the last operation.</dd>
+
+	<dt id="NetFTP.storbinary">storbinary</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.storbinary( <i class="obj">cmd</i>, <i class="obj">fileName</i>, <i class="obj">blocksize</i>, <i class="obj">callback</i>=<code>nil</code>) </dd>
+		<dd class="callseq"><i class="obj">aSession</i>.storbinary( <i class="obj">cmd</i>, <i class="obj">fileName</i>, <i class="obj">blocksize</i> ) {| data | block }</dd>
+		<dd class="desc">Puts the connection into binary (image) mode, issues the given server-side command (such as &ldquo;STOR myfile&rdquo;), and sends the contents of the file named <i class="obj">fileName</i> to the server. If the optional block is given, or if the <i class="obj">callBack</i> parameter is a <code class="class">Proc</code>, also passes it the data, in chunks of <i class="obj">blocksize</i> characters.</dd>
+
+	<dt id="NetFTP.storlines">storlines</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.storlines( <i class="obj">cmd</i>, <i class="obj">fileName</i>, <i class="obj">callback</i>=<code>nil</code>) </dd>
+		<dd class="callseq"><i class="obj">aSession</i>.storlines( <i class="obj">cmd</i>, <i class="obj">fileName</i> ) {| data | block }</dd>
+		<dd class="desc">Puts the connection into ASCII (text) mode, issues the given server-side command (such as &ldquo;STOR myfile&rdquo;), and sends the contents of the file named <i class="obj">fileName</i> to the server, one line at a time. If the optional block is given, or if the <i class="obj">callBack</i> parameter is a <code class="class">Proc</code>, also passes it the lines.</dd>
+
+	<dt id="NetFTP.welcome">welcome</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.welcome  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns the host's welcome message.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="NetHTTP" class="class">class <strong>Net::HTTP</strong> &lt; Net::Protocol</h1>  
+
+<div><code class="block">require 'net/http'
+
+h = Net::HTTP.new('www.pragmaticprogrammer.com', 80)
+resp, data = h.get('/index.html', nil )
+puts "Code = #{resp.code}"
+puts "Message = #{resp.message}"
+resp.each {|key, val| printf "%-14s = %-40.40s\n", key, val }
+p data[0..55]</code></div>
+
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Code = 200
+Message = OK
+last-modified  = Wed, 29 May 2002 11:08:01 GMT
+connection     = close
+content-type   = text/html
+etag           = "804d98-255c-3cf4b691"
+date           = Sun, 09 Jun 2002 05:15:10 GMT
+server         = Rapidsite/Apa/1.3.20 (Unix) FrontPage/4.
+content-length = 9564
+accept-ranges  = bytes
+"&lt;!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional"</code></div>
+
+
+<p>The <code>net/http</code> library provides a simple client to fetch headers and Web page contents using the HTTP protocol.</p>
+
+<p>The <code class="method">get</code>, <code class="method">post</code>, and <code class="method">head</code> requests raise exceptions on any error, including some HTTP status responses that would normally be considered recoverable. There are two ways of handling these.</p>
+
+<ol>
+	<li>Each method has a corresponding version <code class="method">get2</code>, <code class="method">post2</code>, or <code class="method">head2</code> that does not raise an exception. These versions are documented in the source.</li>
+	<li>Recoverable errors raise a <code class="exception">Net::ProtoRetriableError</code> exception. This exception contains a <code>data</code> attribute containing the response returned by the server.</li>  
+</ol>
+
+<p>The code below illustrates the handling of an HTTP status 301, a redirect. It uses Tomoyuki Kosimizu's URI package, available in the RAA.</p>
+
+<div><code class="block">h = Net::HTTP.new(ARGV[0] || 'www.ruby-lang.org', 80)
+url = ARGV[1] || '/'
+
+begin
+  resp, data = h.get(url, nil) { |a| }
+rescue Net::ProtoRetriableError =&gt; detail
+  head = detail.data
+
+  if head.code == "301"
+    uri = URI.create(head['location'])
+
+    host = uri['host']
+    url  = uri['path']
+    port = uri['port']
+
+    h.finish
+    h = Net::HTTP.new(host, port)
+
+    retry
+  end
+end</code></div>
+
+
+<h2 class="refsubsection" id="NetHTTP.classmethods">Net::HTTP class methods</h2>
+<dl class="methodlist">
+	<dt id="NetHTTP.new">new</dt>
+		<dd class="callseq">Net::HTTP.new( <i class="obj">host</i>='localhost', <i class="obj">port</i>=80, <i class="obj">proxy</i>=<code>nil</code>, <i class="obj">proxy_port</i>=<code>nil</code> )  &rarr; <i class="obj">aSession</i></dd>
+		<dd class="desc">Creates and returns a new <code class="class">HTTP</code> object. No connection is made until <code class="class_instance_method"><span class="class">HTTP</span>#<span class="method">start</span></code> is called.</dd>
+
+	<dt id="NetHTTP.port">port</dt>
+		<dd class="callseq">Net::HTTP.port  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns the default HTTP port (80).</dd>
+
+	<dt id="NetHTTP.start">start</dt>
+		<dd class="callseq">Net::HTTP.start( <i class="obj">host</i>=<code>nil</code>, <i class="obj">port</i>=80 )</dd>
+		<dd class="callseq">Net::HTTP.start( <i class="obj">host</i>=<code>nil</code>, <i class="obj">port</i>=80 ) {| <i class="obj">aSession</i> | block }</dd>
+		<dd class="desc">Equivalent to <code>Net::HTTP.new(<i class="obj">host</i>, <i class="obj">port</i>).start</code>.</dd>
+</dl>
+
+<h2 class="refsubsection" id="NetHTTP.instancemethods">Net::HTTP instance methods</h2>
+<dl class="methodlist">
+	<dt id="NetHTTP.get">get</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.get( <i class="obj">path</i>, <i class="obj">headers</i>=<code>nil</code>, <i class="obj">dest</i>="" )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="callseq"><i class="obj">aSession</i>.get( <i class="obj">path</i>, <i class="obj">headers</i>=<code>nil</code>) {| result | block }  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Retrieves headers and content from the specified <i class="obj">path</i> on the host specified when <i class="obj">aSession</i> was created. If specified, the <i class="obj">headers</i> parameter is a <code class="class">Hash</code> containing additional header names and values to be sent with the request. The method returns a two-element array. The first element is an <code>HTTPResponse</code> object (documented in the next section). The second element is the page's content. The page's content is also passed to the <code class="method">&lt;&lt;</code> method of the <i class="obj">dest</i> parameter, or to the block if specified. This result is built network block by network block, not line by line. An exception is raised if an error is encountered. Multiple <code class="method">get</code> calls may be made on <i class="obj">aSession</i>. Unless <code class="class_instance_method"><span class="class">Protocol</span>#<span class="method">finish</span></code> is explicitly called, the connection will use the HTTP/1.1 keep-alive protocol, and will not close between requests.</dd>
+
+	<dt id="NetHTTP.head">head</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.head( <i class="obj">path</i>, <i class="obj">headers</i>=<code>nil</code> )  &rarr; <i class="obj">aHash</i></dd>
+		<dd class="desc">Retrieves headers from the specified <i class="obj">path</i> on the host specified when <i class="obj">aSession</i> was created. If specified, the <i class="obj">headers</i> parameter is a hash containing additional header names and values to be sent with the request. The method returns a hash of received headers.  An exception is raised if an error is encountered. Multiple <code class="method">head</code> calls may be made on <i class="obj">aSession</i>.</dd>
+
+	<dt id="NetHTTP.post">post</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.post( <i class="obj">path</i>, <i class="obj">data</i>, <i class="obj">headers</i>=<code>nil</code>, <i class="obj">dest</i>="" )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="callseq"><i class="obj">aSession</i>.post( <i class="obj">path</i>, <i class="obj">data</i>, <i class="obj">headers</i>=<code>nil</code> ) {| result | block }  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Sends <i class="obj">data</i> to <i class="obj">path</i> using an HTTP POST request. <i class="obj">headers</i> is a hash containing additional headers. Assigns the result to <i class="obj">data</i> or to the block, as for <code class="class_instance_method"><span class="class">Net_HTTP</span>#<span class="method">get</span></code>. Returns a two-element array containing an HTTPResponse object and the reply body.</dd>
+
+	<dt id="NetHTTP.start">start</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.start</dd>
+		<dd class="callseq"><i class="obj">aSession</i>.start {| <i class="obj">aSession</i> | block }</dd>
+		<dd class="desc">Establishes a connection to the host associated with <i class="obj">aSession</i>. (<code class="method">start</code> is actually a method in <code class="class">Net::Protocol</code>, but its use is required in HTTP objects.) In the block form, closes the session at the end of the block.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="NetHTTPResponse" class="class">class <strong>Net::HTTPResponse</strong></h1>
+  Represents an HTTP response to a GET or POST request.
+
+<h2 class="refsubsection" id="NetHTTPResponse.instancemethods">Net::HTTPResponse instance methods</h2>
+<dl class="methodlist">
+	<dt id="NetHTTPResponse._ob_cb">[ ]</dt>
+		<dd class="callseq"><i class="obj">aSession</i>[ <i class="obj">aKey</i> ]  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns the header corresponding to the case-insensitive key. For example, a key of &ldquo;Content-type&rdquo; might return &ldquo;text/html&rdquo;.</dd>
+
+	<dt id="NetHTTPResponse._ob_cb_eq">[ ]=</dt>
+		<dd class="callseq"><i class="obj">aSession</i>[ <i class="obj">aKey</i> ] = <i class="obj">aString</i></dd>
+		<dd class="desc">Sets the header corresponding to the case-insensitive key.</dd>
+
+	<dt id="NetHTTPResponse.code">code</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.code  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns the result code from the request (for example, &ldquo;404&rdquo;).</dd>
+
+	<dt id="NetHTTPResponse.each">each</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.each {| key, val | block }</dd>
+		<dd class="desc">Iterates over all the header key-value pairs.</dd>
+
+	<dt id="NetHTTPResponse.key_qm">key?</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.key?( <i class="obj">aKey</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> only if a header with the given key exists.</dd>
+
+	<dt id="NetHTTPResponse.message">message</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.message  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns the result message from the request (for example, &ldquo;Not found&rdquo;).</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="NetPOP" class="class">class <strong>Net::POP</strong> &lt; Net::Protocol</h1>      
+
+<div><code class="block">require 'net/pop'
+pop = Net::POP3.new('server.ruby-stuff.com')
+pop.start('user', 'secret') do |pop|
+  msg = pop.mails[0]
+
+  # Print the 'From:' header line
+  puts msg.header.split("\r\n").grep(/^From: /)
+
+  # Put message to $stdout (by calling &lt;&lt;)
+  puts "\nFull message:\n"
+  msg.all($stdout)
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">From: dummy msg for Andy
+
+Full message:
+From: dummy msg for Andy
+looks-better: on dave's box
+
+That's all folks!</code></div>
+
+
+<p>The <code>net/pop</code> library provides a simple client to fetch and delete mail on a Post Office Protocol (POP) server.</p>
+
+<p>The class <code class="class">Net::POP3</code> is used to access a POP server, returning a list of <code class="class">Net::POPMail</code> objects, one per message stored on the server. These <code class="class">POPMail</code> objects are then used to fetch and/or delete individual messages. The library also provides an alternative to the <code class="class">POP3</code> class that performs <code class="class">APOP</code> authentication.</p>
+
+
+<h2 class="refsubsection" id="NetPOP.classmethods">Net::POP class methods</h2>
+<dl class="methodlist">
+	<dt id="NetPOP.new">new</dt>
+		<dd class="callseq">HTTP.new( <i class="obj">host</i>='localhost', <i class="obj">port</i>=110 )  &rarr; <i class="obj">aSession</i></dd>
+		<dd class="desc">Creates and returns a new <code class="class">POP3</code> object. No connection is made until <code class="class_instance_method"><span class="class">POP3</span>#<span class="method">start</span></code> is called.</dd>
+</dl>
+
+<h2 class="refsubsection" id="NetPOP.instancemethods">Net::POP instance methods</h2>
+<dl class="methodlist">
+	<dt id="NetPOP.each">each</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.each {| popmail | block }</dd>
+		<dd class="desc">Calls the associated block once for each e-mail stored on the server, passing in the corresponding <code class="class">POPMail</code> object.</dd>
+
+	<dt id="NetPOP.finish">finish</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.finish  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Closes the pop connection. Some servers require that a connection is closed before they honor actions such as deleting mail. Returns <code class="const">false</code> if the connection was never used.</dd>
+
+	<dt id="NetPOP.mails">mails</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.mails  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns an array of <code class="class">POPMail</code> objects, where each object corresponds to an e-mail message stored on the server.</dd>
+
+	<dt id="NetPOP.start">start</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.start( <i class="obj">user</i>, <i class="obj">password</i> )</dd>
+		<dd class="callseq"><i class="obj">aSession</i>.start( <i class="obj">user</i>, <i class="obj">password</i> ) {| pop | block }</dd>
+		<dd class="desc">Establishes a connection to the pop server, using the supplied username and password. Fetches a list of mail held on the server, which may be accessed using the <code class="class_instance_method"><span class="class">POP3</span>#<span class="method">mails</span></code> and <code class="class_instance_method"><span class="class">POP3</span>#<span class="method">each</span></code> methods. In block form, passes <i class="obj">aSession</i> to the block, and closes the connection using <code class="method">finish</code> when the block terminates.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="NetAPOP" class="class">class <strong>Net::APOP</strong> &lt; Net::POP3</h1>
+
+<h2 class="refsubsection" id="NetAPOP.instancemethods">Net::APOP instance methods</h2>
+<dl class="methodlist">
+	<dt id="NetAPOP.start">start</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.start( <i class="obj">user</i>, <i class="obj">password</i> )</dd>
+		<dd class="desc">Establishes a connection to the APOP server.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="NetPOPMail" class="class">class <strong>Net::POPMail</strong> &lt; Object</h1>
+
+<h2 class="refsubsection" id="NetPOPMail.instancemethods">Net::POPMail instance methods</h2>
+<dl class="methodlist">
+	<dt id="NetPOPMail.all">all</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.all  &rarr; <i class="obj">aString</i></dd>
+		<dd class="callseq"><i class="obj">aSession</i>.all( <i class="obj">dest</i> )</dd>
+		<dd class="callseq"><i class="obj">aSession</i>.all {| aString | block }</dd>
+		<dd class="desc">Fetches the corresponding e-mail from the server. With no argument or associated block, returns the e-mail as a string. With an argument but no block, appends the e-mail to <i class="obj">dest</i> by invoking <i class="obj">dest</i><code>&lt;&lt;</code> for each line in the e-mail. With an associated block, invokes the block once for each line in the e-mail.</dd>
+
+	<dt id="NetPOPMail.delete">delete</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.delete</dd>
+		<dd class="desc">Deletes the e-mail from the server.</dd>
+
+	<dt id="NetPOPMail.delete_oh">delete!</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.delete!</dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><span class="class">POPMail</span>#<span class="method">delete</span></code>.</dd>
+
+	<dt id="NetPOPMail.header">header</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.header  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns the header lines for the corresponding e-mail message.</dd>
+
+	<dt id="NetPOPMail.size">size</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.size  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns the size in bytes of the corresponding e-mail.</dd>
+
+	<dt id="NetPOPMail.top">top</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.top( <i class="obj">lines</i> )  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns the header lines, plus <i class="obj">lines</i> message lines for the corresponding e-mail message.</dd>
+
+	<dt id="NetPOPMail.uidl">uidl</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.uidl  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns the server-specific unique identifier for the corresponding e-mail.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="NetSMTP" class="class">class <strong>Net::SMTP</strong> &lt; Net::Protocol</h1>    
+
+<div><code class="block">require 'net/smtp'
+
+# &mdash; Send using class methods
+msg = [ "Subject: Test\n", "\n", "Now is the time\n" ]
+Net::SMTP.start do |smtp|
+  smtp.sendmail( msg,  'dave@localhost', ['dave'] )
+end
+
+# &mdash; Send using SMTP object and an adaptor
+smtp = Net::SMTP.new
+smtp.start('pragprog.com')
+smtp.ready('dave@localhost', 'dave') do |a|
+  a.write "Subject: Test1\r\n"
+  a.write "\r\n"
+  a.write "And so is this"
+end</code></div>
+
+
+<p>The <code>net/smtp</code> library provides a simple client to send electronic mail using the Simple Mail Transfer Protocol (SMTP).</p>
+
+<h2 class="refsubsection" id="NetSMTP.classmethods">Net::SMTP class methods</h2>
+<dl class="methodlist">
+	<dt id="NetSMTP.new">new</dt>
+		<dd class="callseq">Net::SMTP.new( <i class="obj">server</i>='localhost',
+        <i class="obj">port</i>=25 )  &rarr; <i class="obj">aSession</i></dd>
+		<dd class="desc">Returns a new <code class="class">SMTP</code> object connected to the given server and
+      port.</dd>
+
+	<dt id="NetSMTP.start">start</dt>
+		<dd class="callseq">Net::SMTP.start( <i class="obj">server</i>='localhost', <i class="obj">port</i>=25, <i class="obj">domain</i>=ENV['HOSTNAME'], <i class="obj">acct</i>=<code>nil</code>, <i class="obj">passwd</i>=<code>nil</code>, <i class="obj">authtype</i>=:cram_md5 )  &rarr; <i class="obj">aSession</i></dd>
+		<dd class="callseq">Net::SMTP.start( <i class="obj">server</i>='localhost', <i class="obj">port</i>=25, <i class="obj">domain</i>=ENV['HOSTNAME'], <i class="obj">acct</i>=<code>nil</code>, <i class="obj">passwd</i>=<code>nil</code>, <i class="obj">authtype</i>=:cram_md5 ) {| smtp | block }</dd>
+		<dd class="desc">Equivalent to <code>Net::SMTP.new(<i class="obj">server</i>, <i class="obj">port</i>).start(...)</code>. For an explanation of the remainder of the parameters, see the instance method <code class="class_instance_method"><span class="class">Net_SMTP</span>#<span class="method">start</span></code>. Creates a new <code class="class">SMTP</code> object. The <i class="obj">domain</i> parameter will be used in the initial <code>HELO</code> or <code>EHLO</code> transaction with the SMTP server. In the block form, the <i class="obj">smtp</i> object is passed into the block. When the block terminates, the session is closed.</dd>
+</dl>
+
+<h2 class="refsubsection" id="NetSMTP.instancemethods">Net::SMTP instance methods</h2>
+<dl class="methodlist">
+	<dt id="NetSMTP.ready">ready</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.ready( <i class="obj">from</i>, <i class="obj">to</i> ) {| anAdaptor | block }</dd>
+		<dd class="desc">Equivalent to <code>sendmail(from, to) { ...}</code>. Sends header and body lines to the sendmail server. The <i class="obj">from</i> parameter is used as the sender's name in the <code>MAIL FROM:</code> command, and the <i class="obj">to</i> is either a string or an array of strings containing the recipients for the <code>RCPT TO:</code> command. The block is passed an adaptor object. Lines are sent to the server by calling the adaptor's <code>write</code> method. The terminating '.' and <code>QUIT</code> are sent automatically.</dd>
+
+	<dt id="NetSMTP.sendmail">sendmail</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.sendmail( <i class="obj">src</i>, <i class="obj">from</i>, <i class="obj">to</i> )</dd>
+		<dd class="desc">Sends header and body lines to the sendmail server. The <i class="obj">from</i> parameter is used as the sender's name in the <code>MAIL FROM:</code> command, and <i class="obj">to</i> is either a string or an array of strings containing the recipients for the <code>RCPT TO:</code> command. Lines to be sent are fetched by invoking <i class="obj">src</i><code>.each</code>.  The terminating '.' and <code>QUIT</code> are sent automatically.</dd>
+
+	<dt id="NetSMTP.start">start</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.start( <i class="obj">domain</i>=ENV['HOSTNAME'], <i class="obj">acct</i>=<code>nil</code>, <i class="obj">passwd</i>=<code>nil</code>, <i class="obj">authtype</i>=:cram_md5 )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="callseq"> <i class="obj">aSession</i>.start( <i class="obj">domain</i>=ENV['HOSTNAME'], <i class="obj">acct</i>=<code>nil</code>, <i class="obj">passwd</i>=<code>nil</code>, <i class="obj">authtype</i>=:cram_md5 ) {| smtp | block }  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Starts an SMTP session by connecting to the given domain
+        (host). If <i class="obj">acct</i> and <i class="obj">passwd</i> are given,
+        authentication will be attempted using the given
+        authentication type (<code>:plain</code> or <code>:cram_md5</code>). If a
+        block is supplied, it will be invoked with <i class="obj">aSession</i> as a
+        parameter. The connection will be closed when the block terminates.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="NetTelnet" class="class">class <strong>Net::Telnet</strong> &lt; [Socket]</h1>  
+
+    Connect to a <code>localhost</code>, run the &ldquo;date&rdquo; command, and disconnect.
+
+<div><code class="block">require 'net/telnet'
+
+tn = Net::Telnet.new({})
+tn.login "guest", "secret"
+tn.cmd "date"  <span class="output2"><span class="outputmark">&rarr;</span> "date\r\nSun Jun  9 00:15:20 CDT 2002\n\r&gt; "</span></code></div>
+
+    Monitor output as it occurs. We associate a block with each of the 
+    library calls; this block is called whenever data becomes
+    available from the host.
+
+<div><code class="block">require 'net/telnet'
+
+tn = Net::Telnet.new({})     { |str| print str }
+tn.login("guest", "secret")  { |str| print str }
+tn.cmd("date")  { |str| print str }</code></div>
+
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Trying localhost...
+Connected to localhost.
+Welcome to SuSE Linux 7.1 (i386) - Kernel 2.4.0-64GB-SMP (8).
+
+zip login: guest
+Password:
+Last login: Sun Jun  9 00:15:19 from localhost
+/etc/zshrc: setopt: no such option: histexpiredupsfirst [31]
+
+&gt; date
+Sun Jun  9 00:15:20 CDT 2002
+
+&gt;</code></div>
+
+
+<p>Get the time from an NTP server.</p>
+
+<div><code class="block">require 'net/telnet'
+tn = Net::Telnet.new('Host'       =&gt; 'time.nonexistent.org',
+                     'Port'       =&gt; 'time',
+                     'Timeout'    =&gt; 60,
+                     'Telnetmode' =&gt; false)
+atomicTime = tn.recv(4).unpack('N')[0]
+puts "Atomic time: " + Time.at(atomicTime - 2208988800).to_s
+puts "Local time:  " + Time.now.to_s</code></div>
+
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Atomic time: Sun Jun 09 00:15:12 CDT 2002
+Local time:  Sun Jun 09 00:15:20 CDT 2002</code></div>
+
+
+<p>The <code>net/telnet</code> library provides a complete implementation of a telnet client and includes features that make it a convenient mechanism for interacting with non-telnet services.</p>
+
+<p>Although the class description that follows indicates that <code class="class">Net::Telnet</code> is a subclass of class <code class="class">Socket</code>, this is a lie. In reality, the class delegates to <code class="class">Socket</code>. The net effect is the same: the methods of <code class="class">Socket</code> and its parent, class <code class="class">IO</code>, are available through <code class="class">Net::Telnet</code> objects.</p>
+
+<p>The methods <code class="method">new</code>, <code class="method">cmd</code>, <code class="method">login</code>, and <code class="method">waitfor</code> take an optional block. If present, the block is passed output from the server as it is received by the routine. This can be used to provide realtime output, rather than waiting for (for example) a login to complete before displaying the server's response.</p>
+
+
+<h2 class="refsubsection" id="NetTelnet.classmethods">Net::Telnet class methods</h2>
+<dl class="methodlist">
+	<dt id="NetTelnet.new">new</dt>
+		<dd class="callseq">Net::Telnet.new( <i class="obj">options</i> )  &rarr; <i class="obj">aSession</i></dd>
+		<dd class="callseq">Net::Telnet.new( <i class="obj">options</i> ) {| str | block }  &rarr; <i class="obj">aSession</i></dd>
+		<dd class="desc">Connects to a server. <i class="obj">options</i> is a
+      <code class="class">Hash</code> with zero or more of the following:
+
+      <table>
+		<thead><tr>
+	<th>String</th>
+	<th>Standards Level</th>
+<th>Meaning</th>
+		</tr></thead>
+		<tr class="firstRow">
+			<td><code>Binmode</code></td>
+			<td><code class="const">false</code></td>
+			<td>If true, no end-of-line processing will be performed.</td>
+		</tr>
+		<tr>
+		  <td><code>Host</code></td>
+		  <td>localhost</td>
+		  <td>Name or address of server's host.</td>
+		</tr>
+		<tr>
+		  <td><code>Port</code></td>
+		  <td>23</td>
+		  <td>Name or number of service to call.</td>
+		</tr>
+		<tr>
+		  <td><code>Prompt</code></td>
+		  <td><code>/[$%#&gt;]/</code></td>
+		  <td>Pattern that matches the host's prompt.</td>
+		</tr>
+		<tr>
+		  <td><code>Telnetmode</code></td>
+		  <td><code class="const">true</code></td>
+		  <td>If <code class="const">false</code>, ignore the majority of telnet embedded escape sequences. Used when talking with a non-telnet server.</td>
+		</tr>
+		<tr>
+		  <td><code>Timeout</code></td>
+		  <td>10</td>
+		  <td>Time in seconds to wait for a server response (both during connection and during regular data transmission).</td>
+		</tr>
+		<tr>
+		  <td><code>Waittime</code></td>
+		  <td>0</td>
+		  <td>Time to wait for prompt to appear in received data stream.</td>
+		</tr>
+		</table></dd>
+</dl>
+
+<h2 class="refsubsection" id="NetTelnet.instancemethods">Net::Telnet instance methods</h2>
+<dl class="methodlist">
+	<dt id="NetTelnet.binmode">binmode</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.binmode  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns the current value of the <code>Binmode</code> flag.</dd>
+
+	<dt id="NetTelnet.binmode_eq">binmode=</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.binmode = <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Sets the <code>Binmode</code> flag, returning the new value.</dd>
+
+	<dt id="NetTelnet.cmd">cmd</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.cmd( <i class="obj">options</i> )  &rarr; <i class="obj">aString</i></dd>
+		<dd class="callseq"><i class="obj">aSession</i>.cmd( <i class="obj">options</i> ) {| str | block }  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Sends a string to the server and waits (using a timeout) for a string that matches a pattern to be returned by the server. If the parameter is not a <code class="class">Hash</code>, it is sent as a string to the server, and the pattern to match and the timeout are the <code>Prompt</code> and <code>Timeout</code> options given when <i class="obj">aSession</i> was created. If <i class="obj">options</i> is a <code class="class">Hash</code>, then <i class="obj">options['String']</i> is sent to the server. <i class="obj">options['Match']</i> may be used to override the class <code>Prompt</code> parameter, and <i class="obj">options['Timeout']</i> the timeout. The method returns the complete server response.</dd>
+
+	<dt id="NetTelnet.login">login</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.login( <i class="obj">options</i>, <i class="obj">password</i>=nil )  &rarr; <i class="obj">aString</i></dd>
+		<dd class="callseq"><i class="obj">aSession</i>.login( <i class="obj">options</i>, <i class="obj">password</i>=nil ) {| str | block }  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">If <i class="obj">options</i> is a <code class="class">Hash</code>, a username is taken from <i class="obj">options['Name']</i> and a password from <i class="obj">options['Password']</i>; otherwise, <i class="obj">options</i> is assumed to be the username, and <i class="obj">password</i> the password. The method waits for the server to send the string matching the pattern <code>/login[:&#8255;]*\z/</code> and sends the username. If a password is given, it then waits for the server to send <code>/Password[:&#8255;]*\z/</code> and sends the password. The method returns the full server response.</dd>
+
+	<dt id="NetTelnet.print">print</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.print( <i class="obj">aString</i> )</dd>
+		<dd class="desc">Sends <i class="obj">aString</i> to the server, honoring <code>Telnetmode</code>, <code>Binarymode</code>, and any additional modes negotiated with the server.</dd>
+
+	<dt id="NetTelnet.telnetmode">telnetmode</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.telnetmode  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns the current value of the <code>Telnetmode</code> flag.</dd>
+
+	<dt id="NetTelnet.telnetmode_eq">telnetmode=</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.telnetmode= <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Sets the <code>Telnetmode</code> flag, returning the new value.</dd>
+
+	<dt id="NetTelnet.waitfor">waitfor</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.waitfor( <i class="obj">options</i> )  &rarr; <i class="obj">aString</i></dd>
+		<dd class="callseq"><i class="obj">aSession</i>.waitfor( <i class="obj">options</i> ) {| str | block }  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc"><p>Waits for the server to respond with a string that matches a string or pattern. If <i class="obj">options</i> is not a <code class="class">Hash</code>, it is compared against the cumulative server output as that output is received using <i class="obj">options.</i><code>===</code>. It is likely that you will want to use a regular expression in this case.</p>
+
+	<p>If <i class="obj">options</i> is a <code class="class">Hash</code>, then <i class="obj">options['Match']</i>, <i class="obj">options['Prompt']</i>, or <i class="obj">options['String']</i> provides the match. In the latter case, the string will be converted to a regular expression before being used. <i class="obj">options</i> may also include the keys &ldquo;Timeout&rdquo; and &ldquo;Waittime&rdquo; to override the class options of the same names.</p></dd>
+
+	<dt id="NetTelnet.write">write</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.write( <i class="obj">aString</i> )</dd>
+		<dd class="desc">Writes <i class="obj">aString</i> to the server with no translation.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="cgidevelopment">CGI Development</h1>
+
+<h1 id="CGI" class="class">class <strong>CGI</strong> &lt; Object</h1>  
+
+<div><code class="block">require "cgi"
+cgi = CGI.new("html3")  # add HTML generation methods
+cgi.out {
+  CGI.pretty (
+    cgi.html {
+      cgi.head { cgi.title{"TITLE"} } +
+      cgi.body {
+        cgi.form {
+          cgi.textarea("get_text") +
+          cgi.br +
+          cgi.submit
+        } +
+        cgi.h1 { "This is big!" } +
+        cgi.center { "Jazz Greats of the 20" +
+          cgi.small {"th"} + " century" + cgi.hr
+        } + cgi.p + cgi.table ('BORDER' =&gt; '5') {
+          cgi.tr { cgi.td {"Artist"} + cgi.td {"Album"} } +
+          cgi.tr { cgi.td {"Davis, Miles"} +
+          cgi.td {"Kind of Blue"} }
+        }
+      }
+    }
+  ) # CGI.pretty is a method call, not a block
+}</code></div>
+
+
+<p class="footnote">(The output of this script is shown in <a href="lib_network.html#figure_26.2">Figure 26.2</a>.)</p>
+
+<p>The <code class="class">CGI</code> class provides support for programs used as a Web server CGI (Common Gateway Interface) script.  It contains several methods for accessing fields in a CGI form, manipulating &ldquo;cookies&rdquo; and the environment, and outputting formatted HTML.</p>
+
+<p>Since environment variables contain a lot of useful information for a CGI script, <code class="class">CGI</code> makes accessing them very easy&mdash;environment variables are accessible as attributes of <code class="class">CGI</code> objects.  For instance, <code>cgi.auth_type</code> returns the value of <code>ENV["AUTH_TYPE"]</code>.  To create the method name, the environment variable name is translated to all lowercase, and the &ldquo;<code>HTTP_</code>&rdquo; prefix is stripped off.  Thus, <code>HTTP_USER_AGENT</code> would be available as the method <code>user_agent</code>.</p>
+
+<p>Cookies are represented using a separate object of class <code class="class">CGI::Cookie</code>, containing the following accessors:</p>
+
+<table>
+<thead><tr>
+	<th>Accessor</th>
+	<th>Description</th>
+</tr></thead>
+<tr class="firstRow">
+  <td><code>name</code></td>
+  <td>Name of this cookie</td>
+</tr>
+<tr>
+  <td><code>value</code></td>
+  <td>Array of values</td>
+</tr>
+<tr>
+  <td><code>path</code></td>
+  <td>Path (optional)</td>
+</tr>
+<tr>
+  <td><code>domain</code></td>
+  <td>Domain (optional)</td>
+</tr>
+<tr>
+  <td><code>expires</code></td>
+  <td>Time of expiry, defaults to <code class="class_class_method"><a href="ref_c_time.html#Time.now"><span class="class">Time</span>.<span class="method">now</span></a></code> (optional)</td>
+</tr>
+<tr>
+  <td><code>secure</code></td>
+  <td><code class="const">true</code> for a secure cookie</td>
+</tr></table>
+
+<div class="figure">Figure not available...</div>
+
+<p>You create a cookie object using <code class="class_class_method"><span class="class">CGI_Cookie</span>.<span class="method">new</span></code>, which takes as arguments the accessors listed above, or <code class="class_class_method"><span class="class">CGI_Cookie</span>.<span class="method">parse</span></code>, which takes an encoded string and returns a cookie object.</p>
+
+
+<h2 class="refsubsection" id="CGI.classmethods">CGI class methods</h2>
+<dl class="methodlist">
+	<dt id="CGI.escape">escape</dt>
+		<dd class="callseq">CGI.escape( <i class="obj">aString</i> )  &rarr; <i class="obj">aNewString</i></dd>
+		<dd class="desc">Returns a URL-encoded string made from the given argument, where unsafe characters (not alphanumeric, &ldquo;_&rdquo;, &ldquo;-&rdquo;, or &ldquo;.&rdquo;) are encoded using &ldquo;%xx&rdquo; escapes.</dd>
+
+	<dt id="CGI.escapeElement">escapeElement</dt>
+		<dd class="callseq">CGI.escapeElement( <i class="obj">aString</i> <i>[</i>, <i class="obj">elements</i><i>]*</i> )  &rarr; <i class="obj">aNewString</i></dd>
+		<dd class="desc">Returns a string made from the given argument with certain HTML-special characters escaped. The HTML elements given in <i class="obj">elements</i> will be escaped; other HTML elements will not be affected.
+
+<div><code class="block">print CGI::escapeElement('&lt;BR&gt;&lt;A HREF="url"&gt;&lt;/A&gt;&lt;P&gt;', "A", "IMG")</code></div>
+
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">&lt;BR&gt;&amp;lt;A HREF=&amp;quot;url&amp;quot;&amp;gt;&amp;lt;/A&amp;gt;&lt;P&gt;</code></div></dd>
+
+	<dt id="CGI.escapeHTML">escapeHTML</dt>
+		<dd class="callseq">CGI.escapeHTML( <i class="obj">aString</i> )  &rarr; <i class="obj">aNewString</i></dd>
+		<dd class="desc">Returns a string made from the given argument with HTML-special characters (such as &ldquo;<code>&amp;</code>&rdquo;,&ldquo;<code>"</code>&rdquo;,&ldquo;<code>&lt;</code>&rdquo;,&ldquo;<code>&gt;</code>&rdquo;) quoted using &ldquo;<code>&amp;amp;</code>&rdquo;, &ldquo;<code>&amp;quot;</code>&rdquo;, &ldquo;<code>&amp;lt;</code>&rdquo;, &ldquo;<code>&amp;gt;</code>&rdquo;, and so on.</dd>
+
+	<dt id="CGI.new">new</dt>
+		<dd class="callseq">CGI.new( <i>[</i><i class="obj">aString</i><i>]*</i> )  &rarr; <i class="obj">aSession</i></dd>
+		<dd class="desc">Returns a new <code class="class">CGI</code> object.  If HTML output is required, the desired standards level must be given in <i class="obj">aString</i> (otherwise, no output routines will be created). The level may be one of:
+
+		<table>
+		<thead><tr>
+	<th>String</th>
+	<th>Standards Level</th>
+<th>String</th>
+			<th>Standards Level</th>
+		</tr></thead>
+		<tr class="firstRow">
+		  <td>&ldquo;html3&rdquo;</td>
+		  <td>HTML 3.2</td>
+		  <td>&ldquo;html4&rdquo;</td>
+		  <td>HTML 4.0 Strict</td>
+		</tr>
+		<tr>
+		  <td>&ldquo;html4Tr&rdquo;</td>
+		  <td>HTML 4.0 Transitional</td>
+		  <td>&ldquo;html4Fr&rdquo;</td>
+		  <td>HTML 4.0 Frameset</td>
+		</tr>
+		</table></dd>
+
+	<dt id="CGI.parse">parse</dt>
+		<dd class="callseq">CGI.parse( <i class="obj">aString</i> )  &rarr; <i class="obj">aHash</i></dd>
+		<dd class="desc">Parses a query string and returns a hash of its <em>key-value</em> pairs.</dd>
+
+	<dt id="CGI.pretty">pretty</dt>
+		<dd class="callseq">CGI.pretty( <i class="obj">anHTMLString</i>, <i class="obj">aLeaderString</i>="  " )  &rarr; <i class="obj">aSession</i></dd>
+		<dd class="desc">Formats the given <i class="obj">anHTMLString</i> in a nice, readable format, optionally prefixing each line with <i class="obj">aLeaderString</i>.</dd>
+
+	<dt id="CGI.rfc1123_date">rfc1123_date</dt>
+		<dd class="callseq">CGI.rfc1123_date( <i class="obj">aTime</i> )  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns a string representing the given time according to RFC 1123 (for instance, <code>Mon, 1 Jan 2001 00:00:00 GMT</code>).</dd>
+
+	<dt id="CGI.unescape">unescape</dt>
+		<dd class="callseq">CGI.unescape( <i class="obj">aString</i> )  &rarr; <i class="obj">aNewString</i></dd>
+		<dd class="desc">Returns a string containing &ldquo;unsafe&rdquo; characters made from the given URL-encoded argument, where unsafe characters were encoded using &ldquo;%&rdquo; escapes.</dd>
+
+	<dt id="CGI.unescapeElement">unescapeElement</dt>
+		<dd class="callseq">CGI.unescapeElement( <i class="obj">aString</i> <i>[</i>, <i class="obj">elements</i><i>]*</i> )  &rarr; <i class="obj">aNewString</i></dd>
+		<dd class="desc">Returns a string with the selected escaped HTML elements expanded to the actual characters.</dd>
+
+	<dt id="CGI.unescapeHTML">unescapeHTML</dt>
+		<dd class="callseq">CGI.unescapeHTML( <i class="obj">aString</i> )  &rarr; <i class="obj">aNewString</i></dd>
+		<dd class="desc">Returns a string made from the given argument with HTML-special quoted characters expanded to the actual characters.</dd>
+</dl>
+
+<h2 class="refsubsection" id="CGI.instancemethods">CGI instance methods</h2>
+<dl class="methodlist">
+	<dt id="CGI._ob_cb">[ ]</dt>
+		<dd class="callseq"><i class="obj">aSession</i>[ <i>[</i><i class="obj">aString</i><i>]+</i> ]  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns the values of the given field names from the CGI form in an <code class="class">Array</code>.  See the note on <a href="lib_network.html#CGI.multipartformvalues">multipart forms</a>.</dd>
+
+	<dt id="CGI.cookies">cookies</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.cookies  &rarr; <i class="obj">aHash</i></dd>
+		<dd class="desc">Returns a new <code class="class">Hash</code> object containing <em>key-value</em> pairs of cookie keys and values.</dd>
+
+	<dt id="CGI.has_key_qm">has_key?</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.has_key( <i class="obj">aString</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the form contains a field named <i class="obj">aString</i>.</dd>
+
+	<dt id="CGI.header">header</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.header( <i class="obj">aContentType</i>="text/html" )  &rarr; <i class="obj">aString</i></dd>
+		<dd class="callseq"><i class="obj">aSession</i>.header( <i class="obj">aHash</i> )  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns a string containing the given headers (in the <code>MOD_RUBY</code> environment, the resulting header is sent immediately instead). If a hash is given as an argument, then the <em>key-value</em> pairs will be used to generate headers.</dd>
+
+	<dt id="CGI.keys">keys</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.keys  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns an array of all existing field names for the form.</dd>
+
+	<dt id="CGI.out">out</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.out( <i class="obj">aContentType</i>="text/html" ) { block }  &rarr; <code>nil</code></dd>
+		<dd class="callseq"><i class="obj">aSession</i>.out( <i class="obj">aHash</i> ) { block }  &rarr; <code>nil</code></dd>
+		<dd class="desc">Generates HTML output using the results of the block as the content.  Headers are generated as with <code class="class_instance_method"><span class="class">CGI</span>#<span class="method">header</span></code>. See the example at the start of this section.</dd>
+
+	<dt id="CGI.params">params</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.params  &rarr; <i class="obj">aHash</i></dd>
+		<dd class="desc">Returns a new <code class="class">Hash</code> object containing <em>key-value</em> pairs of field names and values from the form.</dd>
+</dl>
+
+
+<h2 id="CGI.htmloutputmethods">HTML Output Methods</h2>
+
+<p>In addition, <code class="class">CGI</code> supports the following HTML output methods.  Each of these methods is named after the corresponding HTML feature (or close to it).  Those tags that require content (such as <code>blockquote</code>) take an optional block; the block should return a <code class="class">String</code> that will be used as the content for the feature.  These methods may take arguments as indicated, or as a hash with the given names as keys.</p>
+
+<ul style="list-style-type:none">
+	<li><code>a</code>( <em><i class="obj">url</i></em> )<br><code>a</code>( <em><code>HREF</code></em> &rArr; )</li>
+	<li><code>base</code>( <em><i class="obj">url</i></em> )<br><code>base</code>( <em><code>HREF</code></em> &rArr; )</li>
+	<li><code>blockquote</code>( <em><i class="obj">cite=""</i></em> ) { <em>aString</em> }<br><code>blockquote</code>( <em><code>CITE</code></em> &rArr; ) { <em>aString</em> }</li>
+	<li><code>caption</code>( <em><i class="obj">align=nil</i></em> ) { <em>aString</em> }<br><code>caption</code>( <em><code>ALIGN</code></em> &rArr; ) { <em>aString</em> }</li>
+	<li><code>checkbox</code>( <em><i class="obj">name</i>=<code>nil</code>, <i class="obj">value</i>=<code>nil</code>, <i class="obj">checked</i>=<code>nil</code></em> )<br><code>checkbox</code>( <em><code>NAME</code>, <code>VALUE</code>, <code>CHECKED</code></em> &rArr; )</li>
+	<li><code>checkbox_group</code>( <em><i class="obj">name</i>=<code>nil</code>, <i>[</i><i class="obj">items</i><i>]+</i></em> )<br><code>checkbox_group</code>( <em>  <code>NAME</code>, <code>VALUES</code></em> &rArr; )<ul>
+		<li>Items may be individual <code class="class">String</code> names, or any of: an array of <span style="white-space:nowrap">[ <i class="obj">name</i>, <i class="obj">checked</i> ],</span> an array of <span style="white-space:nowrap">[ <i class="obj">value</i>, <i class="obj">name</i> ],</span> or an array of <span style="white-space:nowrap">[ <i class="obj">value</i>, <i class="obj">name</i>, <i class="obj">checked</i> ].</span> The value for the hash key VALUES should be an array of these items.</li>
+	</ul></li>
+	<li><code>file_field</code>( <em><i class="obj">name</i>="", <i class="obj">size</i>=20, <i class="obj">maxlength</i>=<code>nil</code></em> )<br><code>file_field</code>( <em>  <code>NAME</code>, <code>SIZE</code>, <code>MAXLENGTH</code></em> &rArr; )</li>
+	<li><code>form</code>( <em><i class="obj">method</i>="post", <i class="obj">action</i>=<code>nil</code>, <i class="obj">enctype</i>="application/x-www-form-urlencoded"</em> ) { <em>aStr</em> }<br><code>form</code>( <em>  <code>METHOD</code>, <code>ACTION</code>, <code>ENCTYPE</code></em> &rArr; ) { <em>aStr</em> }</li>
+	<li><code>hidden</code>( <em><i class="obj">name</i>="", <i class="obj">value</i>=<code>nil</code></em> )<br><code>hidden</code>( <em><code>NAME</code>, <code>VALUE</code></em> &rArr; )</li>
+	<li><code>html</code>( <em></em> ) { <em>aString</em> }<br><code>html</code>( <em><code>PRETTY</code>, <code>DOCTYPE</code></em> &rArr; ) { <em>aString</em> }</li>
+	<li><code>img_button</code>( <em><i class="obj">src</i>="", <i class="obj">name</i>=<code>nil</code>, <i class="obj">alt</i>=<code>nil</code></em> )<br><code>img_button</code>( <em>  <code>SRC</code>, <code>NAME</code>, <code>ALT</code></em> &rArr; )</li>
+	<li><code>img</code>( <em><i class="obj">src</i>="", <i class="obj">alt</i>="", <i class="obj">width</i>=<code>nil</code>, <i class="obj">height</i>=<code>nil</code></em> )<br><code>img</code>( <em>  <code>SRC</code>, <code>ALT</code>, <code>WIDTH</code>, <code>HEIGHT</code></em> &rArr; )</li>
+	<li><code>multipart_form</code>( <em><i class="obj">action</i>=<code>nil</code>, <i class="obj">enctype</i>="multipart/form-data"</em> ) { <em>aString</em> }<br><code>multipart_form</code>( <em><code>METHOD</code>, <code>ACTION</code>, <code>ENCTYPE</code></em> &rArr; ) { <em>aString</em> }</li>
+	<li><code>password_field</code>( <em><i class="obj">name</i>="", <i class="obj">value</i>=<code>nil</code>, <i class="obj">size</i>=40, <i class="obj">maxlength</i>=<code>nil</code></em> )<br><code>password_field</code>( <em><code>NAME</code>, <code>VALUE</code>, <code>SIZE</code>, <code>MAXLENGTH</code></em> &rArr; )</li>
+	<li><code>popup_menu</code>( <em><i class="obj">name</i>="", <i class="obj">items</i></em> )<br><code>popup_menu</code>( <em>  <code>NAME</code>, <code>SIZE</code>,  <code>MULTIPLE</code>, <code>VALUES</code> <em>(array of items)</em></em> &rArr; )<ul>
+		<li>Items may be individual <code class="class">String</code> names, or any of: an array of <span style="white-space:nowrap">[ <i class="obj">name</i>, <i class="obj">selected</i> ],</span> an array of <span style="white-space:nowrap">[ <i class="obj">value</i>, <i class="obj">name</i> ],</span> or an array of <span style="white-space:nowrap">[ <i class="obj">value</i>, <i class="obj">name</i>, <i class="obj">selected</i> ].</span> The value for the hash key VALUES should be an array of these items. </li>
+	</ul></li>
+	<li><code>radio_button</code>( <em><i class="obj">name</i>="", <i class="obj">value</i>=<code>nil</code>, <i class="obj">checked</i>=<code>nil</code></em> )<br><code>radio_button</code>( <em>  <code>NAME</code>, <code>VALUE</code>, <code>CHECKED</code></em> &rArr; )</li>
+	<li><code>radio_group</code>( <em><i class="obj">name</i>="", <i class="obj">items</i></em> )<br><code>radio_group</code>( <em><code>NAME</code>, <code>VALUES</code> <em>(array of items)</em></em> &rArr; )<ul>
+		<li>Items may be individual <code class="class">String</code> names, or any of: an array of <span style="white-space:nowrap">[ <i class="obj">name</i>, <i class="obj">selected</i> ],</span> an array of <span style="white-space:nowrap">[ <i class="obj">value</i>, <i class="obj">name</i> ],</span> or an array of <span style="white-space:nowrap">[ <i class="obj">value</i>, <i class="obj">name</i>, <i class="obj">selected</i> ].</span> The value for the hash key VALUES should be an array of these items.</li>
+	</ul></li>
+	<li><code>reset</code>( <em><i class="obj">value</i>=<code>nil</code>, <i class="obj">name</i>=<code>nil</code></em> )<br><code>reset</code>( <em><code>VALUE</code>, <code>NAME</code></em> &rArr; )</li>
+	<li><code>scrolling_list</code>( <em><em>alias for</em> popup_menu</em> )<br><code>scrolling_list</code>( <em></em> &rArr; )</li>
+	<li><code>submit</code>( <em><i class="obj">value</i>=<code>nil</code>, <i class="obj">name</i>=<code>nil</code></em> )<br><code>submit</code>( <em><code>VALUE</code>, <code>NAME</code></em> &rArr; )</li>
+	<li><code>text_field</code>( <em><i class="obj">name</i>="", <i class="obj">value</i>=<code>nil</code>, <i class="obj">size</i>=40, <i class="obj">maxlength</i>=<code>nil</code></em> )<br><code>text_field</code>( <em><code>NAME</code>, <code>VALUE</code>, <code>SIZE</code>, MAXLENGTH</em> &rArr; )</li>
+	<li><code>textarea</code>( <em><i class="obj">name</i>="", <i class="obj">cols</i>=70, <i class="obj">rows</i>=10</em> )<br><code>textarea</code>( <em>  <code>NAME</code>, <code>COLS</code>, <code>ROWS</code></em> &rArr; )</li>
+</ul>
+
+
+<p>In addition, all HTML tags are supported as methods, including <code>title</code>, <code>head</code>, <code>body</code>, <code>br</code>, <code>pre</code>, and so on. The block given to the method must return a <code class="class">String</code>, which will be used as the content for that tag type.  Not all tags require content: <code>&lt;P&gt;</code>, for example, does not. The available tags vary according to the supported HTML level&mdash;<a href="lib_network.html#table_26.1">Table 26.1</a> lists the complete set.  For these methods, you can pass in a hash with attributes for the given tag.  For instance, you might pass in <code>'BORDER'=&gt;'5'</code> to the <code>table</code> method to set the border width of the table.</p>
+
+<table id="CGI.table_26.1">
+<caption>Table 26.1 : HTML tags available as methods</caption>
+<thead><tr>
+	<th>{HTML 3}</th>
+	<th>{HTML 4}</th>
+<th>{HTML 4 Transitional}</th>
+	<th>{HTML 4 Frameset}</th>
+</tr></thead>
+<tr class="firstRow">
+	<td><code>a</code> <code>address</code> <code>applet</code> <code>area</code> <code>b</code> <code>base</code> <code>basefont</code> <code>big</code> <code>blockquote</code> <code>body</code> <code>br</code> <code>caption</code> <code>center</code> <code>cite</code> <code>code</code> <code>dd</code> <code>dfn</code> <code>dir</code> <code>div</code> <code>dl</code> <code>dt</code> <code>em</code> <code>font</code> <code>form</code> <code>h1</code> <code>h2</code> <code>h3</code> <code>h4</code> <code>h5</code> <code>h6</code> <code>head</code> <code>hr</code> <code>html</code> <code>i</code> <code>img</code> <code>input</code> <code>isindex</code> <code>kbd</code> <code>li</code> <code>link</code> <code>listing</code> <code>map</code> <code>menu</code> <code>meta</code> <code>ol</code> <code>option</code> <code>p</code> <code>param</code> <code>plaintext</code> <code>pre</code> <code>samp</code> <code>script</code> <code>select</code> <code>small</code> <code>strike</code> <code>strong</code> <code>style</code> <code>sub</code> <code>sup</code> <code>table</code> <code>td</code> <code>textarea</code> <code>th</code> <code>title</code> <code>tr</code> <code>tt</code> <code>u</code> <code>ul</code> <code>var</code> <code>xmp</code></td>
+	<td><code>a</code> <code>abbr</code> <code>acronym</code> <code>address</code> <code>area</code> <code>b</code> <code>base</code> <code>bdo</code> <code>big</code> <code>blockquote</code> <code>body</code> <code>br</code> <code>button</code> <code>caption</code> <code>cite</code> <code>code</code> <code>col</code> <code>colgroup</code> <code>dd</code> <code>del</code> <code>dfn</code> <code>div</code> <code>dl</code> <code>dt</code> <code>em</code> <code>fieldset</code> <code>form</code> <code>h1</code> <code>h2</code> <code>h3</code> <code>h4</code> <code>h5</code> <code>h6</code> <code>head</code> <code>hr</code> <code>html</code> <code>i</code> <code>img</code> <code>input</code> <code>ins</code> <code>kbd</code> <code>label</code> <code>legend</code> <code>li</code> <code>link</code> <code>map</code> <code>meta</code> <code>noscript</code> <code>object</code> <code>ol</code> <code>optgroup</code> <code>option</code> <code>p</code> <code>param</code> <code>pre</code> <code>q</code> <code>samp</code> <code>script</code> <code>select</code> <code>small</code> <code>span</code> <code>strong</code> <code>style</code> <code>sub</code> <code>sup</code> <code>table</code> <code>tbody</code> <code>td</code> <code>textarea</code> <code>tfoot</code> <code>th</code> <code>thead</code> <code>title</code> <code>tr</code> <code>tt</code> <code>ul</code> <code>var</code></td>
+	<td><code>a</code> <code>abbr</code> <code>acronym</code> <code>address</code> <code>applet</code> <code>area</code> <code>b</code> <code>base</code> <code>basefont</code> <code>bdo</code> <code>big</code> <code>blockquote</code> <code>body</code> <code>br</code> <code>button</code> <code>caption</code> <code>center</code> <code>cite</code> <code>code</code> <code>col</code> <code>colgroup</code> <code>dd</code> <code>del</code> <code>dfn</code> <code>dir</code> <code>div</code> <code>dl</code> <code>dt</code> <code>em</code> <code>fieldset</code> <code>font</code> <code>form</code> <code>h1</code> <code>h2</code> <code>h3</code> <code>h4</code> <code>h5</code> <code>h6</code> <code>head</code> <code>hr</code> <code>html</code> <code>i</code> <code>iframe</code> <code>img</code> <code>input</code> <code>ins</code> <code>isindex</code> <code>kbd</code> <code>label</code> <code>legend</code> <code>li</code> <code>link</code> <code>map</code> <code>menu</code> <code>meta</code> <code>noframes</code> <code>noscript</code> <code>object</code> <code>ol</code> <code>optgroup</code> <code>option</code> <code>p</code> <code>param</code> <code>pre</code> <code>q</code> <code>s</code> <code>samp</code> <code>script</code> <code>select</code> <code>small</code> <code>span</code> <code>strike</code> <code>strong</code> <code>style</code> <code>sub</code> <code>sup</code> <code>table</code> <code>tbody</code> <code>td</code> <code>textarea</code> <code>tfoot</code> <code>th</code> <code>thead</code> <code>title</code> <code>tr</code> <code>tt</code> <code>u</code> <code>ul</code> <code>var</code></td>
+	<td><em>HTML 4 Transitional plus:</em><br><code>frame frameset</code></td>
+</tr></table>
+
+<h2 id="CGI.multipartformvalues">Multipart Form Values</h2>
+
+<p>When dealing with a multipart form, the array returned by <code class="class_instance_method"><span class="class">CGI</span>#<span class="method">[]</span></code> is composed of objects of class <code class="class">Tempfile</code>, with the following dynamically added methods:</p>
+
+<table>
+	<thead><tr>
+	<th>Method</th>
+	<th>Description</th>
+</tr></thead>
+	<tr class="firstRow">
+	  <td><code>read</code></td>
+	  <td>Body</td>
+	</tr>
+	<tr>
+	  <td><code>local_path</code></td>
+	  <td>Path to local file containing the content</td>
+	</tr>
+	<tr>
+	  <td><code>original_filename</code></td>
+	  <td>Original filename of the content</td>
+	</tr>
+	<tr>
+	  <td><code>content_type</code></td>
+	  <td>Content type</td>
+	</tr>
+</table>
+
+<hr class="classbreak">
+
+<h1 id="CGISession" class="class">class <strong>CGI::Session</strong> &lt; Object</h1>
+
+<p>A <code class="class">CGI::Session</code> maintains a persistent state for web users in a CGI environment.  Sessions may be memory-resident or may be stored on disk.  See the discussion on &ldquo;<a href="web.html#sessions">Sessions</a>&rdquo; for details.</p>
+
+<h2 class="refsubsection" id="CGISession.classmethods">CGI::Session class methods</h2>
+<dl class="methodlist">
+	<dt id="CGISession.new">new</dt>
+		<dd class="callseq">CGI::Session.new( <i class="obj">aCgi</i>, <i>[</i><i class="obj">aHash</i><i>]*</i> )  &rarr; <i class="obj">aSession</i></dd>
+		<dd class="desc"><p>Returns a new session object for the <code class="class">CGI</code> query.  Options that may be given in <i class="obj">aHash</i> include:</p>
+
+          <table>
+			<thead><tr>
+	<th>Option</th>
+	<th>Description</th>
+</tr></thead>
+			<tr class="firstRow">
+			  <td><code>session_key</code></td>
+			  <td>Name of CGI key for session identification.</td>
+			</tr>
+			<tr>
+			  <td><code>session_id</code></td>
+			  <td>Value of session id.</td>
+			</tr>
+			<tr>
+			  <td><code>new_session</code></td>
+			  <td>If <code class="const">true</code>, create a new session id for this session. If <code class="const">false</code>, use an existing session identified by <code>session_id</code>. If omitted, use an existing session if available, otherwise create a new one.</td>
+			</tr>
+			<tr>
+			  <td><code>database_manager</code></td>
+			  <td>Class to use to save sessions; may be <code class="class">CGI::Session::FileStore</code> or <code class="class">CGI::Session::MemoryStore</code> (or user defined if you're brave). Default is <code>FileStore</code>.</td>
+			</tr>
+			<tr><td><code>tmpdir</code></td>
+			  <td>For <code>FileStore,</code> directory for session files.</td></tr>
+			<tr><td><code>prefix</code></td>
+			  <td>For <code>FileStore,</code> prefix of session filenames.</td></tr>
+			</table></dd>
+</dl>
+
+<h2 class="refsubsection" id="CGISession.instancemethods">CGI::Session instance methods</h2>
+<dl class="methodlist">
+	<dt id="CGISession._ob_cb">[ ]</dt>
+		<dd class="callseq"><i class="obj">aSession</i>[ <i class="obj">aKey</i> ]  &rarr; <i class="obj">aValue</i></dd>
+		<dd class="desc">Returns the value for the given key.</dd>
+
+	<dt id="CGISession._ob_cb_eq">[ ]=</dt>
+		<dd class="callseq"><i class="obj">aSession</i>[ <i class="obj">aKey</i> ] = <i class="obj">aValue</i>  &rarr; <i class="obj">aValue</i></dd>
+		<dd class="desc">Sets the value for the given key.</dd>
+
+	<dt id="CGISession.delete">delete</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.delete</dd>
+		<dd class="desc">Calls the <code>delete</code> method of the underlying database manager. For <code>FileStore</code>, deletes the physical file containing the session. For <code>MemoryStore</code>, removes the session from memory.</dd>
+
+	<dt id="CGISession.update">update</dt>
+		<dd class="callseq"><i class="obj">aSession</i>.update</dd>
+		<dd class="desc">Calls the <code>update</code> method of the underlying database manager. For <code>FileStore</code>, writes the session data out to disk. Has no effect with <code>MemoryStore</code>.</dd>
+</dl>
+
+
+<div id="menubot" class="menu">
+	<a href="lib_patterns.html" class="prev">&lt; Previous</a><a href="lib_windows.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="lib_network.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

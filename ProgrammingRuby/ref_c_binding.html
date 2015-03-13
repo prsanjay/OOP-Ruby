@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Binding</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_c_binding',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="class" id="Binding">class <strong>Binding</strong> &lt; Object</h1>
+
+<p>Objects of class <code class="class">Binding</code> encapsulate the execution context at some particular place in the code and retain this context for future use. The variables, methods, value of <code>self</code>, and possibly an iterator block that can be accessed in this context are all retained. Binding objects can be created using <code class="module_instance_method"><a href="ref_m_kernel.html#Kernel.binding"><span class="module">Kernel</span>#<span class="method">binding</span></a></code>, and are made available to the callback of <code class="module_instance_method"><a href="ref_m_kernel.html#Kernel.set_trace_func"><span class="module">Kernel</span>#<span class="method">set_trace_func</span></a></code>.</p>
+
+<p>These binding objects can be passed as the second argument of the <code class="module_instance_method"><a href="ref_m_kernel.html#Kernel.eval"><span class="module">Kernel</span>#<span class="method">eval</span></a></code> method, establishing an environment for the evaluation.</p>
+
+<div><code class="block">class Demo
+  def initialize(n)
+    @secret = n
+  end
+  def getBinding
+    return binding()
+  end
+end
+
+k1 = Demo.new(99)
+b1 = k1.getBinding
+k2 = Demo.new(-3)
+b2 = k2.getBinding
+
+eval("@secret", b1) <span class="output"><span class="outputmark">&rarr;</span> 99</span>
+eval("@secret", b2) <span class="output"><span class="outputmark">&rarr;</span> -3</span>
+eval("@secret") <span class="output"><span class="outputmark">&rarr;</span> nil</span></code></div>
+
+<p>Binding objects have no class-specific methods.</p>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_c_binding.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

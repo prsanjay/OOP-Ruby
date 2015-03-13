@@ -1,0 +1,356 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Ruby and the Web</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	<a href="rubyworld.html" class="prev">&lt; Previous</a><a href="ext_tk.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'web',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+<h1 id="rubyandtheweb">Ruby and the Web</h1>
+<p>Ruby is no stranger to the Internet.  Not only can you write your own SMTP server, FTP daemon, or Web server in Ruby, but you can also use Ruby for more usual tasks such as CGI programming or as a replacement for PHP.</p>
+
+<h2 id="writingcgiscripts">Writing CGI Scripts</h2>
+<p>You can use Ruby to write CGI scripts quite easily.  To have a Ruby script generate HTML output, all you need is</p>
+
+<div><code class="block">#!/usr/bin/env ruby
+print "HTTP/1.0 200 OK\r\n"
+print "Content-type: text/html\r\n\r\n"
+print "&lt;html&gt;&lt;body&gt;Hello World!&lt;/body&gt;&lt;/html&gt;\r\n"</code></div>
+<p>You <em>could</em> use Ruby's regular expression features to parse incoming query strings, look up environment variables, check tags, substitute text into templates, escape special characters, format up the HTML, and print it all out.</p>
+<p>Or, you could use class <code class="class">CGI</code>.</p>
+
+<h3 id="usingcgirb">Using cgi.rb</h3>
+<p>Class <code class="class">CGI</code> provides support for writing CGI scripts.  With it, you can manipulate forms, cookies, and the environment, maintain stateful sessions, and so on.  It's documented in full <a href="lib_network.html#CGI">its reference section</a>, but we'll take a quick look at its capabilities here.</p>
+
+<h3 id="quoting">Quoting</h3>
+<p>When dealing with URLs and HTML code, you must be careful to quote certain characters.  For instance, a slash character (&ldquo;/&rdquo;) has special meaning in a URL, so it must be &ldquo;escaped&rdquo; if it's not part of the path name.  That is, any &ldquo;/&rdquo; in the query portion of the URL will be translated to the string &ldquo;<code>%2F</code>&rdquo; and must be translated back to a &ldquo;/&rdquo; for you to use it.  Space and ampersand are also special characters. To handle this, <code class="class">CGI</code> provides the routines <code class="class_class_method"><span class="class">CGI</span>.<span class="method">escape</span></code> and <code class="class_class_method"><span class="class">CGI</span>.<span class="method">unescape</span></code>:</p>
+
+<div><code class="block">require 'cgi'
+puts CGI.escape( "Nicholas Payton/Trumpet &amp; Flugel Horn" )</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Nicholas+Payton%2FTrumpet+%26+Flugel+Horn</code></div>
+<p>Similarly, you may want to escape HTML special characters:</p>
+
+<div><code class="block">require 'cgi'
+puts CGI.escapeHTML( '&lt;a href="/mp3"&gt;Click Here&lt;/a&gt;' )</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">&amp;lt;a href=&amp;quot;/mp3&amp;quot;&amp;gt;Click Here&amp;lt;/a&amp;gt;</code></div>
+<p>To get really fancy, you can decide to escape only certain elements within a string:</p>
+
+<div><code class="block">require 'cgi'
+puts CGI.escapeElement('&lt;hr&gt;&lt;a href="/mp3"&gt;Click Here&lt;/a&gt;&lt;br&gt;','A')</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">&lt;hr&gt;&amp;lt;a href=&amp;quot;/mp3&amp;quot;&amp;gt;Click Here&amp;lt;/a&amp;gt;&lt;br&gt;</code></div>
+<p>Here only the &ldquo;<code>A</code>&rdquo; tag is escaped; other tags are left alone. Each of these methods has an &ldquo;<code>un</code>-&rdquo; version to restore the original string.</p>
+
+<h3 id="forms">Forms</h3>
+<p>Using class <code class="class">CGI</code> gives you access to HTML query parameters in two ways. Suppose we are given a URL of <code>/cgi-bin/lookup?player=Miles%20Davis&amp;year=1958</code>.  You can access the parameters &ldquo;<code>player</code>&rdquo; and &ldquo;<code>year</code>&rdquo; using <code class="class_instance_method"><span class="class">CGI</span>#<span class="method">[]</span></code> directly:</p>
+
+<div><code class="block">require 'cgi'
+cgi = CGI.new
+cgi['player'] <span class="output"><span class="outputmark">&rarr;</span> ["Miles Davis"]</span>
+cgi['year'] <span class="output"><span class="outputmark">&rarr;</span> ["1958"]</span></code></div>
+
+
+<p>Or, you can retrieve all parameters as a <code class="class">Hash</code>:</p>
+
+<div><code class="block">require 'cgi'
+cgi = CGI.new
+h = cgi.params
+h['player'] <span class="output"><span class="outputmark">&rarr;</span> ["Miles Davis"]</span></code></div>
+
+
+
+<h4 id="creatingformsandhtml">Creating Forms and HTML</h4>
+<p><code class="class">CGI</code> contains a huge number of methods used to create HTML&mdash;one method per tag.  In order to enable these methods, you must create a <code class="class">CGI</code> object by calling <code class="class_class_method"><span class="class">CGI</span>.<span class="method">new</span></code>, passing in the required level of HTML.  For these examples, we'll use &ldquo;<code>html3</code>&rdquo;.</p>
+<p>To make tag nesting easier, these methods take their content as code blocks.  The code blocks should return a <code class="class">String</code>, which will be used as the content for the tag.  For this example, we've added some gratuitous newlines to make the output fit on the page.</p>
+
+<div><code class="block">require "cgi"
+cgi = CGI.new("html3")  # add HTML generation methods
+cgi.out{
+  cgi.asp{
+    cgi.head{ "\n"+cgi.title{"This Is a Test"} } +
+    cgi.body{ "\n"+
+      cgi.form{"\n"+
+        cgi.hr +
+        cgi.h1 { "A Form: " } + "\n"+
+        cgi.textarea("get_text") +"\n"+
+        cgi.br +
+        cgi.submit
+      }
+    }
+  }
+}</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Content-Type: text/html
+Content-Length: 302
+&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN"&gt;&lt;HTML&gt;&lt;HEAD&gt;
+&lt;TITLE&gt;This Is a Test&lt;/TITLE&gt;&lt;/HEAD&gt;&lt;BODY&gt;
+&lt;FORM METHOD="post" ENCTYPE="application/x-www-form-urlencoded"&gt;
+&lt;HR&gt;&lt;H1&gt;A Form: &lt;/H1&gt;
+&lt;TEXTAREA NAME="get_text" ROWS="10" COLS="70"&gt;&lt;/TEXTAREA&gt;
+&lt;BR&gt;&lt;INPUT TYPE="submit"&gt;&lt;/FORM&gt;&lt;/BODY&gt;&lt;/HTML&gt;</code></div>
+<p>This code will produce an HTML form titled &ldquo;This Is a Test,&rdquo; followed by a horizontal rule, a level-one header, a test input area, and finally a submit button.  When the submit comes back, you'll have a CGI parameter named &ldquo;<code>get_text</code>&rdquo; containing the text the user entered.</p>
+
+<h3 id="cookies">Cookies</h3>
+<p>You can store all kinds of interesting stuff on an unsuspecting surfer's machine using <em>cookies</em>. You can create a named cookie object and store a number of values in it.  To send it down to the browser, set a &ldquo;cookie&rdquo; header in the call to <code class="class_instance_method"><span class="class">CGI</span>#<span class="method">out</span></code>.</p>
+
+<div><code class="block">require "cgi"
+cookie = CGI::Cookie.new("rubyweb", "CustID=123", "Part=ABC");
+cgi = CGI.new("html3")
+cgi.out( "cookie" =&gt; [cookie] ){
+  cgi.asp{
+    "\nHTML content here"
+  }
+}</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Content-Type: text/html
+Content-Length: 86
+Set-Cookie: rubyweb=CustID%3D123&amp;Part%3DABC; path=
+
+&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN"&gt;&lt;HTML&gt;
+HTML content here&lt;/HTML&gt;</code></div>
+<p>The next time the user comes back to this page, you can retrieve the cookie values for <code>CustID</code> and <code>Part</code>, as shown in the HTML output.</p>
+
+<div><code class="block">require "cgi"
+cgi = CGI.new("html3")
+cgi.out{
+  cgi.asp{
+    cgi.pre{
+      cookie = cgi.cookies["rubyweb"]
+        "\nCookies are\n" + cookie.value.join("\n")
+    }
+  }
+}</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Content-Type: text/html
+Content-Length: 111
+
+&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN"&gt;&lt;HTML&gt;&lt;PRE&gt;
+Cookies are
+CustID=123
+Part=ABC&lt;/PRE&gt;&lt;/HTML&gt;</code></div>
+
+<h3 id="sessions">Sessions</h3>
+<p>Cookies by themselves still need a bit of work to be useful. What we really want is a <em>session:</em> a persistent state for some Web surfer.  Sessions are handled with <code class="class"><a href="lib_network.html#CGISession">CGI::Session</a></code>, which uses cookies but provides a higher-level abstraction.</p>
+
+<div><code class="block">require "cgi"
+require "cgi/session"
+
+cgi = CGI.new("html3")
+sess = CGI::Session.new( cgi, "session_key" =&gt; "rubyweb",
+                          "session_id"  =&gt; "9650",
+                          "new_session" =&gt; true,
+                          "prefix" =&gt; "web-session.")
+sess["CustID"] = 123
+sess["Part"] = "ABC"
+
+cgi.out{
+  cgi.asp{
+    "\nHTML content here"
+  }
+}</code></div>
+<p>This will send a cookie to the user named &ldquo;rubyweb&rdquo; with a value of 9650.  It will also create a disk file in <code>$TMP/web-session.9650</code> with the <em>key, value</em> pairs for <code>CustID</code> and <code>Part</code>.</p>
+<p>When the user returns, all you need is a parameter to indicate the session id. In this example, that would be <code>rubyweb=9650</code>.  With that value in the parameters, you'll be able to retrieve the full set of saved session data.</p>
+
+<div><code class="block">require "cgi"
+require "cgi/session"
+
+cgi = CGI.new("html3")
+sess = CGI::Session.new( cgi, "session_key" =&gt; "rubyweb",
+                               "prefix" =&gt; "web-session.")
+cgi.out{
+  cgi.asp{
+    "\nCustomer #{sess['CustID']} orders an #{sess['Part']}"
+  }
+}</code></div>
+
+<h2 id="embeddingrubyinhtml">Embedding Ruby in HTML</h2>
+<p>So far we've looked at using Ruby to create HTML output, but we can turn the problem inside out; we can actually embed Ruby in an HTML document.</p>
+<p>There are a number of packages that allow you to embed Ruby statements in some other sort of a document, especially in an HTML page. Generically, this is known as &ldquo;eRuby.&rdquo;  Specifically, there are several different implementations of eRuby, including <code>eruby</code> and <code>erb</code>.  The remainder of this section will discuss <code>eruby</code>, written by Shugo Maeda.</p>
+<p>Embedding Ruby in HTML is a very powerful concept&mdash;it basically gives us the equivalent of a tool such as ASP, JSP, or PHP, but with the full power of Ruby.</p>
+
+<h3 id="usingeruby">Using eruby</h3>
+<p><code>eruby</code> acts as a filter, plain and simple.  Any text within the input file is passed through untouched, with the following exceptions:</p>
+
+
+<table class="figure">
+<thead><tr>
+  <th>Expression</th>
+  <th>Description</th>
+</tr></thead><tbody>
+<tr class="firstRow">
+  <td><code>&lt;%</code> <em>ruby code</em> <code>%&gt;</code></td>
+  <td>The Ruby code between the delimiters
+  is replaced with its output.</td>
+</tr>
+<tr>
+  <td><code>&lt;%=</code> <em>ruby expression</em> <code>%&gt;</code></td>
+  <td>The Ruby expression
+  between the delimiters is replaced with its value.</td>
+</tr>
+<tr>
+  <td><code>&lt;%#</code> <em>ruby code</em> <code>%&gt;</code></td>
+  <td>The Ruby code between the
+  delimiters is ignored (useful for testing).</td>
+</tr></tbody>
+</table>
+
+<p>You invoke <code>eruby</code> as:</p>
+
+<div class="syntax"><code class="block">eruby <i class="opt">[</i><i class="opt">options</i><i class="opt">]</i> <i class="opt">[</i><i class="opt">document</i><i class="opt">]</i></code></div>
+
+<p>If the <em>document</em> is omitted, <code>eruby</code> will read from standard input.  The command-line options for <code>eruby</code> are shown in <a href="web.html#table_14.1">Table 14.1</a>.</p>
+
+<table class="figure" id="table_14.1">
+<caption>Table 14.1 : Command-line options for <code>eruby</code></caption>
+<thead><tr>
+  <th>Option</th>
+  <th>Description</th>
+</tr></thead><tbody>
+<tr class="firstRow">
+  <td><code>-d</code>, <code>--debug</code></td>
+  <td>Sets $DEBUG to <code>true</code>.</td>
+</tr>
+<tr>
+  <td><code>-K</code> <em>kcode</em></td>
+  <td>Specifies an alternate coding system (see &ldquo;<a href="rubyworld.html#commandlineoptions">Command-Line Options</a>&rdquo;).</td>
+</tr>
+<tr>
+  <td><code>-M</code> <em>mode</em></td>
+  <td>Specifies runtime <em>mode</em>, one of:
+	<dl>
+	  <dt><code>f</code></dt>
+	  <dd>filter mode</dd>
+
+	  <dt><code>c</code></dt>
+	  <dd>CGI mode (prints errors as HTML, sets $SAFE=1)</dd>
+
+	  <dt><code>n</code></dt>
+	  <dd>NPH-CGI mode (prints extra HTTP headers, sets $SAFE=1)</dd>
+	</dl>
+</td>
+</tr>
+<tr>
+  <td><code>-n</code>, <code>--noheader</code></td>
+  <td>Disables CGI header output.</td>
+</tr>
+<tr>
+  <td><code>-v</code>, <code>--verbose</code></td>
+  <td>Enables verbose mode.</td>
+</tr>
+<tr>
+  <td><code>--version</code></td>
+  <td>Prints version information and exits.</td>
+</tr></tbody>
+</table>
+
+<p>Let's look at some simple examples.  We'll run the <code>eruby</code> executable on the following input.</p>
+
+<div><code class="block">This text is &lt;% a = 100; puts "#{a}% Live!" %&gt;</code></div>
+
+<p><code>eruby</code> substitutes the expression between the delimiters and produces</p>
+
+<div><code class="block">This text is 100% Live!</code></div>
+
+<p>Using the &lt;%= form acts as if you printed the value of the expression.  For instance, the input</p>
+
+<div><code class="block">  This text is almost 100 degrees! Cool!
+
+&lt;%a = 100%&gt;This text is almost &lt;%=a%&gt; degrees! Cool!</code></div>
+
+<p>replaces the <code>=a</code> with the value of <code>a</code>.</p>
+
+<div><code class="block">This text is almost 100 degrees! Cool!</code></div>
+<p>And, of course, you can embed Ruby within a more complex document type, such as HTML.</p>
+
+<div><code class="block">&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;eruby example&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;Enumeration&lt;/h1&gt;
+&lt;ul&gt;
+&lt;%(1..10).each do|i|%&gt;
+  &lt;li&gt;number &lt;%=i%&gt;&lt;/li&gt;
+&lt;%end%&gt;
+&lt;/ul&gt;
+&lt;h1&gt;Environment variables&lt;/h1&gt;
+&lt;table&gt;
+&lt;%ENV.keys.sort.each do |key|%&gt;
+  &lt;tr&gt;
+    &lt;th&gt;&lt;%=key%&gt;&lt;/th&gt;&lt;td&gt;&lt;%=ENV[key]%&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;%end%&gt;
+&lt;/table&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></div>
+
+<h3 id="installingerubyinapache">Installing eruby in Apache</h3>
+<p>You can set up an Apache Web server to automatically parse Ruby-embedded documents using eRuby, much in the same way that PHP does.  You create Ruby-embedded files with an &ldquo;<code>.rhtml</code>&rdquo; suffix and configure the Web server to run the <code>eruby</code> executable on these documents to produce the desired HTML output.</p>
+<p>In order to use <code>eruby</code> with the Apache Web server, you need to perform the following steps.</p>
+<ul>
+  <li> Copy the <code>eruby</code> binary to the <code>cgi-bin</code> directory.</li>
+<li> Add the following two lines to <code>httpd.conf</code>:
+
+<div><code class="block">AddType application/x-httpd-eruby .rhtml
+Action application/x-httpd-eruby /cgi-bin/eruby</code></div>
+</li><li>If desired, you can also add or replace the <code>DirectoryIndex</code>
+  directive such that it includes <code>index.rhtml</code>.  This lets you use
+  Ruby to create directory listings for directories that do not
+  contain an <code>index.asp</code>.  For instance, the following directive
+  would cause the embedded Ruby script <code>index.rhtml</code> to be searched
+  for and served if neither <code>index.asp</code> nor <code>index.shtml</code> existed in a
+  directory.
+
+<div><code class="block">DirectoryIndex index.asp index.shtml index.rhtml</code></div>
+<p>Of course, you could also simply use a site-wide Ruby script as   well.</p>
+
+<div><code class="block">DirectoryIndex index.asp index.shtml /cgi-bin/index.rb</code></div>
+</li></ul>
+<p>And that's it!  You can now write HTML documents that contain embedded Ruby to generate forms and content dynamically.  Be sure to see also the Ruby <a href="lib_network.html#cgidevelopment"><code class="class">CGI</code> library</a>.</p>
+
+<h2 id="improvingperformance">Improving Performance</h2>
+<p>You can use Ruby to write CGI programs for the Web, but, as with most CGI programs, the default configuration has to start up a new copy of Ruby with every cgi-bin page access. That's expensive in terms of machine utilization and can be painfully slow for Web surfers. The Apache Web server solves this problem by allowing loadable <em>modules</em>.</p>
+<p>Typically, these modules are dynamically loaded and become part of the running Web server process&mdash;there is no need to spawn another interpreter over and over again to service requests; the Web server <em>is</em> the interpreter.</p>
+<p>And so we come to <code>mod_ruby</code> (available from the archives), an Apache module that links a full Ruby interpreter into the Apache Web server itself.  The <code>README</code> file included with <code>mod_ruby</code> provides details on how to compile and install it.</p>
+<p>Once installed and configured, you can run Ruby scripts just like you could without <code>mod_ruby</code>, except that now they will come up much faster.</p>
+
+
+<div id="menubot" class="menu">
+	<a href="rubyworld.html" class="prev">&lt; Previous</a><a href="ext_tk.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="web.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

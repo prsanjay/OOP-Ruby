@@ -1,0 +1,1475 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Standard Library</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	<a href="builtins.html" class="prev">&lt; Previous</a><a href="lib_patterns.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'lib_standard',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+
+<h1 id="standardlibrary">Standard Library</h1>
+
+<p>Ruby comes &ldquo;out of the box&rdquo; with a large and useful library of modules and classes. This chapter contains a sampling of the more useful of these.</p>
+
+<p>Interestingly, and unlike some of the code in later chapters, all of these libraries are written in Ruby. You'll find the source in the <code>lib</code> subdirectory of the standard Ruby distribution.</p>
+
+<h1 id="Complex" class="class">class <strong>Complex</strong> &lt; Numeric</h1>
+
+<div><code class="block">require "complex"
+
+v1 = Complex(2,3) <span class="output"><span class="outputmark">&rarr;</span> Complex(2, 3)</span>
+v2 = 2.im <span class="output"><span class="outputmark">&rarr;</span> Complex(0, 2)</span>
+v1 + v2 <span class="output"><span class="outputmark">&rarr;</span> Complex(2, 5)</span>
+v1 * v2 <span class="output"><span class="outputmark">&rarr;</span> Complex(-6, 4)</span>
+v2**2 <span class="output"><span class="outputmark">&rarr;</span> Complex(-4, 0)</span>
+Math.sin(v1) <span class="output"><span class="outputmark">&rarr;</span> Complex(9.154499147, -4.16890696)</span>
+v1 &lt; v2 <span class="output"><span class="outputmark">&rarr;</span> false</span>
+v2**2 == -4 <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+<h2 class="refsubsection" id="Complex.constants">Complex constants</h2>
+<table class="constants">
+<tr class="firstRow">
+	<th><code class="constant">Complex::I</code></th>
+	<td>0 +1<sub>i</sub></td>
+</tr></table>
+
+
+<h2 class="refsubsection" id="Complex.classmethods">Complex class methods</h2>
+<dl class="methodlist">
+	<dt id="Complex.new">new</dt>
+		<dd class="callseq">Complex.new( <i class="obj">a</i>, <i class="obj">b</i> )  &rarr; <i class="obj">aComplex</i></dd>
+		<dd class="desc">Returns a + b<sub>i</sub>.
+
+		<p>In addition to the <code class="class_class_method"><span class="class">Complex</span>.<span class="method">new</span></code> constructor, the <code class="class">Complex</code> library defines the method <code class="class_class_method"><span class="class">Numeric</span>.<span class="method">im</span></code>, such that <i class="obj">aNumeric</i><code>.im</code> returns 0 + <i class="obj">aNumeric</i><sub>i</sub>. Complex numbers are also constructed using the global method <code class="method">Complex</code>, which takes one or two arguments. The value it returns depends on the type of its arguments:</p>
+
+		<table>
+		<thead><tr>
+			<th>a</th>
+			<th>b</th>
+			<th>Result</th>
+		</tr></thead>
+		<tr class="firstRow">
+		  <td>Number</td>
+		  <td>Number</td>
+		  <td>a + b<sub>i</sub></td>
+		</tr>
+		<tr>
+		  <td>Complex</td>
+		  <td>0</td>
+		  <td><i class="obj">a</i></td>
+		</tr>
+		<tr>
+		  <td>Complex</td>
+		  <td>Complex</td>
+		  <td><code>Complex( <i class="obj">a</i>.real - <i class="obj">b</i>.image, <i class="obj">a</i>.image + <i class="obj">b</i>.real )</code></td>
+		</tr>
+		<tr>
+		  <td>Number</td>
+		  <td>Complex</td>
+		  <td><code>Complex( <i class="obj">a</i> - <i class="obj">b</i>.image, <i class="obj">b</i>.real )</code></td>
+		</tr>
+		</table>
+		
+		</dd>
+</dl>
+
+<h2 class="refsubsection" id="Complex.instancemethods">Complex instance methods</h2>
+<dl class="methodlist">
+	<dt id="Complex.Arithmeticoperations" class="noncode">Arithmetic operations</dt>
+		<dd class="callseq noncode">Performs various arithmetic operations on <i class="obj">ref</i>.</dd>
+		<dd class="desc">
+			<table>
+			<tr class="firstRow">
+			  <td><i class="obj">ref</i></td>
+			  <td><code>+</code></td>
+			  <td><i class="obj">aNumeric</i>  &rarr; <i class="obj">aComplex</i></td>
+			  <td>Addition</td>
+			</tr>
+			<tr>
+			  <td><i class="obj">ref</i></td>
+			  <td><code>-</code></td>
+			  <td><i class="obj">aNumeric</i>  &rarr; <i class="obj">aComplex</i></td>
+			  <td>Subtraction</td>
+			</tr>
+			<tr>
+			  <td><i class="obj">ref</i></td>
+			  <td><code>*</code></td>
+			  <td><i class="obj">aNumeric</i>  &rarr; <i class="obj">aComplex</i></td>
+			  <td>Multiplication</td>
+			</tr>
+			<tr>
+			  <td><i class="obj">ref</i></td>
+			  <td><code>/</code></td>
+			  <td><i class="obj">aNumeric</i>  &rarr; <i class="obj">aComplex</i></td>
+			  <td>Division</td>
+			</tr>
+			<tr>
+			  <td><i class="obj">ref</i></td>
+			  <td><code>%</code></td>
+			  <td><i class="obj">aNumeric</i>  &rarr; <i class="obj">aComplex</i></td>
+			  <td>Remainder</td>
+			</tr>
+			<tr>
+			  <td><i class="obj">ref</i></td>
+			  <td><code>**</code></td>
+			  <td><i class="obj">aNumeric</i>  &rarr; <i class="obj">aComplex</i></td>
+			  <td>Exponentiation (real and complex power)</td>
+			</tr>
+			</table></dd>
+
+	<dt id="Complex._lt_eq_lt">&lt;=&gt;</dt>
+		<dd class="callseq"><i class="obj">ref</i> &lt;=&gt; <i class="obj">other</i>  &rarr; -1, 0, +1</dd>
+		<dd class="desc">Returns <i class="obj">ref</i>.abs <code>&lt;=&gt;</code> <i class="obj">other</i>.abs.</dd>
+
+	<dt id="Complex._eq_eq">==</dt>
+		<dd class="callseq"><i class="obj">ref</i> == <i class="obj">anObject</i>  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">If <i class="obj">anObject</i> is a complex number, returns <code class="const">true</code> if its real and imaginary parts match <i class="obj">ref</i>. If <i class="obj">anObject</i> is a simple number, returns <code class="const">true</code> if <i class="obj">ref</i>.<code>real</code> equals <i class="obj">anObject</i> and <i class="obj">ref</i>.<code>image</code> is zero. Otherwise, attempts to coerce <i class="obj">anObject</i> to a complex number and compares the result.</dd>
+
+	<dt id="Complex.abs">abs</dt>
+		<dd class="callseq"><i class="obj">ref</i>.abs  &rarr; <i class="obj">aFloat</i></dd>
+		<dd class="desc">Absolute value.</dd>
+
+	<dt id="Complex.abs2">abs2</dt>
+		<dd class="callseq"><i class="obj">ref</i>.abs2  &rarr; <i class="obj">aFloat</i></dd>
+		<dd class="desc">Square of absolute value.</dd>
+
+	<dt id="Complex.arg">arg</dt>
+		<dd class="callseq"><i class="obj">ref</i>.arg  &rarr; <i class="obj">aFloat</i></dd>
+		<dd class="desc">Argument (angle from (1,0)).</dd>
+
+	<dt id="Complex.conjugate">conjugate</dt>
+		<dd class="callseq"><i class="obj">ref</i>.conjugate  &rarr; <i class="obj">aComplex</i></dd>
+		<dd class="desc">Complex conjugate.</dd>
+
+	<dt id="Complex.image">image</dt>
+		<dd class="callseq"><i class="obj">ref</i>.image  &rarr; <i class="obj">aNumeric</i></dd>
+		<dd class="desc">The imaginary part of <i class="obj">ref</i>.</dd>
+
+	<dt id="Complex.polar">polar</dt>
+		<dd class="callseq"><i class="obj">ref</i>.polar  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns the two-element array: [<i class="obj">c</i>.abs, <i class="obj">c</i>.arg].</dd>
+
+	<dt id="Complex.real">real</dt>
+		<dd class="callseq"><i class="obj">ref</i>.real  &rarr; <i class="obj">aNumeric</i></dd>
+		<dd class="desc">The real part of <i class="obj">ref</i>.</dd>
+
+	<dt id="Complex.to_f">to_f</dt>
+		<dd class="callseq"><i class="obj">ref</i>.to_f  &rarr; <i class="obj">aComplex</i></dd>
+		<dd class="desc">Returns <code>Complex(real.to_f, image.to_f)</code>.</dd>
+
+	<dt id="Complex.to_i">to_i</dt>
+		<dd class="callseq"><i class="obj">ref</i>.to_i  &rarr; <i class="obj">aComplex</i></dd>
+		<dd class="desc">Returns <code>Complex(real.to_i, image.to_i)</code>.</dd>
+
+	<dt id="Complex.to_r">to_r</dt>
+		<dd class="callseq"><i class="obj">ref</i>.to_r  &rarr; <i class="obj">aComplex</i></dd>
+		<dd class="desc">Returns <code>Complex(real.to_r, image.to_r)</code>, converting both parts of the complex to a rational number.</dd>
+
+	<dt id="Complex.to_s">to_s</dt>
+		<dd class="callseq"><i class="obj">ref</i>.to_s  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">String representation of <i class="obj">ref</i>.</dd>
+</dl>
+
+<p>In addition, the <code class="module">Math</code> functions <code class="method">sqrt</code>, <code class="method">exp</code>, <code class="method">cos</code>, <code class="method">sin</code>, <code class="method">tan</code>, <code class="method">log</code>, <code class="method">log10</code>, and <code class="method">atan2</code> are extended to support a <code class="class">Complex</code> argument.</p>
+
+
+<hr class="classbreak">
+
+
+<h1 id="Date" class="class">class <strong>Date</strong> &lt; Object</h1>
+
+<div><code class="block">require 'date'
+
+d = Date.new(2000, 3, 31) <span class="output"><span class="outputmark">&rarr;</span> #&lt;Date: 2451635,2299161&gt;</span>
+[d.year, d.yday, d.wday] <span class="output"><span class="outputmark">&rarr;</span> [2000, 91, 5]</span>
+[d.month, d.mday] <span class="output"><span class="outputmark">&rarr;</span> [3, 31]</span>
+[d.cwyear, d.cweek, d.cwday] <span class="output"><span class="outputmark">&rarr;</span> [2000, 13, 5]</span>
+[d.jd, d.mjd] <span class="output"><span class="outputmark">&rarr;</span> [2451635, 51634.5]</span>
+(d &lt;&lt; 1).to_s <span class="output"><span class="outputmark">&rarr;</span> "2000-02-29"</span>
+d.succ.to_s <span class="output"><span class="outputmark">&rarr;</span> "2000-04-01"</span>
+(d + 100).to_s <span class="output"><span class="outputmark">&rarr;</span> "2000-07-09"</span>
+d.leap? <span class="output"><span class="outputmark">&rarr;</span> true</span>
+Date.new(2000, 3, -10).to_s <span class="output"><span class="outputmark">&rarr;</span> "2000-03-22"</span>
+d1 = Date.neww(2000, 13, 7) <span class="output"><span class="outputmark">&rarr;</span> #&lt;Date: 2451637,2299161&gt;</span>
+d1.to_s <span class="output"><span class="outputmark">&rarr;</span> "2000-04-02"</span>
+[d1.cwday, d1.wday] <span class="output"><span class="outputmark">&rarr;</span> [7, 0]</span></code></div>
+
+<p>The <code>date</code> library implements class <code class="class">Date</code>, which provides a comprehensive set of facilities for storing, manipulating, and converting dates. To document its options, we need to take a brief historical detour to establish some vocabulary.</p>
+
+<p>Internally a date is stored as a Julian day number, the number of days since midday, January 1st, 4713 BCE. <span class="footnote">(In the code, you may find references to the year -4712. As astronomical dates include a year zero, 4713 BCE is the same year as -4712.)</span> The rules for converting a Julian day number to a calendar date are complicated because the Romans estimated the length of a year incorrectly. In the Julian calendar (often called Old Style, or O.S.), every year divisible by 4 is a leap year. The <code class="class">Date</code> class has options to convert dates using this as an assumption.</p>
+
+<p>By the sixteenth century, the inaccuracies in this measurement had become apparent. An edict from Pope Gregory XIII in 1582 created the New Style (N.S.) or Gregorian calendar, where years divisible by 100 were no longer leap years unless they were also divisible by 400. This system was adopted by most Catholic countries immediately, but religious differences held up a wider adoption. England (and several other countries) switched in 1752, with some countries following later. The <code class="class">Date</code> class allows you to determine whether to implement the cutover in 1582 (the <code class="const">Date::ITALY</code> option), 1752 (<code class="const">Date::ENGLAND</code>), or another date of your choosing.</p>
+
+<p>The <code class="class">Date</code> class also provides conversions to Modified Julian Day (MJD) numbers. MJD values count from midnight, November 17, 1858. Because these values count from midnight, not midday, there is a half-day added to the conversion factor.</p>
+
+<p>The descriptions that follow use the abbreviations listed in <a href="lib_standard.html#table_24.1">Table 24.1</a>.</p>
+
+<p>Class <code class="class">Date</code> exports the constant arrays <code class="const">Date::MONTHNAMES</code> and <code class="const">Date::DAYNAMES</code>, which can be indexed by <i class="obj">mon</i> and <i class="obj">wday</i> values to return the corresponding English names.</p>
+
+<p>The <code class="class">Date</code> class also provides low-level date-conversion methods:</p>
+
+<ul class="brief">
+	<li><code class="method">civil_to_jd</code></li>
+	<li><code class="method">commercial_to_jd</code></li>
+	<li><code class="method">ordinal_to_jd</code></li>
+	<li><code class="method">mjd_to_jd</code></li>
+	<li><code class="method">jd_to_mjd</code></li>
+	<li><code class="method">jd_to_civil</code></li>
+	<li><code class="method">jd_to_commercial</code></li>
+	<li><code class="method">jd_to_ordinal</code></li>
+</ul>
+
+<p>These methods perform limited error checking of their parameters, and are not documented here. The somewhat confusingly named <code>exist..?</code> routines perform conversions from different formats into a Julian day number with error checking. These routines also automatically normalize their parameters.</p>
+
+<table id="Date.table_24.1">
+<caption>Table 24.1 : Abbreviations used describing dates</caption>
+<thead><tr>
+	<th>Field</th>
+	<th>Meaning</th>
+</tr></thead>
+<tr class="firstRow">
+  <td>cwday</td>
+  <td>An ISO 8601 calendar weekday. 1 is Monday, 7 is Sunday.</td>
+</tr>
+<tr>
+  <td>cweek</td>
+  <td>An ISO 8601 calendar week. Week 1 is the week containing the first Thursday (or equivalently the week that contains January 4th).</td>
+</tr>
+<tr>
+  <td>cwyear</td>
+  <td>An ISO 8601 calendar-week-based year. May be different from <i class="obj">year</i>, as it rolls forward only on a Monday.</td>
+</tr>
+<tr>
+  <td>jd</td>
+  <td>The Julian day number&mdash;the number of days since January 1st, 4713 BCE.</td>
+</tr>
+<tr>
+  <td>mday</td>
+  <td>The day of the month (1..31).</td>
+</tr>
+<tr>
+  <td>mjd</td>
+  <td>A modified Julian day number.</td>
+</tr>
+<tr>
+  <td>mon</td>
+  <td>The month of the year (1..12).</td>
+</tr>
+<tr>
+  <td>sg</td>
+  <td>The start of the Gregorian correction: <code class="const">Date::ITALY</code> (the default) for 1582, <code class="const">Date::ENGLAND</code> for 1752, or <code class="const">JULIAN</code>, meaning no correction. You may also provide an arbitrary Julian day number for this parameter, in which case the correction will start from this date.</td>
+</tr>
+<tr>
+  <td>wday</td>
+  <td>The day of the week (0 is Sunday).</td>
+</tr>
+<tr>
+  <td>week</td>
+  <td>The week number into a year (1..53).</td>
+</tr>
+<tr>
+  <td>yday</td>
+  <td>The day into the year (1..366).</td>
+</tr>
+<tr>
+  <td>year</td>
+  <td>A year (1966, 2001, and the like).</td>
+</tr></table>
+
+<h2 id="Date.mixins">mixins</h2>
+<dl>
+	<dt><code class="module"><a href="ref_m_comparable.html">Comparable</a></code></dt>
+	<dd><code>&lt;</code>, <code>&lt;=</code>, <code>==</code>, <code>&gt;=</code>, <code>&gt;</code>, <code>between?</code></dd>
+</dl>
+
+<h2 class="refsubsection" id="Date.classmethods">Date class methods</h2>
+<dl class="methodlist">
+	<dt id="Date.exist2_qm">exist2?</dt>
+		<dd class="callseq">Date.exist2?( <i class="obj">year</i>, <i class="obj">yday</i>, <i class="obj">sg</i>=<code class="const">Date::ITALY</code>)  &rarr; <i class="obj">jd</i></dd>
+		<dd class="desc">Converts a <i class="obj">year</i> and <i class="obj">yday</i> into a Julian day number, returning <code>nil</code> on error.</dd>
+
+	<dt id="Date.exist_qm">exist?</dt>
+		<dd class="callseq">Date.exist?( <i class="obj">year</i>, <i class="obj">mon</i>, <i class="obj">mday</i>,  <i class="obj">sg</i>=<code class="const">Date::ITALY</code>)  &rarr; <i class="obj">jd</i></dd>
+		<dd class="desc">Converts a <i class="obj">year</i>, <i class="obj">mon</i>, and <i class="obj">mday</i> into a Julian day number, or <code>nil</code> if the parameters are invalid.</dd>
+
+	<dt id="Date.existw_qm">existw?</dt>
+		<dd class="callseq">Date.existw?( <i class="obj">cyear</i>, <i class="obj">cweek</i>, <i class="obj">cwday</i>, <i class="obj">sg</i>=<code class="const">Date::ITALY</code>)  &rarr; <i class="obj">jd</i></dd>
+		<dd class="desc">Converts a <i class="obj">cyear</i>, <i class="obj">cweek</i>, and <i class="obj">cwday</i> into a Julian day number.</dd>
+
+	<dt id="Date.gregorian_leap_qm">gregorian_leap?</dt>
+		<dd class="callseq">Date.gregorian_leap?( <i class="obj">year</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">If <i class="obj">year</i> does not end with &ldquo;00&rdquo;, returns <code class="const">true</code> if <i class="obj">year</i> is divisible by 4, otherwise returns <code class="const">true</code> if <i class="obj">year</i> is divisible by 400.</dd>
+
+	<dt id="Date.julian_leap_qm">julian_leap?</dt>
+		<dd class="callseq">Date.julian_leap?( <i class="obj">year</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">year</i> is divisible by 4.</dd>
+
+	<dt id="Date.leap_qm">leap?</dt>
+		<dd class="callseq">Date.leap?( <i class="obj">year</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Synonym for <code class="class_class_method"><span class="class">Date</span>.<span class="method">gregorian_leap?</span></code>.</dd>
+
+	<dt id="Date.new">new</dt>
+		<dd class="callseq">Date.new( <i class="obj">year</i>=-4712, <i class="obj">mon</i>=1, <i class="obj">mday</i>=1, <i class="obj">sg</i>=<code class="const">Date::ITALY</code>)  &rarr; <i class="obj">aNewDate</i></dd>
+		<dd class="desc">Returns a <code class="class">Date</code> for the given <i class="obj">year</i>, <i class="obj">mon</i>, and <i class="obj">mday</i>. If <i class="obj">mon</i> is negative, it counts back from the end of the year. If <i class="obj">mday</i> is negative, it counts back from the end of the month.</dd>
+
+	<dt id="Date.new1">new1</dt>
+		<dd class="callseq">Date.new1( <i class="obj">jd</i>, <i class="obj">sg</i>=<code class="const">Date::ITALY</code>)  &rarr; <i class="obj">aNewDate</i></dd>
+		<dd class="desc">Creates a <code class="class">Date</code> corresponding to the given Julian day number.</dd>
+
+	<dt id="Date.new2">new2</dt>
+		<dd class="callseq">Date.new2( <i class="obj">year</i>=-4712, <i class="obj">yday</i>=1, <i class="obj">sg</i>=<code class="const">Date::ITALY</code>)  &rarr; <i class="obj">aNewDate</i></dd>
+		<dd class="desc">Returns a <code class="class">Date</code> for the given <i class="obj">year</i> and <i class="obj">yday</i>. If <i class="obj">yday</i> is negative, it counts back from the end of the year.</dd>
+
+	<dt id="Date.new3">new3</dt>
+		<dd class="callseq">Date.new3( <i class="obj">year</i>=-4712, <i class="obj">mon</i>=1, <i class="obj">mday</i>=1, <i class="obj">sg</i>=<code class="const">Date::ITALY</code>)  &rarr; <i class="obj">aNewDate</i></dd>
+		<dd class="desc">Synonym for <code class="class_class_method"><span class="class">Date</span>.<span class="method">new</span></code>.</dd>
+
+	<dt id="Date.neww">neww</dt>
+		<dd class="callseq">Date.neww( <i class="obj">cyear</i>=1582, <i class="obj">cweek</i>=41, <i class="obj">cwday</i>=5, <i class="obj">sg</i>=<code class="const">Date::ITALY</code>)  &rarr; <i class="obj">aNewDate</i></dd>
+		<dd class="desc">Returns a <code class="class">Date</code> for the given <i class="obj">cyear</i>, <i class="obj">cweek</i>, and <i class="obj">cwday</i>. If <i class="obj">cweek</i> is negative, it counts back from the end of the year. If <i class="obj">cwday</i> is negative, it counts back from the end of the week.</dd>
+
+	<dt id="Date.today">today</dt>
+		<dd class="callseq">Date.today( <i class="obj">sg</i>=<code class="const">Date::ITALY</code>)  &rarr; <i class="obj">aNewDate</i></dd>
+		<dd class="desc">Returns a <code class="class">Date</code> for today.</dd>
+</dl>
+
+<h2 class="refsubsection" id="Date.instancemethods">Date instance methods</h2>
+<dl class="methodlist">
+	<dt id="Date.Accessors" class="noncode">Accessors</dt>
+		<dd class="callseq"><i class="obj">ref</i>.year  &rarr; <i class="obj">year</i></dd>
+		<dd class="callseq"><i class="obj">ref</i>.yday  &rarr; <i class="obj">yday</i></dd>
+		<dd class="callseq"><i class="obj">ref</i>.mjd  &rarr; <i class="obj">mjd</i></dd>
+		<dd class="callseq"><i class="obj">ref</i>.mon  &rarr; <i class="obj">mon</i></dd>
+		<dd class="callseq"><i class="obj">ref</i>.month  &rarr; <i class="obj">mon</i></dd>
+		<dd class="callseq"><i class="obj">ref</i>.mday  &rarr; <i class="obj">mday</i></dd>
+		<dd class="callseq"><i class="obj">ref</i>.day  &rarr; <i class="obj">mday</i></dd>
+		<dd class="callseq"><i class="obj">ref</i>.cwyear  &rarr; <i class="obj">cwyear</i></dd>
+		<dd class="callseq"><i class="obj">ref</i>.cweek  &rarr; <i class="obj">cweek</i></dd>
+		<dd class="callseq"><i class="obj">ref</i>.cwday  &rarr; <i class="obj">cwday</i></dd>
+		<dd class="callseq"><i class="obj">ref</i>.wday  &rarr; <i class="obj">wday</i></dd>
+		<dd class="desc">Returns the given component of <i class="obj">ref</i> as a number.</dd>
+
+	<dt id="Date._pl">+</dt>
+		<dd class="callseq"><i class="obj">ref</i> + <i class="obj">anInteger</i>  &rarr; <i class="obj">aNewDate</i></dd>
+		<dd class="desc">Returns a new <code class="class">Date</code> <i class="obj">anInteger</i> days from <i class="obj">ref</i>.</dd>
+
+	<dt id="Date._mi_mi">-</dt>
+		<dd class="callseq"><i class="obj">ref</i> <code>-</code> <i class="obj">anInteger</i>  &rarr; <i class="obj">aNewDate</i></dd>
+		<dd class="callseq"><i class="obj">ref</i> <code>-</code> <i class="obj">anOtherDate</i>  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">The first form returns a new <code class="class">Date</code> <i class="obj">anInteger</i> days before <i class="obj">ref</i>. The second form returns the number of days between <i class="obj">ref</i> and <i class="obj">anOtherDate</i>.</dd>
+
+	<dt id="Date._lt_lt">&lt;&lt;</dt>
+		<dd class="callseq"><i class="obj">ref</i> &lt;&lt; <i class="obj">anInteger</i>  &rarr; <i class="obj">aNewDate</i></dd>
+		<dd class="desc">Returns a new <code class="class">Date</code> formed by subtracting <i class="obj">anInteger</i> months to <i class="obj">ref</i>, adjusting the <i class="obj">mday</i> value back to the last day of the month if it otherwise exceeds it.</dd>
+
+	<dt id="Date._lt_eq_lt">&lt;=&gt;</dt>
+		<dd class="callseq"><i class="obj">ref</i> &lt;=&gt; <i class="obj">anOther</i>  &rarr; -1, 0, +1</dd>
+		<dd class="desc"><i class="obj">anOther</i> must be a <code class="class">Numeric</code>, in which case it is treated as a Julian day number, or a <code class="class">Date</code>. Returns -1, 0, +1 if <i class="obj">ref</i> is less than, equal to, or greater than <i class="obj">anOther</i>. See module <code class="module"><a href="ref_m_comparable.html">Comparable</a></code>.</dd>
+
+	<dt id="Date._eq_eq_eq">===</dt>
+		<dd class="callseq"><i class="obj">ref</i> === <i class="obj">anOther</i>  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc"><i class="obj">anOther</i> must be a <code class="class">Numeric</code>, in which case it is treated as a Julian day number, or a <code class="class">Date</code>. Returns <code class="const">true</code> if the Julian day number of <i class="obj">anOther</i> is the same as <i class="obj">ref</i>.</dd>
+
+	<dt id="Date._lt_lt">&gt;&gt;</dt>
+		<dd class="callseq"><i class="obj">ref</i> &gt;&gt; <i class="obj">anInteger</i>  &rarr; <i class="obj">aNewDate</i></dd>
+		<dd class="desc">Returns a new <code class="class">Date</code> formed by adding <i class="obj">anInteger</i> months to <i class="obj">ref</i>, adjusting the <i class="obj">mday</i> value back to the last day of the month if it otherwise exceeds it.</dd>
+
+	<dt id="Date.downto">downto</dt>
+		<dd class="callseq"><i class="obj">ref</i>.downto( <i class="obj">aDateMin</i> )
+        {| date | block }  &rarr; <i class="obj">ref</i></dd>
+		<dd class="desc">Invokes block with dates from <i class="obj">ref</i> down to <i class="obj">aDateMin</i>.</dd>
+
+	<dt id="Date.england">england</dt>
+		<dd class="callseq"><i class="obj">ref</i>.england  &rarr; <i class="obj">aDate</i></dd>
+		<dd class="desc">Equivalent to <i class="obj">ref</i><code>.newsg(Date::ENGLAND)</code>.</dd>
+
+	<dt id="Date.gregorian">gregorian</dt>
+		<dd class="callseq"><i class="obj">ref</i>.gregorian  &rarr; <i class="obj">aDate</i></dd>
+		<dd class="desc">Equivalent to <i class="obj">ref</i><code>.newsg(Date::GREGORIAN)</code>.</dd>
+
+	<dt id="Date.italy">italy</dt>
+		<dd class="callseq"><i class="obj">ref</i>.italy  &rarr; <i class="obj">aDate</i></dd>
+		<dd class="desc">Equivalent to <i class="obj">ref</i><code>.newsg(Date::ITALY)</code>.</dd>
+
+	<dt id="Date.jd">jd</dt>
+		<dd class="callseq"><i class="obj">ref</i>.jd  &rarr; <i class="obj">jd</i></dd>
+		<dd class="desc">Returns the Julian day number for <i class="obj">ref</i>.</dd>
+
+	<dt id="Date.julian">julian</dt>
+		<dd class="callseq"><i class="obj">ref</i>.julian  &rarr; <i class="obj">aDate</i></dd>
+		<dd class="desc">Equivalent to <i class="obj">ref</i><code>.newsg(Date::JULIAN)</code>.</dd>
+
+	<dt id="Date.leap_qm">leap?</dt>
+		<dd class="callseq"><i class="obj">ref</i>.leap?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">ref</i> falls within a leap year.</dd>
+
+	<dt id="Date.mjd">mjd</dt>
+		<dd class="callseq"><i class="obj">ref</i>.mjd  &rarr; <i class="obj">mjd</i></dd>
+		<dd class="desc">Returns the Julian day number of <i class="obj">ref</i> converted to a modified Julian day number.</dd>
+
+	<dt id="Date.newsg">newsg</dt>
+		<dd class="callseq"><i class="obj">ref</i>.newsg( <i class="obj">sg</i>=<code class="const">Date::ITALY</code> )  &rarr; <i class="obj">aNewDate</i></dd>
+		<dd class="desc">Returns a new <code class="class">Date</code>.</dd>
+
+	<dt id="Date.next">next</dt>
+		<dd class="callseq"><i class="obj">ref</i>.next  &rarr; <i class="obj">aNewDate</i></dd>
+		<dd class="desc">Synonym for <i class="obj">ref</i>.succ.</dd>
+
+	<dt id="Date.ns_qm">ns?</dt>
+		<dd class="callseq"><i class="obj">ref</i>.ns?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">ref</i> falls in the period of New Style dates.</dd>
+
+	<dt id="Date.os_qm">os?</dt>
+		<dd class="callseq"><i class="obj">ref</i>.os?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">ref</i> falls in the period of Old Style dates.</dd>
+
+	<dt id="Date.sg">sg</dt>
+		<dd class="callseq"><i class="obj">ref</i>.sg  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Returns the Julian day number of the start of New Style dates for <i class="obj">ref</i>.</dd>
+
+	<dt id="Date.step">step</dt>
+		<dd class="callseq"><i class="obj">ref</i>.step( <i class="obj">aDateLimit</i>, <i class="obj">step</i> ) {| date | block }  &rarr; <i class="obj">ref</i></dd>
+		<dd class="desc">Invokes block with dates starting at <i class="obj">ref</i>, incrementing by <i class="obj">step</i> days, ending at the first date greater than <i class="obj">aDateLimit</i> (less than for a negative step).</dd>
+
+	<dt id="Date.succ">succ</dt>
+		<dd class="callseq"><i class="obj">ref</i>.succ  &rarr; <i class="obj">aNewDate</i></dd>
+		<dd class="desc">Returns the date of <i class="obj">ref</i> plus one day.</dd>
+
+	<dt id="Date.to_s">to_s</dt>
+		<dd class="callseq"><i class="obj">ref</i>.to_s  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns <code>self</code> as &ldquo;year-mon-mday.&rdquo;</dd>
+
+	<dt id="Date.upto">upto</dt>
+		<dd class="callseq"><i class="obj">ref</i>.upto( <i class="obj">aDateMax</i> ) {| date | block }  &rarr; <i class="obj">ref</i></dd>
+		<dd class="desc">Invokes block with dates from <i class="obj">ref</i> to <i class="obj">aDateMax</i>.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="English" class="library">library <strong>English</strong></h1>
+
+<div><code class="block">require "English"
+
+$OUTPUT_FIELD_SEPARATOR = ' -- '
+"waterbuffalo" =~ /buff/
+print $LOADED_FEATURES, $POSTMATCH, $PID, "\n"
+print $", $', $$, "\n"</code></div>
+
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">English.rb -- alo -- 32130 --
+English.rb -- alo -- 32130 --</code></div>
+
+
+<p>Include the English library file in a Ruby script, and you can reference the global variables such as <code>$_</code> using less cryptic names, listed in the following table.</p>
+
+<table>
+<tr class="firstRow">
+  <td><code>$*</code></td>
+  <td>$ARGV</td>
+  <td><code>$"</code></td>
+  <td>$LOADED_FEATURES</td>
+</tr>
+<tr>
+  <td><code>$?</code></td>
+  <td>$CHILD_STATUS</td>
+  <td><code>$&amp;</code></td>
+  <td>$MATCH</td>
+</tr>
+<tr>
+  <td><code>$&lt;</code></td>
+  <td>$DEFAULT_INPUT</td>
+  <td><code>$.</code></td>
+  <td>$NR</td>
+</tr>
+<tr>
+  <td><code>$&gt;</code></td>
+  <td>$DEFAULT_OUTPUT</td>
+  <td><code>$,</code></td>
+  <td>$OFS</td>
+</tr>
+<tr>
+  <td><code>$!</code></td>
+  <td>$ERROR_INFO</td>
+  <td><code>$\</code></td>
+  <td>$ORS</td>
+</tr>
+<tr>
+  <td><code>$@</code></td>
+  <td>$ERROR_POSITION</td>
+  <td><code>$\</code></td>
+  <td>$OUTPUT_RECORD_SEPARATOR</td>
+</tr>
+<tr>
+  <td><code>$;</code></td>
+  <td>$FIELD_SEPARATOR</td>
+  <td><code>$,</code></td>
+  <td>$OUTPUT_FIELD_SEPARATOR</td>
+</tr>
+<tr>
+  <td><code>$;</code></td>
+  <td>$FS</td>
+  <td><code>$$</code></td>
+  <td>$PID</td>
+</tr>
+<tr>
+  <td><code>$=</code></td>
+  <td>$IGNORECASE</td>
+  <td><code>$'</code></td>
+  <td>$POSTMATCH</td>
+</tr>
+<tr>
+  <td><code>$.</code></td>
+  <td>$INPUT_LINE_NUMBER</td>
+  <td><code>$`</code></td>
+  <td>$PREMATCH</td>
+</tr>
+<tr>
+  <td><code>$/</code></td>
+  <td>$INPUT_RECORD_SEPARATOR</td>
+  <td><code>$$</code></td>
+  <td>$PROCESS_ID</td>
+</tr>
+<tr>
+  <td><code>$~</code></td>
+  <td>$LAST_MATCH_INFO</td>
+  <td><code>$0</code></td>
+  <td>$PROGRAM_NAME</td>
+</tr>
+<tr>
+  <td><code>$+</code></td>
+  <td>$LAST_PAREN_MATCH</td>
+  <td><code>$/</code></td>
+  <td>$RS</td>
+</tr>
+<tr>
+  <td><code>$_</code></td>
+  <td>$LAST_READ_LINE</td>
+  <td></td>
+  <td></td>
+</tr></table>
+
+
+
+<hr class="classbreak">
+
+
+<h1 id="Find" class="module">module <strong>Find</strong></h1>
+
+<div><code class="block">require "find"
+Find.find("/etc/passwd", "/var/spool/lp1", ".") do |f|
+  Find.prune if f == "."
+  puts f
+end</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">/etc/passwd
+/var/spool/lp1
+/var/spool/lp1/status
+/var/spool/lp1/lock
+/var/spool/lp1/.seq</code></div>
+
+
+<p>The <code class="module">Find</code> module supports the top-down traversal of a set of file paths.</p>
+
+
+<h2 class="refsubsection" id="Find.classmethods">Find class methods</h2>
+<dl class="methodlist">
+	<dt id="Find.find">find</dt>
+		<dd class="callseq"><i class="obj">ref</i>.find( <i>[</i><i class="obj">aName</i><i>]*</i> ) {| aFileName | block }</dd>
+		<dd class="desc">Calls the associated block with the name of every file and directory listed as arguments, then recursively on their subdirectories, and so on.</dd>
+
+	<dt id="Find.prune">prune</dt>
+		<dd class="callseq"><i class="obj">ref</i>.prune</dd>
+		<dd class="desc">Skips the current file or directory, restarting the loop with the next entry. If the current file is a directory, that directory will not be recursively entered. Meaningful only within the block associated with <code class="module_module_method"><span class="module">Find</span>.<span class="method">find</span></code>.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="File" class="class">class <strong>File</strong> &lt; IO</h1>
+
+<div><code class="block">require 'ftools'
+
+File.copy 'testfile', 'testfile1'     <span class="output2"><span class="outputmark">&rarr;</span> true</span>
+File.compare 'testfile', 'testfile1'  <span class="output2"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+<p>The <code>FTools</code> library adds several methods to the built-in <code class="class">File</code> class. These methods are particularly useful to programs that move and copy files, such as installers.</p>
+
+
+<h2 class="refsubsection" id="File.classmethods">File class methods</h2>
+<dl class="methodlist">
+	<dt id="File.cmp">cmp</dt>
+		<dd class="callseq"><i class="obj">ref</i>.cmp( <i class="obj">name1</i>, <i class="obj">name2</i>, <i class="obj">verbose</i>=<code class="const">false</code> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Synonym for <code class="class_class_method"><a href="ref_c_file.html#File.compare"><span class="class">File</span>.<span class="method">compare</span></a></code>.</dd>
+
+	<dt id="File.compare">compare</dt>
+		<dd class="callseq"><i class="obj">ref</i>.compare( <i class="obj">name1</i>, <i class="obj">name2</i>, <i class="obj">verbose</i>=<code class="const">false</code> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> only if the contents of files <i class="obj">name1</i> and <i class="obj">name2</i> are identical.</dd>
+
+	<dt id="File.copy">copy</dt>
+		<dd class="callseq"><i class="obj">ref</i>.copy( <i class="obj">fromName</i>, <i class="obj">toName</i>, <i class="obj">verbose</i>=<code class="const">false</code> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Equivalent to calling <code class="class_class_method"><a href="ref_c_file.html#File.syscopy"><span class="class">File</span>.<span class="method">syscopy</span></a></code>, but logs the attempt to <var>$stderr</var> if <i class="obj">verbose</i> is not <code class="const">false</code>.</dd>
+
+	<dt id="File.cp">cp</dt>
+		<dd class="callseq"><i class="obj">ref</i>.cp( <i class="obj">fromName</i>, <i class="obj">toName</i>, <i class="obj">verbose</i>=<code class="const">false</code> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Synonym for <code class="class_class_method"><a href="ref_c_file.html#File.copy"><span class="class">File</span>.<span class="method">copy</span></a></code>.</dd>
+
+	<dt id="File.install">install</dt>
+		<dd class="callseq"><i class="obj">ref</i>.install( <i class="obj">fromName</i>, <i class="obj">toName</i>, <i class="obj">aMode</i>=<code>nil</code>, <i class="obj">verbose</i>=<code class="const">false</code> )</dd>
+		<dd class="desc">Copies file <i class="obj">fromName</i> to file <i class="obj">toName</i> using <code class="class_class_method"><a href="ref_c_file.html#File.syscopy"><span class="class">File</span>.<span class="method">syscopy</span></a></code>, unless <i class="obj">toName</i> already exists and has the same content as <i class="obj">fromName</i>. Sets the mode of the resulting file to <i class="obj">aMode</i> unless <i class="obj">aMode</i> is <code>nil</code>.</dd>
+
+	<dt id="File.makedirs">makedirs</dt>
+		<dd class="callseq"><i class="obj">ref</i>.makedirs( <i>[</i><i class="obj">dirName</i><i>]*</i> <i>[</i>, <i class="obj">aBoolean</i><i>]</i> )</dd>
+		<dd class="desc">Creates the given directories, logging each attempt to <var>$stderr</var> if the last parameter is <code class="const">true</code>. Creates any missing parent directories as required.</dd>
+
+	<dt id="File.mkpath">mkpath</dt>
+		<dd class="callseq"><i class="obj">ref</i>.mkpath( <i>[</i><i class="obj">dirName</i><i>]*</i> <i>[</i>, <i class="obj">aBoolean</i><i>]</i> )</dd>
+		<dd class="desc">Synonym for <code class="class_class_method"><a href="ref_c_file.html#File.makedirs"><span class="class">File</span>.<span class="method">makedirs</span></a></code>.</dd>
+
+	<dt id="File.move">move</dt>
+		<dd class="callseq"><i class="obj">ref</i>.move( <i class="obj">fromName</i>, <i class="obj">toName</i>, <i class="obj">verbose</i>=<code class="const">false</code> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Effectively renames <i class="obj">fromName</i> to <i class="obj">toName</i>, logging to <var>$stderr</var> if <i class="obj">verbose</i> is not <code class="const">false</code>.</dd>
+
+	<dt id="File.mv">mv</dt>
+		<dd class="callseq"><i class="obj">ref</i>.mv( <i class="obj">fromName</i>, <i class="obj">toName</i>, <i class="obj">verbose</i>=<code class="const">false</code> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Synonym for <code class="class_class_method"><a href="ref_c_file.html#File.move"><span class="class">File</span>.<span class="method">move</span></a></code>.</dd>
+
+	<dt id="File.rm_f">rm_f</dt>
+		<dd class="callseq"><i class="obj">ref</i>.rm_f( <i>[</i><i class="obj">fileName</i><i>]*</i> <i>[</i>, <i class="obj">aBoolean</i><i>]</i> )  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Synonym for <code class="class_class_method"><a href="ref_c_file.html#File.safe_unlink"><span class="class">File</span>.<span class="method">safe_unlink</span></a></code> (the name refers to the Unix <code>rm -f</code> command).</dd>
+
+	<dt id="File.safe_unlink">safe_unlink</dt>
+		<dd class="callseq"><i class="obj">ref</i>.safe_unlink( <i>[</i><i class="obj">fileName</i><i>]*</i> <i>[</i>, <i class="obj">aBoolean</i><i>]</i> )  &rarr; <i class="obj">anInteger</i> or <code>nil</code></dd>
+		<dd class="desc">Unlinks (deletes) the given files, logging to <var>$stderr</var> if the last parameter is <code class="const">true</code>. The method attempts to make all files writable before unlinking them, so no errors will occur deleting read-only files. Returns the number of files deleted, or <code>nil</code> on error.</dd>
+
+	<dt id="File.syscopy">syscopy</dt>
+		<dd class="callseq"><i class="obj">ref</i>.syscopy( <i class="obj">fromName</i>, <i class="obj">toName</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Efficiently copies the file named <i class="obj">fromName</i> to <i class="obj">toName</i>. If <i class="obj">toName</i> names a directory, the destination will be a file in that directory with the same basename as <i class="obj">fromName</i>. After the copy, the file mode of <i class="obj">toName</i> will be the same as that of <i class="obj">fromName</i>. Returns <code class="const">true</code> on success.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="GetoptLong" class="class">class <strong>GetoptLong</strong> &lt; Object</h1>      
+
+<div><code class="block"># Call using "ruby example.rb --size 10k -v -q a.txt b.doc"
+
+require 'getoptlong'
+
+# specify the options we accept and initialize
+# the option parser
+
+opts = GetoptLong.new(
+  [ "--size",    "-s",            GetoptLong::REQUIRED_ARGUMENT ],
+  [ "--verbose", "-v",            GetoptLong::NO_ARGUMENT ],
+  [ "--query",   "-q",            GetoptLong::NO_ARGUMENT ],
+  [ "--check",   "--valid", "-c", GetoptLong::NO_ARGUMENT ]
+)
+
+# process the parsed options
+
+opts.each do |opt, arg|
+  puts "Option: #{opt}, arg #{arg.inspect}"
+end
+
+puts "Remaining args: #{ARGV.join(', ')}"</code></div>
+
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Option: --size, arg "10k"
+Option: --verbose, arg ""
+Option: --query, arg ""
+Remaining args: a.txt, b.doc</code></div>
+
+
+<p>Class <code class="class">GetoptLong</code> supports GNU-style command-line option parsing. Options may be a minus sign (`-') followed by a single character, or two minus signs (`--') followed by a name (a long option). Long options may be abbreviated to their shortest unambiguous lengths.</p>
+
+<p>A single internal option may have multiple external representations. For example, the option to control verbose output could be any of <code>-v</code>, <code>--verbose</code>, or <code>--details</code>.  Some options may also take an associated value.</p>
+
+<p>Each internal option is passed to <code class="class">GetoptLong</code> as an array, containing strings representing the option's external forms and a flag. The flag (<code>NO_ARGUMENT</code>, <code>REQUIRED_ARGUMENT</code>, or <code>OPTIONAL_ARGUMENT</code>) specifies how <code class="class">GetoptLong</code> is to associate an argument with the option.</p>
+
+<p>If the environment variable <code>POSIXLY_CORRECT</code> is set, all options must precede nonoptions on the command line. Otherwise, the default behavior of <code class="class">GetoptLong</code> is to reorganize the command line to put the options at the front.  This behavior may be changed by setting <code class="class_instance_method"><span class="class">GetoptLong</span>#<span class="method">ordering=</span></code> to one of the constants <code>PERMUTE</code>, <code>REQUIRE_ORDER</code>, or <code>RETURN_IN_ORDER</code>. <code>POSIXLY_CORRECT</code> may not be overridden.</p>
+
+<h2 class="refsubsection" id="GetoptLong.constants">GetoptLong constants</h2>
+
+<table class="constants"><thead><tr>
+	<th colspan="3"><em>Per-option constants</em></th>
+</tr></thead>
+<tr class="firstRow">
+	<td><code class="constant">NO_ARGUMENT</code></td>
+	<td>Flags an option that takes no argument.</td>
+</tr><tr>
+	<td><code class="constant">OPTIONAL_ARGUMENT</code></td>
+	<td>A nonoption following this option will be used as this option's argument.</td>
+</tr><tr>
+	<td><code class="constant">REQUIRED_ARGUMENT</code></td>
+	<td>This option must be followed by an argument.</td>
+</tr></table>
+    
+<table class="constants"><thead><tr>
+	<th colspan="3"><em>Overall constants</em></th>
+</tr></thead>
+<tr class="firstRow">
+	<td><code class="constant">PERMUTE</code></td>
+	<td>Options and their arguments will be shuffled to the front of the command line.</td>
+</tr><tr>
+	<td><code class="constant">REQUIRE_ORDER</code></td>
+	<td>Options and their arguments must appear at the start of the command line. The first nonoption terminates option processing.</td>
+</tr><tr>
+	<td><code class="constant">RETURN_IN_ORDER</code></td>
+<td>Return options in the order in which they occur on the command line.</td>
+</tr></table>
+
+
+<h2 class="refsubsection" id="GetoptLong.classmethods">GetoptLong class methods</h2>
+<dl class="methodlist">
+	<dt id="GetoptLong.new">new</dt>
+		<dd class="callseq">GetoptLong.new( <i>[</i><i class="obj">options</i><i>]*</i> )  &rarr; <i class="obj">ref</i></dd>
+		<dd class="desc">Returns a new option parser. Any <i class="obj">options</i> are passed to <i class="obj">ref</i>.<code class="method">set_options</code>.</dd>
+</dl>
+
+<h2 class="refsubsection" id="GetoptLong.instancemethods">GetoptLong instance methods</h2>
+<dl class="methodlist">
+	<dt id="GetoptLong.each">each</dt>
+		<dd class="callseq"><i class="obj">ref</i>.each {| anOption, anArgument | block }</dd>
+		<dd class="desc">Loops calling <code class="class_instance_method"><span class="class">GetoptLong</span>#<span class="method">get</span></code>, passing the returned option and argument to the associated block. The loop ends when <code>get</code> returns <code>nil</code> for <i class="obj">anOption</i>.</dd>
+
+	<dt id="GetoptLong.error_qm">error?</dt>
+		<dd class="callseq"><i class="obj">ref</i>.error?  &rarr; <i class="obj">anException</i></dd>
+		<dd class="desc">Returns an <code class="class">Exception</code> object documenting any error that has occurred, or <code>nil</code> if there has not been an error.</dd>
+
+	<dt id="GetoptLong.error_message">error_message</dt>
+		<dd class="callseq"><i class="obj">ref</i>.error_message  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns the text of the last error message.</dd>
+
+	<dt id="GetoptLong.get">get</dt>
+		<dd class="callseq"><i class="obj">ref</i>.get  &rarr; [ <i class="obj">anOption</i>,
+          <i class="obj">anArgument</i> ]</dd>
+		<dd class="desc"><p>Returns the next option, along with any associated argument. If there is no argument, <code>nil</code> is returned for <i class="obj">anArgument</i>. If there are no remaining unprocessed options, or if there is an error in option processing and <code class="method">quiet</code> has been set, <code>nil</code> is returned for <i class="obj">anOption</i>. Otherwise, if there is an error, a message is written to <var>$stderr</var> and an exception (a subclass of <code class="exception">StandardError</code>) is raised.</p>
+		<p>The option string returned is the first option that was given in the corresponding array passed to <code class="method">set_options</code>.</p>
+	</dd>
+
+	<dt id="GetoptLong.get_option">get_option</dt>
+		<dd class="callseq"><i class="obj">ref</i>.get_option  &rarr; [ <i class="obj">anOption</i>, <i class="obj">anArgument</i> ]</dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><span class="class">GetoptLong</span>#<span class="method">get</span></code>.</dd>
+
+	<dt id="GetoptLong.ordering">ordering</dt>
+		<dd class="callseq"><i class="obj">ref</i>.ordering  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns the current ordering.</dd>
+
+	<dt id="GetoptLong.ordering_eq">ordering=</dt>
+		<dd class="callseq"><i class="obj">ref</i>.ordering = <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Sets the ordering to one of <code>PERMUTE</code>, <code>REQUIRE_ORDER</code>, or <code>RETURN_IN_ORDER</code>. Quietly ignored if the environment variable <code>POSIXLY_CORRECT</code> is set. Ordering may not be changed once option processing has been started.</dd>
+
+	<dt id="GetoptLong.quiet">quiet</dt>
+		<dd class="callseq"><i class="obj">ref</i>.quiet  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns the current value of the <code>quiet</code> attribute.</dd>
+
+	<dt id="GetoptLong.quiet_eq">quiet=</dt>
+		<dd class="callseq"><i class="obj">ref</i>.quiet = <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Sets the current value of the <code>quiet</code> attribute. If <code class="const">false</code>, any errors encountered are reported to <var>$stderr</var>.</dd>
+
+	<dt id="GetoptLong.quiet_qm">quiet?</dt>
+		<dd class="callseq"><i class="obj">ref</i>.quiet?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><span class="class">GetoptLong</span>#<span class="method">quiet</span></code>.</dd>
+
+	<dt id="GetoptLong.set_options">set_options</dt>
+		<dd class="callseq"><i class="obj">ref</i>.set_options( <i>[</i><i class="obj">anOptArray</i><i>]*</i> )  &rarr; <i class="obj">ref</i></dd>
+		<dd class="desc">Each parameter is an array specifying a single internal option. The array contains one or more strings specifying the external form(s) of the option, and one of the flags <code>NO_ARGUMENT</code>, <code>OPTIONAL_ARGUMENT</code>, or <code>REQUIRED_ARGUMENT</code>. See the sample code on at the <a href="lib_standard.html#GetoptLong">start</a> of the documentation for this class.</dd>
+
+	<dt id="GetoptLong.terminate">terminate</dt>
+		<dd class="callseq"><i class="obj">ref</i>.terminate  &rarr; <i class="obj">ref</i></dd>
+		<dd class="desc">Terminates option processing. Any remaining arguments are written back to <var>ARGV</var>.  This may be called from within a <code class="class_instance_method"><span class="class">GetoptLong</span>#<span class="method">each</span></code> or on its own.    For example, calling the following program using &ldquo;<code>ruby example.rb --size 10k -v -term -q a.txt b.doc</code>&rdquo; will leave the <code>-q</code> and filenames in <var>ARGV</var>.
+
+<div><code class="block">require 'getoptlong'
+
+opts = GetoptLong.new(
+  [ "--size",    "-s",            GetoptLong::REQUIRED_ARGUMENT ],
+  [ "--verbose", "-v",            GetoptLong::NO_ARGUMENT ],
+  [ "--term",    "-t",            GetoptLong::NO_ARGUMENT ],
+  [ "--query",   "-q",            GetoptLong::NO_ARGUMENT ],
+  [ "--check",   "--valid", "-c", GetoptLong::NO_ARGUMENT ]
+  )
+
+opts.each do |opt, arg|
+  puts "Option: #{opt}, arg #{arg.inspect}"
+  opts.terminate if (opt == '--term')
+end
+
+puts "Remaining args: #{ARGV.join(', ')}"</code></div>
+
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Option: --size, arg "10k"
+Option: --verbose, arg ""
+Option: --term, arg ""
+Remaining args: -q, a.txt, b.doc</code></div></dd>
+
+	<dt id="GetoptLong.terminated_qm">terminated?</dt>
+		<dd class="callseq"><i class="obj">ref</i>.terminated?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if option processing has been terminated.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="mkmf" class="module">module <strong>mkmf</strong></h1>
+
+<p>The <code class="class">mkmf</code> library is used by Ruby extension modules to help create <code>Makefiles</code>.  When writing an extension, you create a program named &ldquo;<code>extconf.rb</code>&rdquo;, which may be as simple as:</p>
+
+<div><code class="block">require 'mkmf'
+create_makefile("Test")</code></div>
+
+
+<p>When run, this script will produce a <code>Makefile</code> suited to the target platform.  <code class="class">mkmf</code> contains several methods you can use to find libraries and include files and to set compiler flags.</p>
+
+<p>For more information on creating extension modules, see Chapter 17, &ldquo;<a href="ext_ruby.html">Extending Ruby</a>.&rdquo;</p>
+
+<h2 class="refsubsection" id="mkmf.constants">mkmf constants</h2>
+
+<table class="constants">
+<tr class="firstRow">
+	<td><code class="constant">PLATFORM</code></td>
+	<td>varies</td>
+	<td>A constant string that describes the platform on which Ruby is running, such as &ldquo;mswin32&rdquo; or &ldquo;i686-linux.&rdquo;</td>
+</tr><tr>
+	<td><code class="constant">$CFLAGS</code></td>
+	<td></td>
+	<td>Global variable for compiler flags.</td>
+</tr><tr>
+	<td><code class="constant">$LDFLAGS</code></td>
+	<td></td>
+	<td>Global variable for linker flags.</td>
+</tr></table>
+
+<h2 class="refsubsection" id="mkmf.instancemethods">mkmf instance methods</h2>
+<dl class="methodlist">
+	<dt id="mkmf.create_makefile">create_makefile</dt>
+		<dd class="callseq">create_makefile( <i class="obj">target</i> )</dd>
+		<dd class="desc">Creates a <code>Makefile</code> for an extension named <em>target</em>. If this method is not called, no <code>Makefile</code> is created.</dd>
+
+	<dt id="mkmf.dir_config">dir_config</dt>
+		<dd class="callseq">dir_config( <i class="obj">name</i> )</dd>
+		<dd class="desc"><p>Looks for directory configuration options for <em>name</em> given as arguments to this program or to the original build of Ruby. These arguments may be one of:</p>
+
+      <table>
+		<tr class="firstRow">
+		  <td><code>--with-<em>name</em>-dir=<em>directory</em></code></td>
+		</tr>
+		<tr>
+		  <td><code>--with-<em>name</em>-include=<em>directory</em></code></td>
+		</tr>
+		<tr>
+		  <td><code>--with-<em>name</em>-lib=<em>directory</em></code></td>
+		</tr>
+		</table>
+		
+		<p>The given directories will be added to the appropriate search paths (include or link) in the <code>Makefile</code>.</p>
+
+	</dd>
+
+	<dt id="mkmf.find_library">find_library</dt>
+		<dd class="callseq">find_library( <i class="obj">name</i>, <i class="obj">function</i>, <i>[</i><i class="obj">path</i><i>]+</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Same as <code class="method">have_library</code>, but will also search in the given directory paths.</dd>
+
+	<dt id="mkmf.have_func">have_func</dt>
+		<dd class="callseq">have_func( <i class="obj">function</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">If the named function exists in the standard compile environment, adds the directive -DHAVE_<em>FUNCTION</em> to the compile command in the <code>Makefile</code> and returns <code class="const">true</code>.</dd>
+
+	<dt id="mkmf.have_header">have_header</dt>
+		<dd class="callseq">have_header( <i class="obj">header</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">If the given header file can be found in the standard search path, adds the directive -DHAVE_<em>HEADER</em> to the compile command in the <code>Makefile</code>  and returns <code class="const">true</code>.</dd>
+
+	<dt id="mkmf.have_library">have_library</dt>
+		<dd class="callseq">have_library( <i class="obj">library</i>, <i class="obj">function</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">If the given function exists in the named library, which must exist in the standard search path or in a directory added with <code class="method">dir_config</code>, adds the library to the link command in the <code>Makefile</code>  and returns <code class="const">true</code>.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="ParseDate" class="module">module <strong>ParseDate</strong></h1>
+
+<p>The <code class="module">ParseDate</code> module defines a single method, <code class="module_module_method"><span class="module">ParseDate</span>.<span class="method">parsedate</span></code>, which converts a date and/or time string into its constituents. It uses heuristics that handle a wide variety of date and time formats, including a subset of ISO 8601, Unix <code>ctime</code>, and most common written variants. The following table shows some examples.</p>
+
+<table><thead><tr>
+	<th>String</th>
+	<th>Guess?</th>
+<th>yy</th>
+	<th>mm</th>
+	<th>dd</th>
+	<th>hh</th>
+	<th>min</th>
+	<th>sec</th>
+	<th>zone</th>
+	<th>wd</th>
+</tr></thead>
+<tr class="firstRow">
+  <td>1999-09-05 23:55:21+0900</td>
+  <td>F</td>
+  <td>1999</td>
+  <td>9</td>
+  <td>5</td>
+  <td>23</td>
+  <td>55</td>
+  <td>21</td>
+  <td>+0900</td>
+  <td>--</td>
+</tr>
+<tr>
+  <td>1983-12-25</td>
+  <td>F</td>
+  <td>1983</td>
+  <td>12</td>
+  <td>25</td>
+  <td>--</td>
+  <td>--</td>
+  <td>--</td>
+  <td>--</td>
+  <td>--</td>
+</tr>
+<tr>
+  <td>1965-11-10 T13:45</td>
+  <td>F</td>
+  <td>1965</td>
+  <td>11</td>
+  <td>10</td>
+  <td>13</td>
+  <td>45</td>
+  <td>--</td>
+  <td>--</td>
+  <td>--</td>
+</tr>
+<tr>
+  <td>10/9/75 1:30pm</td>
+  <td>F</td>
+  <td>75</td>
+  <td>10</td>
+  <td>9</td>
+  <td>13</td>
+  <td>30</td>
+  <td>--</td>
+  <td>--</td>
+  <td>--</td>
+</tr>
+<tr>
+  <td>10/9/75 1:30pm</td>
+  <td>T</td>
+  <td>1975</td>
+  <td>10</td>
+  <td>9</td>
+  <td>13</td>
+  <td>30</td>
+  <td>--</td>
+  <td>--</td>
+  <td>--</td>
+</tr>
+<tr>
+  <td>Mon Feb 28 17:15:49 CST 2000</td>
+  <td>F</td>
+  <td>2000</td>
+  <td>2</td>
+  <td>28</td>
+  <td>17</td>
+  <td>15</td>
+  <td>49</td>
+  <td>CST</td>
+  <td>1</td>
+</tr>
+<tr>
+  <td>Tue, 02-Mar-99 11:20:32 GMT</td>
+  <td>F</td>
+  <td>99</td>
+  <td>3</td>
+  <td>2</td>
+  <td>11</td>
+  <td>20</td>
+  <td>32</td>
+  <td>GMT</td>
+  <td>2</td>
+</tr>
+<tr>
+  <td>Tue, 02-Mar-99 11:20:32 GMT</td>
+  <td>T</td>
+  <td>1999</td>
+  <td>3</td>
+  <td>2</td>
+  <td>11</td>
+  <td>20</td>
+  <td>32</td>
+  <td>GMT</td>
+  <td>2</td>
+</tr>
+<tr>
+  <td>12-January-1990, 04:00 WET</td>
+  <td>F</td>
+  <td>1990</td>
+  <td>1</td>
+  <td>12</td>
+  <td>4</td>
+  <td>0</td>
+  <td>--</td>
+  <td>WET</td>
+  <td>--</td>
+</tr>
+<tr>
+  <td>4/3/99</td>
+  <td>F</td>
+  <td>99</td>
+  <td>4</td>
+  <td>3</td>
+  <td>--</td>
+  <td>--</td>
+  <td>--</td>
+  <td>--</td>
+  <td>--</td>
+</tr>
+<tr>
+  <td>4/3/99</td>
+  <td>T</td>
+  <td>1999</td>
+  <td>4</td>
+  <td>3</td>
+  <td>--</td>
+  <td>--</td>
+  <td>--</td>
+  <td>--</td>
+  <td>--</td>
+</tr>
+<tr>
+  <td>10th February, 1976</td>
+  <td>F</td>
+  <td>1976</td>
+  <td>2</td>
+  <td>10</td>
+  <td>--</td>
+  <td>--</td>
+  <td>--</td>
+  <td>--</td>
+  <td>--</td>
+</tr>
+<tr>
+  <td>March 1st, 84</td>
+  <td>T</td>
+  <td>1984</td>
+  <td>3</td>
+  <td>1</td>
+  <td>--</td>
+  <td>--</td>
+  <td>--</td>
+  <td>--</td>
+  <td>--</td>
+</tr>
+<tr>
+  <td>Friday</td>
+  <td>F</td>
+  <td>--</td>
+  <td>--</td>
+  <td>--</td>
+  <td>--</td>
+  <td>--</td>
+  <td>--</td>
+  <td>--</td>
+  <td>5</td>
+</tr></table>
+
+
+<h2 class="refsubsection" id="ParseDate.classmethods">ParseDate class methods</h2>
+<dl class="methodlist">
+	<dt id="ParseDate.parsedate">parsedate</dt>
+		<dd class="callseq">ParseDate.parsedate( <i class="obj">aString</i>, <i class="obj">guessYear</i>=<code class="const">false</code> )  &rarr; [ <i class="obj">year</i>, <i class="obj">mon</i>, <i class="obj">mday</i>, <i class="obj">hour</i>, <i class="obj">min</i>, <i class="obj">sec</i>, <i class="obj">zone</i>, <i class="obj">wday</i> ]</dd>
+		<dd class="desc">Parses a string containing a date and/or a time, returning an array of <code class="class">Fixnum</code> objects containing the various components. <code>nil</code> is returned for fields that cannot be parsed from <i class="obj">aString</i>. If the result contains a year that is less than 100 and <i class="obj">guessYear</i> is true, <code class="method">parsedate</code> will return a year value equal to <i class="obj">year</i> plus 2000 if <i class="obj">year</i> is less than 69, <i class="obj">year</i> plus 1900 otherwise.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="profile" class="library">library <strong>profile</strong></h1>
+
+<p>The <code>profile</code> library prints to <var>$stderr</var> a summary of the number of calls to, and the time spent in, each method in a Ruby program. The output is sorted by the total time spent in each method. Profiling can be enabled from the command line using the <code class="cmdopt">-r</code><code>profile</code> option, or from within a source program by requiring the <code>profile</code> module.</p>
+
+<div><code class="block">require 'profile'
+def ackerman(m, n)
+  if m == 0 then  n+1
+  elsif n == 0 and m &gt; 0 then ackerman(m-1, 1)
+  else ackerman(m-1, ackerman(m, n-1))
+  end
+end
+ackerman(3,3)</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block output">time   seconds   seconds    calls  ms/call  ms/call  name
+ 74.17     2.47      2.47     2432     1.02    41.95  Object#ackerman
+ 17.42     3.05      0.58     3676     0.16     0.16  Fixnum#==
+  5.71     3.24      0.19     2431     0.08     0.08  Fixnum#-
+  2.70     3.33      0.09     1188     0.08     0.08  Fixnum#+
+  0.00     3.33      0.00        1     0.00     0.00  Module#method_added
+  0.00     3.33      0.00       57     0.00     0.00  Fixnum#&gt;
+  0.00     3.33      0.00        1     0.00  3330.00  #toplevel</code></div>
+
+
+<hr class="classbreak">
+
+
+<h1 id="PStore" class="class">class <strong>PStore</strong> &lt; Object</h1>    
+
+<p>The <code class="class">PStore</code> class provides transactional, file-based persistent storage of Ruby objects.  The following example stores two hierarchies in a PStore. The first, identified by the key &ldquo;<code>names</code>&rdquo;, is an array of Strings. The second, identified by &ldquo;<code>tree</code>&rdquo;, is a simple binary tree.</p>
+
+<div><code class="block">require "pstore"
+
+class T
+  def initialize(val, left=nil, right=nil)
+    @val, @left, @right = val, left, right
+  end
+  def to_a
+    [ @val, @left.to_a, @right.to_a ]
+  end
+end
+
+store = PStore.new("/tmp/store")
+store.transaction do
+   store['names'] = [ 'Douglas', 'Barenberg', 'Meyer' ]
+   store['tree']  = T.new('top',
+                      T.new('A', T.new('B')),
+                      T.new('C', T.new('D', nil, T.new('E'))))
+end
+
+# now read it back in
+
+store.transaction do
+   puts "Roots: #{store.roots.join(', ')}"
+   puts store['names'].join(', ')
+   puts store['tree'].to_a.inspect
+end</code></div>
+
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Roots: names, tree
+Douglas, Barenberg, Meyer
+["top", ["A", ["B", [], []], []], ["C", ["D", [], ["E", [], []]], []]]</code></div>
+
+
+<p>Each <code class="class">PStore</code> can store several object hierarchies. Each hierarchy has a root, identified by a key (often a string). At the start of a <code class="class">PStore</code> transaction, these hierarchies are read from a disk file and made available to the Ruby program. At the end of the transaction, the hierarchies are written back to the file. Any changes made to objects in these hierarchies are therefore saved on disk, to be read at the start of the next transaction that uses that file.</p>
+
+<p>In normal use, a <code class="class">PStore</code> object is created and then is used one or more times to control a transaction. Within the body of the transaction, any object hierarchies that had previously been saved are made available, and any changes to object hierarchies, and any new hierarchies, are written back to the file at the end.</p>
+
+
+<h2 class="refsubsection" id="PStore.classmethods">PStore class methods</h2>
+<dl class="methodlist">
+	<dt id="PStore.new">new</dt>
+		<dd class="callseq">PStore.new( <i class="obj">aFilename</i> )  &rarr; <i class="obj">aPStore</i></dd>
+		<dd class="desc">Returns a new <code class="class">PStore</code> object associated with the given
+      file. If the file exists, its contents must have been previously 
+      written by <code class="class">PStore</code>.</dd>
+</dl>
+
+<h2 class="refsubsection" id="PStore.instancemethods">PStore instance methods</h2>
+<dl class="methodlist">
+	<dt id="PStore._ob_cb">[ ]</dt>
+		<dd class="callseq"><i class="obj">ref</i>[ <i class="obj">anObject</i> ]  &rarr; <i class="obj">anOtherObject</i></dd>
+		<dd class="desc">Root Access&mdash;Returns the root of an object hierarchy identified
+      by <i class="obj">anObject</i>. An exception is raised if <i class="obj">anObject</i> does 
+      not identify a root.</dd>
+
+	<dt id="PStore._ob_cb_eq">[ ]=</dt>
+		<dd class="callseq"><i class="obj">ref</i>[ <i class="obj">anObject</i> ] =
+        <i class="obj">anOtherObject</i>  &rarr; <i class="obj">anOtherObject</i></dd>
+		<dd class="desc">Root Creation&mdash;Sets <i class="obj">anOtherObject</i> as the base of the object 
+      hierarchy to be identified using <i class="obj">anObject</i>.</dd>
+
+	<dt id="PStore.abort">abort</dt>
+		<dd class="callseq"><i class="obj">ref</i>.abort</dd>
+		<dd class="desc">Terminates this transaction, losing any changes made to the
+      object hierarchies.</dd>
+
+	<dt id="PStore.commit">commit</dt>
+		<dd class="callseq"><i class="obj">ref</i>.commit</dd>
+		<dd class="desc">Terminates the current transaction, saving the object hierarchies 
+      into the store's file.</dd>
+
+	<dt id="PStore.path">path</dt>
+		<dd class="callseq"><i class="obj">ref</i>.path  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns the name of the file associated with this store.</dd>
+
+	<dt id="PStore.root_qm">root?</dt>
+		<dd class="callseq"><i class="obj">ref</i>.root?( <i class="obj">anObject</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">anObject</i> is the key of a root in
+      this store.</dd>
+
+	<dt id="PStore.roots">roots</dt>
+		<dd class="callseq"><i class="obj">ref</i>.roots  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns an array containing the keys of the root objects
+      available in this store.</dd>
+
+	<dt id="PStore.transaction">transaction</dt>
+		<dd class="callseq"><i class="obj">ref</i>.transaction {| <i class="obj">ref</i> | block }  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">If the file associated with <i class="obj">ref</i> exists, reads in the object hierarchies from it. It then executes the associated block, passing in <i class="obj">ref</i>. The block may use this parameter to access the roots of the hierarchies and hence access the persistent objects. If the block calls <code class="class_instance_method"><span class="class">PStore</span>#<span class="method">abort</span></code>, or if it raises an exception, no data is saved back to the associated file. Otherwise, if it invokes <code class="class_instance_method"><span class="class">PStore</span>#<span class="method">commit</span></code>, or if it terminates normally, the object hierarchies are written back to the file. The value returned is the value returned by the block.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="Tempfile" class="class">class <strong>Tempfile</strong> &lt; IO</h1>  
+
+<div><code class="block">require "tempfile"
+
+tf = Tempfile.new("afile")
+tf.path <span class="output"><span class="outputmark">&rarr;</span> "/tmp/afile32146.0"</span>
+tf.puts("Cosi Fan Tutte") <span class="output"><span class="outputmark">&rarr;</span> nil</span>
+tf.close <span class="output"><span class="outputmark">&rarr;</span> nil</span>
+tf.open <span class="output"><span class="outputmark">&rarr;</span> #&lt;File:0x40196fc8&gt;</span>
+tf.gets <span class="output"><span class="outputmark">&rarr;</span> "Cosi Fan Tutte\n"</span>
+tf.close(true) <span class="output"><span class="outputmark">&rarr;</span> #&lt;File:0x40196fc8&gt;</span></code></div>
+
+<p>Class <code class="class">Tempfile</code> creates managed temporary files. Although they behave the same as any other <code class="class">IO</code> objects, temporary files are automatically deleted when the Ruby program terminates. Once a <code class="class">Tempfile</code> object has been created, the underlying file may be opened and closed a number of times in succession.</p>
+
+<p><code class="class">Tempfile</code> does not directly inherit from <code class="class">IO</code>. Instead, it delegates calls to a <code class="class">File</code> object. From the programmer's perspective, apart from the unusual <code class="method">new</code>, <code class="method">open,</code> and <code class="method">close</code> semantics, a <code class="class">Tempfile</code> object behaves as if it were an <code class="class">IO</code> object.</p>
+
+
+<h2 class="refsubsection" id="Tempfile.classmethods">Tempfile class methods</h2>
+<dl class="methodlist">
+	<dt id="Tempfile.new">new</dt>
+		<dd class="callseq">Tempfile.new( <i class="obj">basename</i>,
+        <i class="obj">tmpdir</i>=&lt;see below&gt; )  &rarr; <i class="obj">ref</i></dd>
+		<dd class="desc"><p>Constructs a temporary file in the given directory. The file name is built by concatenating <i class="obj">basename</i>, the current process id and (as an extension) a unique sequence number. If the <i class="obj">tmpdir</i> parameter is not supplied, it defaults to the value of one of the environment variables <code>TMPDIR</code>, <code>TMP</code>, or <code>TEMP</code>, or to the directory <code>/tmp</code>.</p>
+
+		<p>The file is then opened using mode &ldquo;w+&rdquo;, which allows reading and writing and deletes any existing content (see <a href="ref_c_io.html#table_22.5">Table 22.5</a>).</p>
+	</dd>
+
+	<dt id="Tempfile.open">open</dt>
+		<dd class="callseq">Tempfile.open( <i class="obj">basename</i>,
+      <i class="obj">tmpdir</i> )  &rarr; <i class="obj">ref</i></dd>
+		<dd class="desc">Synonym for <code class="class_class_method"><span class="class">Tempfile</span>.<span class="method">new</span></code>.</dd>
+</dl>
+
+<h2 class="refsubsection" id="Tempfile.instancemethods">Tempfile instance methods</h2>
+<dl class="methodlist">
+	<dt id="Tempfile.close">close</dt>
+		<dd class="callseq"><i class="obj">ref</i>.close( <i class="obj">final</i>=<code class="const">false</code> )</dd>
+		<dd class="desc">Closes <i class="obj">ref</i>. If <i class="obj">final</i> is <code class="const">true</code>, deletes the underlying real file. If <i class="obj">final</i> is <code class="const">false</code>, <i class="obj">ref</i> may be subsequently reopened. In all cases, the underlying file is deleted when the program terminates.</dd>
+
+	<dt id="Tempfile.open">open</dt>
+		<dd class="callseq"><i class="obj">ref</i>.open</dd>
+		<dd class="desc">Reopens <i class="obj">ref</i> using mode &ldquo;r+&rdquo;, which allows reading and writing but does not delete existing content.</dd>
+
+	<dt id="Tempfile.path">path</dt>
+		<dd class="callseq"><i class="obj">ref</i>.path  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns the full path of the underlying file.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="Mutex" class="class">class <strong>Mutex</strong> &lt; Object</h1>  
+
+<div><code class="block">require 'thread'
+sema4 = Mutex.new
+
+a = Thread.new {
+  sema4.synchronize {
+    # access shared resource
+  }
+}
+
+b = Thread.new {
+  sema4.synchronize {
+    # access shared resource
+  }
+}</code></div>
+
+
+<p><code class="class">Mutex</code> implements a simple semaphore that can be used to coordinate access to shared data from multiple concurrent threads.</p>
+
+<h2 class="refsubsection" id="Mutex.instancemethods">Mutex instance methods</h2>
+<dl class="methodlist">
+	<dt id="Mutex.lock">lock</dt>
+		<dd class="callseq"><i class="obj">ref</i>.lock  &rarr; <i class="obj">ref</i></dd>
+		<dd class="desc">Attempts to grab the lock and waits if it isn't available.</dd>
+
+	<dt id="Mutex.locked_qm">locked?</dt>
+		<dd class="callseq"><i class="obj">ref</i>.locked?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if this lock is currently held by some thread.</dd>
+
+	<dt id="Mutex.synchronize">synchronize</dt>
+		<dd class="callseq"><i class="obj">ref</i>.synchronize { block }  &rarr; <i class="obj">ref</i></dd>
+		<dd class="desc">Obtains a lock (using <code class="class_instance_method"><span class="class">Mutex</span>#<span class="method">lock</span></code>), runs the block, and releases the lock when the block completes.</dd>
+
+	<dt id="Mutex.try_lock">try_lock</dt>
+		<dd class="callseq"><i class="obj">ref</i>.try_lock  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Attempts to obtain the lock and returns immediately. Returns <code class="const">true</code> if the lock was granted.</dd>
+
+	<dt id="Mutex.unlock">unlock</dt>
+		<dd class="callseq"><i class="obj">ref</i>.unlock  &rarr; <i class="obj">ref</i> or <code>nil</code></dd>
+		<dd class="desc">Releases the lock. Returns <code>nil</code> if <i class="obj">ref</i> wasn't locked.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="ConditionVariable" class="class">class <strong>ConditionVariable</strong> &lt; Object</h1>
+
+<div><code class="block">require 'thread'
+mutex = Mutex.new
+resource = ConditionVariable.new
+
+a = Thread.new {
+  mutex.synchronize {
+    # Thread 'a' now needs the resource
+    resource.wait(mutex)
+    # 'a' can now have the resource
+  }
+}
+
+b = Thread.new {
+  mutex.synchronize {
+    # Thread 'b' has finished using the resource
+    resource.signal
+  }
+}</code></div>
+
+
+<p><code class="class">ConditionVariable</code> objects augment class <code class="class">Mutex</code>. Using condition variables, it is possible to suspend while in the middle of a critical section until a resource becomes available (see the discussion &ldquo;<a href="tut_threads.html#conditionvariables">Condition Variables</a>&rdquo;).</p>
+
+<h2 class="refsubsection" id="ConditionVariable.instancemethods">ConditionVariable instance methods</h2>
+<dl class="methodlist">
+	<dt id="ConditionVariable.broadcast">broadcast</dt>
+		<dd class="callseq"><i class="obj">ref</i>.broadcast</dd>
+		<dd class="desc">Wakes up all threads waiting for this lock.</dd>
+
+	<dt id="ConditionVariable.signal">signal</dt>
+		<dd class="callseq"><i class="obj">ref</i>.signal</dd>
+		<dd class="desc">Wakes up the first thread in line waiting for this lock.</dd>
+
+	<dt id="ConditionVariable.wait">wait</dt>
+		<dd class="callseq"><i class="obj">ref</i>.wait( <i class="obj">aMutex</i> )  &rarr; <i class="obj">aMutex</i></dd>
+		<dd class="desc">Releases the lock held in <i class="obj">aMutex</i> and waits; reacquires
+          the lock on wakeup.</dd>
+</dl>
+
+
+<hr class="classbreak">
+
+
+<h1 id="timeout" class="library">library <strong>timeout</strong></h1>
+
+<div><code class="block">require "timeout"
+
+for snooze in 1..2
+  puts "About to sleep for #{snooze}"
+  timeout(1.5) do
+    sleep(snooze)
+  end
+  puts "That was refreshing"
+end</code></div>
+
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">About to sleep for 1
+That was refreshing
+About to sleep for 2
+/tc/usr/lib/ruby/1.6/timeout.rb:37: execution expired (TimeoutError)
+	from prog.rb:5:in `timeout'
+	from prog.rb:5
+	from prog.rb:3:in `each'
+	from prog.rb:3</code></div>
+
+
+<p>The <code class="method">timeout</code> method takes a single parameter, representing a timeout period in seconds, and a block. The block is executed, and a timer is run concurrently. If the block terminates before the timeout, <code class="method">timeout</code> returns <code class="const">true</code>. Otherwise, a <code class="exception">TimeoutError</code> exception is raised.</p>
+
+
+<hr class="classbreak">
+
+
+<h1 id="WeakRef" class="class">class <strong>WeakRef</strong> &lt; Delegator</h1>    
+
+<div><code class="block">require "weakref"
+
+ref = "fol de rol"
+puts "Initial object is #{ref}"
+ref = WeakRef.new(ref)
+puts "Weak reference is #{ref}"
+ObjectSpace.garbage_collect
+puts "But then it is #{ref}"</code></div>
+
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">Initial object is fol de rol
+Weak reference is fol de rol
+prog.rb:8: Illegal Reference - probably recycled (WeakRef::RefError)</code></div>
+
+
+<p>In Ruby, objects are not eligible for garbage collection if there are still references to them. Normally, this is a Good Thing&mdash;it would be disconcerting to have an object simply evaporate while you were using it. However, sometimes you may need more flexibility. For example, you might want to implement an in-memory cache of commonly used file contents. As you read more files, the cache grows. At some point, you may run low on memory. The garbage collector will be invoked, but the objects in the cache are all referenced by the cache data structures, and so will not be deleted.</p>
+
+<p>A weak reference behaves exactly as any normal object reference with one important exception&mdash;the referenced object may be garbage collected, even while references to it exist. In the cache example, if the cached files were accessed using weak references, once memory runs low they will be garbage collected, freeing memory for the rest of the application.</p>
+
+<p>Weak references introduce a slight complexity. As the object referenced can be deleted by garbage collection at any time, code that accesses these objects must take care to ensure that the references are valid. Two techniques can be used. First, the code can reference the objects normally. Any attempt to reference an object that has been garbage collected will raise a <code class="exception">WeakRef::RefError</code> exception.</p>
+
+<p>An alternative approach is to use the <code class="class_instance_method"><span class="class">WeakRef</span>#<span class="method">weakref_alive?</span></code> method to check that a reference is valid before using it. Garbage collection must be disabled during the test and subsequent reference to the object. In a single-threaded program, you could use something like:</p>
+
+<div><code class="block">ref = WeakRef.new(someObject)
+#
+# .. some time later
+#
+
+gcWasDisabled = GC.disable
+if ref.weakref_alive?
+  # do stuff with 'ref'
+end
+GC.enable unless gcWasDisabled</code></div>
+
+
+<h2 class="refsubsection" id="WeakRef.classmethods">WeakRef class methods</h2>
+<dl class="methodlist">
+	<dt id="WeakRef.new">new</dt>
+		<dd class="callseq">WeakRef.new( <i class="obj">anObject</i> )  &rarr; <i class="obj">ref</i></dd>
+		<dd class="desc">Creates and returns a weak reference to <i class="obj">anObject</i>. All future references to <i class="obj">anObject</i> should be made using <i class="obj">ref</i>.</dd>
+</dl>
+
+<h2 class="refsubsection" id="WeakRef.instancemethods">WeakRef instance methods</h2>
+<dl class="methodlist">
+	<dt id="WeakRef.weakref_alive_qm">weakref_alive?</dt>
+		<dd class="callseq"><i class="obj">ref</i>.weakref_alive?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">false</code> if the object referenced by <i class="obj">ref</i> has been garbage collected.</dd>
+</dl>
+
+
+<div id="menubot" class="menu">
+	<a href="builtins.html" class="prev">&lt; Previous</a><a href="lib_patterns.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="lib_standard.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

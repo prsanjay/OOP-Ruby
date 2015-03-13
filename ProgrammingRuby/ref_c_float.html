@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Float</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_c_float',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="class" id="Float">class <strong>Float</strong> &lt; Numeric</h1>
+
+<p><code>Float</code> objects represent real numbers using the native   architecture's double-precision floating point representation.</p>
+
+<h2 class="refsubsection" id="instancemethods">instance methods</h2>
+<dl class="methodlist">
+	<dt id="Float.Arithmeticoperations" class="noncode">Arithmetic operations</dt>
+		<dd class="callseq noncode">Performs various arithmetic operations on <i class="obj">flt</i>.</dd>
+		<dd class="desc"><table>
+				<tr class="firstRow">
+					<td><i class="obj">flt</i></td>
+					<td><code>+</code></td>
+					<td><i class="obj">aNumeric</i></td>
+					<td>Addition</td>
+				</tr>
+				<tr>
+					<td><i class="obj">flt</i></td>
+					<td><code>-</code></td>
+					<td><i class="obj">aNumeric</i></td>
+					<td>Subtraction</td>
+				</tr>
+				<tr>
+					<td><i class="obj">flt</i></td>
+					<td><code>*</code></td>
+					<td><i class="obj">aNumeric</i></td>
+					<td>Multiplication</td>
+				</tr>
+				<tr>
+					<td><i class="obj">flt</i></td>
+					<td><code>/</code></td>
+					<td><i class="obj">aNumeric</i></td>
+					<td>Division</td>
+				</tr>
+				<tr>
+					<td><i class="obj">flt</i></td>
+					<td><code>%</code></td>
+					<td><i class="obj">aNumeric</i></td>
+					<td>Modulo</td>
+				</tr>
+				<tr>
+					<td><i class="obj">flt</i></td>
+					<td><code>**</code></td>
+					<td><i class="obj">aNumeric</i></td>
+					<td>Exponentiation</td>
+				</tr>
+			</table>
+		</dd>
+
+	<dt id="Float._lt_eq_lt">&lt;=&gt;</dt>
+		<dd class="callseq"><i class="obj">flt</i> &lt;=&gt; <i class="obj">aNumeric</i> &rarr; -1, 0, +1</dd>
+		<dd class="desc">Returns -1, 0, or +1 depending on whether <i class="obj">flt</i> is less than, equal to, or greater than <i class="obj">aNumeric</i>. This is the basis for the tests in <code>Comparable</code>. </dd>
+
+	<dt id="Float.ceil">ceil</dt>
+		<dd class="callseq"><i class="obj">flt</i>.ceil  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Returns the smallest <code>Integer</code> greater than or equal to <i class="obj">flt</i>.
+
+<div><code class="block">1.2.ceil <span class="output"><span class="outputmark">&rarr;</span> 2</span>
+2.0.ceil <span class="output"><span class="outputmark">&rarr;</span> 2</span>
+(-1.2).ceil <span class="output"><span class="outputmark">&rarr;</span> -1</span>
+(-2.0).ceil <span class="output"><span class="outputmark">&rarr;</span> -2</span></code></div>
+
+		</dd>
+
+	<dt id="Float.finite_qm">finite?</dt>
+		<dd class="callseq"><i class="obj">flt</i>.finite?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">flt</i> is a valid IEEE floating point number (it is not infinite, and <code class="method">nan?</code> is <code class="const">false</code>). </dd>
+
+	<dt id="Float.floor">floor</dt>
+		<dd class="callseq"><i class="obj">flt</i>.floor  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Returns the largest integer less than or equal to <i class="obj">flt</i>.
+
+<div><code class="block">1.2.floor <span class="output"><span class="outputmark">&rarr;</span> 1</span>
+2.0.floor <span class="output"><span class="outputmark">&rarr;</span> 2</span>
+(-1.2).floor <span class="output"><span class="outputmark">&rarr;</span> -2</span>
+(-2.0).floor <span class="output"><span class="outputmark">&rarr;</span> -2</span></code></div>
+
+		</dd>
+
+	<dt id="Float.infinite_qm">infinite?</dt>
+		<dd class="callseq"><i class="obj">flt</i>.infinite?  &rarr; <code>nil</code>, -1, +1</dd>
+		<dd class="desc">Returns <code>nil</code>, -1, or +1 depending on whether <i class="obj">flt</i> is finite,
+      -infinity, or +infinity.
+
+<div><code class="block">(0.0).infinite? <span class="output"><span class="outputmark">&rarr;</span> nil</span>
+(-1.0/0.0).infinite? <span class="output"><span class="outputmark">&rarr;</span> -1</span>
+(+1.0/0.0).infinite? <span class="output"><span class="outputmark">&rarr;</span> 1</span></code></div>
+
+		</dd>
+
+	<dt id="Float.nan_qm">nan?</dt>
+		<dd class="callseq"><i class="obj">flt</i>.nan?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">flt</i> is an invalid IEEE
+      floating point number.
+
+<div><code class="block">a = -1.0 <span class="output"><span class="outputmark">&rarr;</span> -1.0</span>
+a.nan? <span class="output"><span class="outputmark">&rarr;</span> false</span>
+a = Math.log(a) <span class="output"><span class="outputmark">&rarr;</span> NaN</span>
+a.nan? <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="Float.round">round</dt>
+		<dd class="callseq"><i class="obj">flt</i>.round  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Rounds <i class="obj">flt</i> to the nearest integer. Equivalent to:
+
+<div><code class="block">def round
+  return floor(self+0.5) if self &gt; 0.0
+  return ceil(self-0.5)  if self &lt; 0.0
+  return 0.0
+end</code></div>
+
+<div><code class="block">1.5.round <span class="output"><span class="outputmark">&rarr;</span> 2</span>
+(-1.5).round <span class="output"><span class="outputmark">&rarr;</span> -2</span></code></div>
+
+		</dd>
+
+	<dt id="Float.to_f">to_f</dt>
+		<dd class="callseq"><i class="obj">flt</i>.to_f  &rarr; <i class="obj">flt</i></dd>
+		<dd class="desc">Returns <i class="obj">flt</i>.
+
+		</dd>
+
+	<dt id="Float.to_i">to_i</dt>
+		<dd class="callseq"><i class="obj">flt</i>.to_i  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Returns <i class="obj">flt</i> truncated to an <code>Integer</code>.
+
+		</dd>
+
+	<dt id="Float.to_s">to_s</dt>
+		<dd class="callseq"><i class="obj">flt</i>.to_s  &rarr; <i class="obj">aString</i></dd>
+		<dd class="desc">Returns a string containing a representation of self. As well as a fixed or exponential form of the number, the call may return &ldquo;<code>NaN</code>&rdquo;, &ldquo;<code>Infinity</code>&rdquo;, and &ldquo;<code>-Infinity</code>&rdquo;.</dd>
+</dl>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_c_float.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

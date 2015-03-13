@@ -1,0 +1,485 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>File</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_c_file',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="class" id="File">class <strong>File</strong> &lt; IO</h1>
+
+<p>A <code class="class">File</code> is an abstraction of any file object accessible by the program and is closely associated with class <code class="class"><a href="ref_c_io.html">IO</a></code>. <code class="class">File</code> includes the methods of module <code class="module"><a href="ref_m_filetest.html">FileTest</a></code> as class methods, allowing you to write (for example) <code>File.exist?("foo")</code>.</p>
+
+<p id="permissions">In this section, <em>permission bits</em> are a platform-specific set of bits that indicate permissions of a file.  On Unix-based systems, permissions are viewed as a set of three octets, for the owner, the group, and the rest of the world.  For each of these entities, permissions may be set to read, write, or execute (or search, if a directory) the file:</p>
+
+  
+<table><thead>
+	<tr>
+		<th colspan="3">Owner</th>
+		<th colspan="3">Group</th>
+		<th colspan="3">Other</th>
+	</tr></thead>
+	<tr class="firstRow">
+		<td>r</td>
+		<td>w</td>
+		<td>x</td>
+		<td style="border-left:1px solid #ccc">r</td>
+		<td>w</td>
+		<td>x</td>
+		<td style="border-left:1px solid #ccc">r</td>
+		<td>w</td>
+		<td>x</td>
+	</tr>
+	<tr>
+		<td>4</td>
+		<td>2</td>
+		<td>1</td>
+		<td style="border-left:1px solid #ccc">4</td>
+		<td>2</td>
+		<td>1</td>
+		<td style="border-left:1px solid #ccc">4</td>
+		<td>2</td>
+		<td>1</td>
+	</tr>
+</table>
+
+  
+
+<p>The permission bits <code>0644</code> (in octal) would thus be interpreted as read/write for owner, and read-only for group and other.  Higher-order bits may also be used to indicate the type of file (plain, directory, pipe, socket, and so on) and various other special features.</p>
+
+<p>On non-Posix operating systems, there may be only the ability to make a file read-only or not.  In this case, the remaining permission bits will be synthesized to resemble typical values.  For instance, on Windows NT the default permission bits are <code>0644</code>, which means read/write for owner, read-only for all others.  The only change that can be made is to make the file read-only, which is reported as <code>0444</code>.</p>
+
+
+<h2>mixins</h2>
+<dl>
+	<dt><code class="module"><a href="ref_m_fileTest.html#FileTest">FileTest</a></code></dt>
+	<dd><code>blockdev?</code>, <code>chardev?</code>, <code>directory?</code>, <code>executable?</code>, <code>executable_real?</code>, <code>exist?</code>, <code>exists?</code>, <code>file?</code>, <code>grpowned?</code>, <code>owned?</code>, <code>pipe?</code>, <code>readable?</code>, <code>readable_real?</code>, <code>setgid?</code>, <code>setuid?</code>, <code>size</code>, <code>size?</code>, <code>socket?</code>, <code>sticky?</code>, <code>symlink?</code>, <code>writable?</code>, <code>writable_real?</code>, <code>zero?</code></dd>
+</dl>
+
+
+<h2 class="refsubsection" id="classmethods">class methods</h2>
+<dl class="methodlist">
+	<dt id="File.atime">atime</dt>
+		<dd class="callseq">File.atime( <i class="obj">fileName</i> )  &rarr; <i class="obj">aTime</i></dd>
+		<dd class="desc">Returns the last access time for the named file.
+
+<div><code class="block">File.atime("testfile") <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:09:52 CDT 2002</span></code></div>
+
+		</dd>
+
+	<dt id="File.basename">basename</dt>
+		<dd class="callseq">File.basename( <i class="obj">fileName</i> [, <i class="obj">aSuffix</i>] )  &rarr; <i class="obj">aNewString</i></dd>
+		<dd class="desc">Returns the last component of the filename given in <i class="obj">fileName</i>, which must be formed using forward slashes (&ldquo;<code>/</code>&rdquo;) regardless of the separator used on the local file system.  If <i class="obj">aSuffix</i> is given and present at the end of <i class="obj">fileName</i>, it is removed.
+
+<div><code class="block">File.basename("/home/gumby/work/ruby.rb")        <span class="output2"><span class="outputmark">&rarr;</span> "ruby.rb"</span>
+File.basename("/home/gumby/work/ruby.rb", ".rb") <span class="output2"><span class="outputmark">&rarr;</span> "ruby"</span></code></div>
+
+		</dd>
+
+	<dt id="File.chmod">chmod</dt>
+		<dd class="callseq">File.chmod( <i class="obj">aModeInt</i> <i>[</i>, <i class="obj">fileName</i><i>]+</i> )  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Changes permission bits on the named file(s) to the bit pattern represented by <i class="obj">aModeInt</i>. Actual effects are operating system dependent (see the beginning of this section).  On Unix systems, see <code>chmod(2)</code> for details.  Returns the number of files processed.
+
+<div><code class="block">File.chmod(0644, "testfile", "out") <span class="output"><span class="outputmark">&rarr;</span> 2</span></code></div>
+
+		</dd>
+
+	<dt id="File.chown">chown</dt>
+		<dd class="callseq">File.chown( <i class="obj">anOwnerInt</i>, <i class="obj">aGroupInt</i> <i>[</i>, <i class="obj">fileName</i><i>]+</i> ) &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc"><p>Changes the owner and group of the named file(s) to the given numeric owner and group id's. Only a process with superuser privileges may change the owner of a file.  The current owner of a file may change the file's group to any group to which the owner belongs.  A <code>nil</code> or -1 owner or group id is ignored.</p>
+		<p>Returns the number of files processed.</p>
+
+<div><code class="block">File.chown(nil, 100, "testfile")</code></div>
+
+		</dd>
+
+	<dt id="File.ctime">ctime</dt>
+		<dd class="callseq">File.ctime( <i class="obj">fileName</i> )  &rarr; <i class="obj">aTime</i></dd>
+		<dd class="desc">Returns the change time for the named file (the time at which directory information about the file was changed, not the file itself).
+
+<div><code class="block">File.ctime("testfile") <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:17:17 CDT 2002</span></code></div>
+
+		</dd>
+
+	<dt id="File.delete">delete</dt>
+		<dd class="callseq">File.delete( <i>[</i><i class="obj">fileName</i><i>]+</i> )  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc"><p>Deletes the named file(s). Returns the number of files processed.</p>
+		<p>See also <code class="class_class_method"><a href="ref_c_dir.html#Dir.rmdir"><span class="class">Dir</span>.<span class="method">rmdir</span></a></code>.</p>
+
+<div><code class="block">File.new("testrm", "w+").close <span class="output"><span class="outputmark">&rarr;</span> nil</span>
+File.delete("testrm") <span class="output"><span class="outputmark">&rarr;</span> 1</span></code></div>
+
+		</dd>
+
+	<dt id="File.dirname">dirname</dt>
+		<dd class="callseq">File.dirname( <i class="obj">fileName</i> )  &rarr; <i class="obj">fileName</i></dd>
+		<dd class="desc">Returns all components of the filename given in <i class="obj">fileName</i> except the last one.  The filename must be formed using forward slashes (&ldquo;<code>/</code>&rdquo;) regardless of the separator used on the local file system.
+
+<div><code class="block">File.dirname("/home/gumby/work/ruby.rb")  <span class="output2"><span class="outputmark">&rarr;</span> "/home/gumby/work"</span></code></div>
+
+		</dd>
+
+	<dt id="File.expand_path">expand_path</dt>
+		<dd class="callseq">File.expand_path( <i class="obj">fileName</i> [, <i class="obj">aDirString</i>] ) &rarr; <i class="obj">fileName</i></dd>
+		<dd class="desc">Converts a pathname to an absolute pathname. Relative paths are referenced from the current working directory of the process unless <i class="obj">aDirString</i> is given, in which case it will be used as the starting point.  The given pathname may start with a &ldquo;<code>~</code>&rdquo;, which expands to the process owner's home directory (the environment variable <code>HOME</code> must be set correctly). &ldquo;<code>~</code><i class="obj">user</i>&rdquo; expands to the named user's home directory.
+
+<div><code class="block">File.expand_path("~oracle/bin")          <span class="output2"><span class="outputmark">&rarr;</span> "/home/oracle/bin"</span>
+File.expand_path("../../bin", "/tmp/x")  <span class="output2"><span class="outputmark">&rarr;</span> "/bin"</span></code></div>
+
+		</dd>
+
+	<dt id="File.ftype">ftype</dt>
+		<dd class="callseq">File.ftype( <i class="obj">fileName</i> )  &rarr; <i class="obj">fileType</i></dd>
+		<dd class="desc">Identifies the type of the named file; the return string is one of &ldquo;<code>file</code>&rdquo;, &ldquo;<code>directory</code>&rdquo;, &ldquo;<code>characterSpecial</code>&rdquo;, &ldquo;<code>blockSpecial</code>&rdquo;, &ldquo;<code>fifo</code>&rdquo;, &ldquo;<code>link</code>&rdquo;, or &ldquo;<code>socket</code>&rdquo;.
+
+<div><code class="block">File.ftype("testfile") <span class="output"><span class="outputmark">&rarr;</span> "file"</span>
+File.ftype("/dev/tty") <span class="output"><span class="outputmark">&rarr;</span> "characterSpecial"</span>
+File.ftype("/tmp/.X11-unix/X0") <span class="output"><span class="outputmark">&rarr;</span> "socket"</span></code></div>
+
+		</dd>
+
+	<dt id="File.join">join</dt>
+		<dd class="callseq">File.join( <i>[</i><i class="obj">aString</i><i>]+</i> )  &rarr; <i class="obj">fileName</i></dd>
+		<dd class="desc"><p>Returns a new string formed by joining the strings using <code class="class_constant"><a href="ref_c_file.html#File.SEPARATOR"><span class="class">File</span>::<span class="method">SEPARATOR</span></a></code> (see <a href="ref_c_file.html#table_22.2">Table 22.2</a>).</p>
+
+<div><code class="block">File.join("usr", "mail", "gumby") <span class="output"><span class="outputmark">&rarr;</span> "usr/mail/gumby"</span></code></div>
+
+			<table id="table_22.2">
+				<caption>Table 22.2 : Path separator constants (platform-specific)</caption>
+				<tr class="firstRow">
+					<td id="File.ALT_SEPARATOR"><code class="constant">ALT_SEPARATOR</code></td>
+					<td>Alternate path separator.</td>
+				</tr>
+				<tr>
+					<td id="File.PATH_SEPARATOR"><code class="constant">PATH_SEPARATOR</code></td>
+					<td>Character that separates filenames in  a search path (such as &ldquo;:&rdquo; or &ldquo;;&rdquo;).</td>
+				</tr>
+				<tr>
+					<td id="File.SEPARATOR"><code class="constant">SEPARATOR</code></td>
+					<td>Character that separates directory components in a filename (such as &ldquo;\&rdquo; or &ldquo;/&rdquo;).</td>
+				</tr>
+				<tr>
+					<td><code>Separator</code></td>
+					<td>Alias for <code class="const">SEPARATOR</code>.</td>
+				</tr>
+			</table>
+
+		</dd>
+
+	<dt id="File.link">link</dt>
+		<dd class="callseq">File.link( <i class="obj">anOldName</i>, <i class="obj">aNewName</i> )  &rarr; 0</dd>
+		<dd class="desc">Creates a new name for an existing file using a hard link. Will not overwrite <i class="obj">aNewName</i> if it already exists (raising a subclass of <code class="exception">SystemCallError</code>). Not available on all platforms.
+
+<div><code class="block">File.link("testfile", ".testfile")  <span class="output2"><span class="outputmark">&rarr;</span> 0</span>
+IO.readlines(".testfile")[0]        <span class="output2"><span class="outputmark">&rarr;</span> "This is line one\n"</span></code></div>
+
+		</dd>
+
+	<dt id="File.lstat">lstat</dt>
+		<dd class="callseq">File.lstat( <i class="obj">fileName</i> )  &rarr; <i class="obj">aStat</i></dd>
+		<dd class="desc">Same as <code class="class_instance_method"><a href="ref_c_io.html#IO.stat"><span class="class">IO</span>#<span class="method">stat</span></a></code>, but does not follow the last symbolic link.
+      Instead, reports on the link itself.
+
+<div><code class="block">File.symlink("testfile", "link2test")  <span class="output2"><span class="outputmark">&rarr;</span> 0</span>
+File.stat("testfile").size             <span class="output2"><span class="outputmark">&rarr;</span> 66</span>
+File.lstat("link2test").size           <span class="output2"><span class="outputmark">&rarr;</span> 8</span>
+File.stat("link2test").size            <span class="output2"><span class="outputmark">&rarr;</span> 66</span></code></div>
+
+		</dd>
+
+	<dt id="File.mtime">mtime</dt>
+		<dd class="callseq">File.mtime( <i class="obj">fileName</i> )  &rarr; <i class="obj">aTime</i></dd>
+		<dd class="desc">Returns the modification time for the named file.
+
+<div><code class="block">File.mtime("testfile") <span class="output"><span class="outputmark">&rarr;</span> Sun Nov 25 23:48:26 CST 2001</span></code></div>
+
+		</dd>
+
+	<dt id="File.new">new</dt>
+		<dd class="callseq">File.new( <i class="obj">fileName</i>, <i class="obj">aModeString</i>="r" )  &rarr; <i class="obj">file</i></dd>
+		<dd class="callseq">File.new( <i class="obj">fileName</i> [, <i class="obj">aModeNum</i> [<i class="obj">aPermNum</i>]] ) &rarr; <i class="obj">file</i></dd>
+		<dd class="desc">Opens the file named by <i class="obj">fileName</i> according to <i class="obj">aModeString</i> (default is &ldquo;r&rdquo;) and returns a new <code class="class">File</code> object.  See <a href="ref_c_io.html#table_22.5">Table 22.5</a> for a description of <i class="obj">aModeString</i>. The file mode may optionally be specified as a <code class="class">Fixnum</code> by <em>or</em>-ing together the flags described in <a href="ref_c_file.html#table_22.3">Table 22.3</a>. Optional permission bits may be given in <i class="obj">aPermNum</i>.  These mode and permission bits are platform dependent; on Unix systems, see <code>open(2)</code> for details.
+
+<div><code class="block">f = File.new("testfile", "r")
+f = File.new("newfile",  "w+")
+f = File.new("newfile", File::CREAT|File::TRUNC|File::RDWR, 0644)</code></div>
+
+	<table id="table_22.3">
+		<caption>Table 22.3 : Open-mode constants</caption>
+		<tr class="firstRow">
+			<td id="File.APPEND"><code class="constant">APPEND</code></td>
+			<td>Open the file in append mode; all writes will occur at end of file.</td>
+		</tr>
+		<tr>
+			<td id="File.CREAT"><code class="constant">CREAT</code></td>
+			<td>Create the file on open if it does not exist.</td>
+		</tr>
+		<tr>
+			<td id="File.EXCL"><code class="constant">EXCL</code></td>
+			<td>When used with CREAT, open will fail if the file exists.</td>
+		</tr>
+		<tr>
+			<td id="File.NOCTTY"><code class="constant">NOCTTY</code></td>
+			<td>When opening a terminal device (see <code class="class_instance_method"><a href="ref_c_io.html#IO.isatty"><span class="class">IO</span>#<span class="method">isatty</span></a></code>), do not allow it to become the controlling terminal.</td>
+		</tr>
+		<tr>
+			<td id="File.NONBLOCK"><code class="constant">NONBLOCK</code></td>
+			<td>Open the file in nonblocking mode.</td>
+		</tr>
+		<tr>
+			<td id="File.RDONLY"><code class="constant">RDONLY</code></td>
+			<td>Open for reading only.</td>
+		</tr>
+		<tr>
+			<td id="File.RDWR"><code class="constant">RDWR</code></td>
+			<td>Open for reading and writing.</td>
+		</tr>
+		<tr>
+			<td id="File.TRUNC"><code class="constant">TRUNC</code></td>
+			<td>Open the file and truncate it to zero length if the file exists.</td>
+		</tr>
+		<tr>
+			<td id="File.WRONLY"><code class="constant">WRONLY</code></td>
+			<td>Open for writing only.</td>
+		</tr>
+	</table>
+
+		</dd>
+
+	<dt id="File.open">open</dt>
+		<dd class="callseq">File.open( <i class="obj">fileName</i>, <i class="obj">aModeString</i>="r" )  &rarr; <i class="obj">file</i></dd>
+		<dd class="callseq">File.open( <i class="obj">fileName</i> [, <i class="obj">aModeNum</i> [<i class="obj">aPermNum</i>]] ) &rarr; <i class="obj">file</i></dd>
+		<dd class="callseq">File.open( <i class="obj">fileName</i>, <i class="obj">aModeString</i>="r" ) {| <i class="obj">file</i> | block } &rarr; <code>nil</code></dd>
+		<dd class="callseq">File.open( <i class="obj">fileName</i> [, <i class="obj">aModeNum</i> [<i class="obj">aPermNum</i>]] ) {| <i class="obj">file</i> | block } &rarr; <code>nil</code></dd>
+		<dd class="desc">With no associated block, <code class="method">open</code> is a synonym for <code class="class_class_method"><a href="ref_c_file.html#File.new"><span class="class">File</span>.<span class="method">new</span></a></code>. If the optional code block is given, it will be passed <i class="obj">file</i> as an argument, and the file will automatically be closed when the block terminates. In this instance, <code class="class_class_method"><a href="ref_c_file.html#File.open"><span class="class">File</span>.<span class="method">open</span></a></code> returns <code>nil</code>. </dd>
+
+	<dt id="File.readlink">readlink</dt>
+		<dd class="callseq">File.readlink( <i class="obj">fileName</i> )  &rarr; <i class="obj">fileName</i></dd>
+		<dd class="desc">Returns the given symbolic link as a string. Not available on all platforms.
+
+<div><code class="block">File.symlink("testfile", "link2test")  <span class="output2"><span class="outputmark">&rarr;</span> 0</span>
+File.readlink("link2test")             <span class="output2"><span class="outputmark">&rarr;</span> "testfile"</span></code></div>
+
+		</dd>
+
+	<dt id="File.rename">rename</dt>
+		<dd class="callseq">File.rename( <i class="obj">anOldName</i>, <i class="obj">aNewName</i> )  &rarr; 0</dd>
+		<dd class="desc">Renames the given file to the new name. Raises a <code class="exception">SystemCallError</code> if the file cannot be renamed.
+
+<div><code class="block">File.rename("afile", "afile.bak") <span class="output"><span class="outputmark">&rarr;</span> 0</span></code></div>
+
+		</dd>
+
+	<dt id="File.size">size</dt>
+		<dd class="callseq">File.size( <i class="obj">fileName</i> )  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Returns the size of the file in bytes.
+
+<div><code class="block">File.size("testfile") <span class="output"><span class="outputmark">&rarr;</span> 66</span></code></div>
+
+		</dd>
+
+	<dt id="File.split">split</dt>
+		<dd class="callseq">File.split( <i class="obj">fileName</i> )  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Splits the given string into a directory and a file component and returns them in a two-element array.  See also <code class="class_class_method"><a href="ref_c_file.html#File.dirname"><span class="class">File</span>.<span class="method">dirname</span></a></code> and <code class="class_class_method"><a href="ref_c_file.html#File.basename"><span class="class">File</span>.<span class="method">basename</span></a></code>.
+
+<div><code class="block">File.split("/home/gumby/.profile")  <span class="output2"><span class="outputmark">&rarr;</span> ["/home/gumby", ".profile"]</span></code></div>
+
+		</dd>
+
+	<dt id="File.stat">stat</dt>
+		<dd class="callseq">File.stat( <i class="obj">fileName</i> )  &rarr; <i class="obj">aStat</i></dd>
+		<dd class="desc">Returns a <code class="class">File::Stat</code> object for the named file (see <code class="const"><a href="ref_c_file__stat.html">File::Stat</a></code>).
+
+<div><code class="block">File.stat("testfile").mtime <span class="output"><span class="outputmark">&rarr;</span> Sun Nov 25 23:48:26 CST 2001</span></code></div>
+
+		</dd>
+
+	<dt id="File.symlink">symlink</dt>
+		<dd class="callseq">File.symlink( <i class="obj">anOldName</i>, <i class="obj">aNewName</i> )  &rarr; 0 or <code>nil</code></dd>
+		<dd class="desc">Creates a symbolic link called <i class="obj">aNewName</i> for the existing file <i class="obj">anOldName</i>. Returns <code>nil</code> on all platforms that do not support symbolic links.
+
+<div><code class="block">File.symlink("testfile", "link2test") <span class="output"><span class="outputmark">&rarr;</span> 0</span></code></div>
+
+		</dd>
+
+	<dt id="File.truncate">truncate</dt>
+		<dd class="callseq">File.truncate( <i class="obj">fileName</i>, <i class="obj">anInteger</i> )  &rarr; 0</dd>
+		<dd class="desc">Truncates the file <i class="obj">fileName</i> to be at most <i class="obj">anInteger</i> bytes long.  Not available on all platforms.
+
+<div><code class="block">f = File.new("out", "w")
+f.write("1234567890") <span class="output"><span class="outputmark">&rarr;</span> 10</span>
+f.close <span class="output"><span class="outputmark">&rarr;</span> nil</span>
+File.truncate("out", 5) <span class="output"><span class="outputmark">&rarr;</span> 0</span>
+File.size("out") <span class="output"><span class="outputmark">&rarr;</span> 5</span></code></div>
+
+		</dd>
+
+	<dt id="File.umask">umask</dt>
+		<dd class="callseq">File.umask( [<i class="obj">anInteger</i>] )  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Returns the current umask value for this process. If the optional argument is given, set the umask to that value and return the previous value. Umask values are <em>subtracted</em> from the default permissions; so a umask of <code>0222</code> would make a file read-only for everyone. See also the <a href="ref_c_file.html#permissions">discussion of permissions</a>.
+
+<div><code class="block">File.umask(0006) <span class="output"><span class="outputmark">&rarr;</span> 18</span>
+File.umask <span class="output"><span class="outputmark">&rarr;</span> 6</span></code></div>
+
+		</dd>
+
+	<dt id="File.unlink">unlink</dt>
+		<dd class="callseq">File.unlink( <i>[</i><i class="obj">fileName</i><i>]+</i> )  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Synonym for <code class="class_class_method"><a href="ref_c_file.html#File.delete"><span class="class">File</span>.<span class="method">delete</span></a></code>. See also <code class="class_class_method"><a href="ref_c_dir.html#Dir.rmdir"><span class="class">Dir</span>.<span class="method">rmdir</span></a></code>. </dd>
+
+	<dt id="File.utime">utime</dt>
+		<dd class="callseq">File.utime( <i class="obj">anAccessTime</i>, <i class="obj">aModTime</i> <i>[</i>, <i class="obj">fileName</i><i>]+</i> ) &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Changes the access and modification times on a number of files. The times must be instances of class <code class="class">Time</code> or integers representing the number of seconds since epoch. Returns the number of files processed. Not available on all platforms.
+
+<div><code class="block">File.utime(0, 0, "testfile")  <span class="output2"><span class="outputmark">&rarr;</span> 1</span>
+File.mtime("testfile")  <span class="output2"><span class="outputmark">&rarr;</span> Wed Dec 31 18:00:00 CST 1969</span>
+File.utime(0, Time.now, "testfile")  <span class="output2"><span class="outputmark">&rarr;</span> 1</span>
+File.mtime("testfile")  <span class="output2"><span class="outputmark">&rarr;</span> Sun Jun 09 00:17:19 CDT 2002</span></code></div>
+
+		</dd>
+</dl>
+
+
+<h2 class="refsubsection" id="instancemethods">instance methods</h2>
+<dl class="methodlist">
+	<dt id="File.atime">atime</dt>
+		<dd class="callseq"><i class="obj">file</i>.atime  &rarr; <i class="obj">aTime</i></dd>
+		<dd class="desc">Returns the last access time for <i class="obj">file</i>, or epoch if <i class="obj">file</i> has not been accessed.
+
+<div><code class="block">File.new("testfile").atime <span class="output"><span class="outputmark">&rarr;</span> Wed Dec 31 18:00:00 CST 1969</span></code></div>
+
+		</dd>
+
+	<dt id="File.chmod">chmod</dt>
+		<dd class="callseq"><i class="obj">file</i>.chmod( <i class="obj">aModeInt</i> )  &rarr; <code>0</code></dd>
+		<dd class="desc">Changes permission bits on <i class="obj">file</i> to the bit pattern represented by <i class="obj">aModeInt</i>.  Actual effects are platform dependent; on Unix systems, see <code>chmod(2)</code> for details. See the <a href="ref_c_file.html#permissions">discussion of permissions</a>.
+
+<div><code class="block">f = File.new("out", "w");
+f.chmod(0644) <span class="output"><span class="outputmark">&rarr;</span> 0</span></code></div>
+
+		</dd>
+
+	<dt id="File.chown">chown</dt>
+		<dd class="callseq"><i class="obj">file</i>.chown( <i class="obj">anOwnerInt</i>, <i class="obj">aGroupInt</i> )  &rarr; 0</dd>
+		<dd class="desc">Changes the owner and group of <i class="obj">file</i> to the given numeric owner and group id's. Only a process with superuser privileges may change the owner of a file.  The current owner of a file may change the file's group to any group to which the owner belongs.  A <code>nil</code> or -1 owner or group id is ignored.
+
+<div><code class="block">File.new("testfile").chown(502, 1000)</code></div>
+
+		</dd>
+
+	<dt id="File.ctime">ctime</dt>
+		<dd class="callseq"><i class="obj">file</i>.ctime  &rarr; <i class="obj">aTime</i></dd>
+		<dd class="desc">Returns the change time for <i class="obj">file</i> (that is, the time
+      directory information about the file was changed, not the file
+      itself).
+
+<div><code class="block">File.new("testfile").ctime <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:17:19 CDT 2002</span></code></div>
+
+		</dd>
+
+	<dt id="File.flock">flock</dt>
+		<dd class="callseq"><i class="obj">file</i>.flock ( <i class="obj">aLockingConstant</i> )  &rarr; 0 or <code class="const">false</code></dd>
+		<dd class="desc">Locks or unlocks a file according to <i class="obj">aLockingConstant</i> (a logical <em>or</em> of the values in <a href="ref_c_file.html#table_22.4">Table 22.4</a>). Returns <code class="const">false</code> if <code class="const">File::LOCK_NB</code> is specified and the operation would otherwise have blocked. Not available on all platforms.
+
+<div><code class="block">File.new("testfile").flock(File::LOCK_UN) <span class="output2"><span class="outputmark">&rarr;</span> 0</span></code></div>
+
+			<table id="table_22.4">
+				<caption>Table 22.4 : Lock-mode constants</caption>
+				<tr class="firstRow">
+					<td id="File.LOCK_EX"><code class="constant">LOCK_EX</code></td>
+					<td>Exclusive lock. Only one process may hold an exclusive lock for a given file at a time.</td>
+				</tr>
+				<tr>
+					<td id="File.LOCK_NB"><code class="constant">LOCK_NB</code></td>
+					<td>Don't block when locking. May be combined with other lock options using logical or.</td>
+				</tr>
+				<tr>
+					<td id="File.LOCK_SH"><code class="constant">LOCK_SH</code></td>
+					<td>Shared lock. Multiple processes may each hold a shared lock for a given file at the same time.</td>
+				</tr>
+				<tr>
+					<td id="File.LOCK_UN"><code class="constant">LOCK_UN</code></td>
+					<td>Unlock.</td>
+				</tr>
+			</table>
+
+
+		</dd>
+
+	<dt id="File.lstat">lstat</dt>
+		<dd class="callseq"><i class="obj">file</i>.lstat  &rarr; <i class="obj">aStat</i></dd>
+		<dd class="desc">Same as <code class="class_instance_method"><a href="ref_c_io.html#IO.stat"><span class="class">IO</span>#<span class="method">stat</span></a></code>, but does not follow the last symbolic link.
+      Instead, reports on the link itself.
+
+<div><code class="block">File.symlink("testfile", "link2test") <span class="output2"><span class="outputmark">&rarr;</span> 0</span>
+File.stat("testfile").size <span class="output"><span class="outputmark">&rarr;</span> 66</span>
+f = File.new("link2test")
+f.lstat.size <span class="output"><span class="outputmark">&rarr;</span> 8</span>
+f.stat.size <span class="output"><span class="outputmark">&rarr;</span> 66</span></code></div>
+
+		</dd>
+
+	<dt id="File.mtime">mtime</dt>
+		<dd class="callseq"><i class="obj">file</i>.mtime  &rarr; <i class="obj">aTime</i></dd>
+		<dd class="desc">Returns the modification time for <i class="obj">file</i>.
+
+<div><code class="block">File.new("testfile").mtime <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:17:19 CDT 2002</span></code></div>
+
+		</dd>
+
+	<dt id="File.path">path</dt>
+		<dd class="callseq"><i class="obj">file</i>.path  &rarr; <i class="obj">fileName</i></dd>
+		<dd class="desc">Returns the pathname used to create <i class="obj">file</i> as a string.
+
+<div><code class="block">File.new("testfile").path <span class="output"><span class="outputmark">&rarr;</span> "testfile"</span></code></div>
+
+		</dd>
+
+	<dt id="File.truncate">truncate</dt>
+		<dd class="callseq"><i class="obj">file</i>.truncate( <i class="obj">anInteger</i> )  &rarr; 0</dd>
+		<dd class="desc">Truncates <i class="obj">file</i> to at most <i class="obj">anInteger</i> bytes. The file must be opened for writing. Not available on all platforms.
+
+<div><code class="block">f = File.new("out", "w")
+f.syswrite("1234567890") <span class="output"><span class="outputmark">&rarr;</span> 10</span>
+f.truncate(5) <span class="output"><span class="outputmark">&rarr;</span> 0</span>
+f.close() <span class="output"><span class="outputmark">&rarr;</span> nil</span>
+File.size("out") <span class="output"><span class="outputmark">&rarr;</span> 5</span></code></div></dd>
+</dl>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_c_file.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

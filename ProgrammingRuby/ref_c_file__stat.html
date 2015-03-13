@@ -1,0 +1,400 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>File::Stat</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_c_file__stat',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="class" id="File::Stat">class <strong>File::Stat</strong> &lt; Object</h1>
+
+<p>Objects of class <code class="class">File::Stat</code> encapsulate common status information for <code class="class">File</code> objects.  The information is recorded at the moment the <code class="class">File::Stat</code> object is created; changes made to the file after that point will not be reflected.</p>
+
+<p><code class="class">File::Stat</code> objects are returned by <code class="class_instance_method"><a href="ref_c_io.html#IO.stat"><span class="class">IO</span>#<span class="method">stat</span></a></code>,  <code class="class_class_method"><a href="ref_c_file.html#File.stat"><span class="class">File</span>.<span class="method">stat</span></a></code>, <code class="class_instance_method"><a href="ref_c_file.html#File.lstat"><span class="class">File</span>#<span class="method">lstat</span></a></code>, and <code class="class_class_method"><a href="ref_c_file.html#File.lstat"><span class="class">File</span>.<span class="method">lstat</span></a></code>. Many of these methods return platform-specific values, and not all values are meaningful on all systems.</p>
+
+<p>See also <code class="module_instance_method"><a href="ref_m_kernel.html#Kernel.test"><span class="module">Kernel</span>#<span class="method">test</span></a></code>.</p>
+
+<h2>mixins</h2>
+<dl>
+	<dt><code class="module"><a href="ref_m_comparable.html#Comparable">Comparable</a></code></dt>
+	<dd><code class="module_instance_method"><a href="ref_m_comparable.html#Comparable._lt">&lt;</a></code>, <code class="module_instance_method"><a href="ref_m_comparable.html#Comparable._lt_eq">&lt;=</a></code>, <code class="module_instance_method"><a href="ref_m_comparable.html#Comparable.eqeq">==</a></code>, <code class="module_instance_method"><a href="ref_m_comparable.html#Comparable._gt_eq">&gt;=</a></code>, <code class="module_instance_method"><a href="ref_m_comparable.html#Comparable._gt">&gt;</a></code>, <code class="module_instance_method"><a href="ref_m_comparable.html#Comparable.between">between?</a></code></dd>
+</dl>
+
+<h2 class="refsubsection" id="instancemethods">instance methods</h2>
+<dl class="methodlist">
+	<dt id="File__Stat._lt_eq_lt">&lt;=&gt;</dt>
+		<dd class="callseq"><i class="obj">statfile</i> &lt;=&gt; <i class="obj">anOtherStat</i>  &rarr; -1, 0, 1</dd>
+		<dd class="desc">Compares <code class="class">File::Stat</code> objects by comparing their respective
+       modification times.
+
+<div><code class="block">f1 = File.new("f1", "w")
+sleep 1
+f2 = File.new("f2", "w")
+f1.stat &lt;=&gt; f2.stat <span class="output"><span class="outputmark">&rarr;</span> -1</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.atime">atime</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.atime  &rarr; <i class="obj">aTime</i></dd>
+		<dd class="desc">Returns the last access time for this file
+      as an object of class <code class="class">Time</code>.
+
+<div><code class="block">File.stat("testfile").atime <span class="output"><span class="outputmark">&rarr;</span> Wed Dec 31 18:00:00 CST 1969</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.blksize">blksize</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.blksize  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Returns the native file system's block size.
+      Will return 0 on platforms that don't support this information.
+
+<div><code class="block">File.stat("testfile").blksize <span class="output"><span class="outputmark">&rarr;</span> 4096</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.blockdev_qm">blockdev?</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.blockdev?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the file is a block device, <code class="const">false</code>
+      if it isn't or
+      if the operating system doesn't support this feature.
+
+<div><code class="block">File.stat("testfile").blockdev? <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.blocks">blocks</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.blocks  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Returns the number of native file system blocks allocated for
+      this file, or 0
+      if the operating system doesn't support this feature.
+
+<div><code class="block">File.stat("testfile").blocks <span class="output"><span class="outputmark">&rarr;</span> 2</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.chardev_qm">chardev?</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.chardev?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the file is a character device, <code class="const">false</code>
+      if it isn't or
+      if the operating system doesn't support this feature.
+
+<div><code class="block">File.stat("/dev/tty").chardev? <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.ctime">ctime</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.ctime  &rarr; <i class="obj">aTime</i></dd>
+		<dd class="desc">Returns the change time for <i class="obj">statfile</i> (that is, the time
+      directory information about the file was changed, not the file
+      itself).
+
+<div><code class="block">File.stat("testfile").ctime <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:17:19 CDT 2002</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.dev">dev</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.dev  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns an integer representing the device on which <i class="obj">statfile</i>
+      resides.
+
+<div><code class="block">File.stat("testfile").dev <span class="output"><span class="outputmark">&rarr;</span> 774</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.directory_qm">directory?</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.directory?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">statfile</i> is a directory, <code class="const">false</code>
+      otherwise.
+
+<div><code class="block">File.stat("testfile").directory? <span class="output"><span class="outputmark">&rarr;</span> false</span>
+File.stat(".").directory? <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.executable_qm">executable?</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.executable?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">statfile</i> is executable or if the
+      operating system doesn't distinguish executable files from
+      nonexecutable files.  The tests are made using the effective
+      owner of the process.
+
+<div><code class="block">File.stat("testfile").executable? <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.executable_real_qm">executable_real?</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.executable_real?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Same as <code>executable?</code>, but tests using the real owner of the
+      process.
+
+		</dd>
+
+	<dt id="File__Stat.file_qm">file?</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.file?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">statfile</i> is a regular file (not a device
+     file, pipe, socket, etc.).
+
+<div><code class="block">File.stat("testfile").file? <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.ftype">ftype</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.ftype  &rarr; <i class="obj">fileType</i></dd>
+		<dd class="desc">Identifies the type of <i class="obj">statfile</i>.
+      The return string is one of:
+        &ldquo;<code>file</code>&rdquo;,
+        &ldquo;<code>directory</code>&rdquo;,
+        &ldquo;<code>characterSpecial</code>&rdquo;,
+        &ldquo;<code>blockSpecial</code>&rdquo;,
+        &ldquo;<code>fifo</code>&rdquo;,
+        &ldquo;<code>link</code>&rdquo;, or
+        &ldquo;<code>socket</code>&rdquo;.
+
+<div><code class="block">File.stat("/dev/tty").ftype <span class="output"><span class="outputmark">&rarr;</span> "characterSpecial"</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.gid">gid</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.gid  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns the numeric group id of the owner of <i class="obj">statfile</i>.
+
+<div><code class="block">File.stat("testfile").gid <span class="output"><span class="outputmark">&rarr;</span> 500</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.grpowned_qm">grpowned?</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.grpowned?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns true if the effective group id of the process is the same
+      as the group id of <i class="obj">statfile</i>.
+      On Windows NT, returns <code class="const">false</code>.
+
+<div><code class="block">File.stat("testfile").grpowned? <span class="output"><span class="outputmark">&rarr;</span> true</span>
+File.stat("/etc/passwd").grpowned? <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.ino">ino</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.ino  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns the inode number for <i class="obj">statfile</i>.
+
+<div><code class="block">File.stat("testfile").ino <span class="output"><span class="outputmark">&rarr;</span> 43331</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.mode">mode</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.mode  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns an integer representing the permission bits of
+      <i class="obj">statfile</i>.  The meaning of the bits is platform dependent; on Unix
+      systems, see <code>stat(2)</code>.
+
+<div><code class="block">File.chmod(0644, "testfile") <span class="output"><span class="outputmark">&rarr;</span> 1</span>
+s = File.stat("testfile")
+sprintf("%o", s.mode) <span class="output"><span class="outputmark">&rarr;</span> "100644"</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.mtime">mtime</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.mtime  &rarr; <i class="obj">aTime</i></dd>
+		<dd class="desc">Returns the modification time for <i class="obj">statfile</i>.
+
+<div><code class="block">File.stat("testfile").mtime <span class="output"><span class="outputmark">&rarr;</span> Sun Jun 09 00:17:19 CDT 2002</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.nlink">nlink</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.nlink  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns the number of hard links to <i class="obj">statfile</i>.
+
+<div><code class="block">File.stat("testfile").nlink <span class="output"><span class="outputmark">&rarr;</span> 1</span>
+File.link("testfile", "testfile.bak") <span class="output"><span class="outputmark">&rarr;</span> 0</span>
+File.stat("testfile").nlink <span class="output"><span class="outputmark">&rarr;</span> 2</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.owned_qm">owned?</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.owned?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the effective user id of the process is the same
+      as the owner of <i class="obj">statfile</i>.
+
+<div><code class="block">File.stat("testfile").owned? <span class="output"><span class="outputmark">&rarr;</span> true</span>
+File.stat("/etc/passwd").owned? <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.pipe_qm">pipe?</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.pipe?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the operating system supports pipes and
+      <i class="obj">statfile</i> is a pipe; <code class="const">false</code> otherwise.
+
+		</dd>
+
+	<dt id="File__Stat.rdev">rdev</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.rdev  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns an integer representing the device type on which <i class="obj">statfile</i>
+      resides.  Returns <code>0</code>
+      if the operating system doesn't support this feature.
+
+<div><code class="block">File.stat("/dev/fd0").rdev <span class="output"><span class="outputmark">&rarr;</span> 512</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.readable_qm">readable?</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.readable?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">statfile</i> is readable by the effective
+      user id of this process.
+
+<div><code class="block">File.stat("testfile").readable? <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.readable_real_qm">readable_real?</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.readable_real?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">statfile</i> is readable by the real
+      user id of this process.
+
+<div><code class="block">File.stat("testfile").readable_real? <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.setgid_qm">setgid?</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.setgid?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">statfile</i> has the set-group-id
+      permission bit set, <code class="const">false</code> if it doesn't or
+      if the operating system doesn't support this feature.
+
+<div><code class="block">File.stat("/usr/sbin/lpc").setgid? <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.setuid_qm">setuid?</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.setuid?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">statfile</i> has the set-user-id
+      permission bit set, <code class="const">false</code> if it doesn't or
+      if the operating system doesn't support this feature.
+
+<div><code class="block">File.stat("/bin/su").setuid? <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.size">size</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.size  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns the size of <i class="obj">statfile</i> in bytes.
+
+<div><code class="block">File.stat("testfile").size <span class="output"><span class="outputmark">&rarr;</span> 66</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.size_qm">size?</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.size?  &rarr; <i class="obj">aFixnum</i> or <code>nil</code></dd>
+		<dd class="desc">Returns <code>nil</code> if <i class="obj">statfile</i> is a zero-length file; otherwise,
+      returns the file size.
+
+<div><code class="block">File.stat("testfile").size? <span class="output"><span class="outputmark">&rarr;</span> 66</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.socket_qm">socket?</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.socket?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">statfile</i> is a socket, <code class="const">false</code> if
+      it isn't or
+      if the operating system doesn't support this feature.
+
+<div><code class="block">File.stat("testfile").socket? <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.sticky_qm">sticky?</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.sticky?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">statfile</i> has its sticky bit set,
+      <code class="const">false</code> if it doesn't or if the operating system doesn't
+      support this feature.
+
+<div><code class="block">File.stat("testfile").sticky? <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.symlink_qm">symlink?</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.symlink?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">statfile</i> is a symbolic link,
+      <code class="const">false</code> if it isn't or if the operating system doesn't
+      support this feature. As <code class="class_class_method"><a href="ref_c_file.html#File.stat"><span class="class">File</span>.<span class="method">stat</span></a></code> automatically follows
+      symbolic links, <code class="method">symlink?</code> will always be
+      <code class="const">false</code> for an object returned by <code class="class_class_method"><a href="ref_c_file.html#File.stat"><span class="class">File</span>.<span class="method">stat</span></a></code>.
+
+<div><code class="block">File.symlink("testfile", "alink") <span class="output"><span class="outputmark">&rarr;</span> 0</span>
+File.stat("alink").symlink? <span class="output"><span class="outputmark">&rarr;</span> false</span>
+File.lstat("alink").symlink? <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.uid">uid</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.uid  &rarr; <i class="obj">aFixnum</i></dd>
+		<dd class="desc">Returns the numeric user id of the owner of <i class="obj">statfile</i>.
+
+<div><code class="block">File.stat("testfile").uid <span class="output"><span class="outputmark">&rarr;</span> 501</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.writable_qm">writable?</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.writable?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">statfile</i> is writable by the effective
+      user id of this process.
+
+<div><code class="block">File.stat("testfile").writable? <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.writable_real_qm">writable_real?</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.writable_real?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">statfile</i> is writable by the real
+      user id of this process.
+
+<div><code class="block">File.stat("testfile").writable_real? <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div>
+
+		</dd>
+
+	<dt id="File__Stat.zero_qm">zero?</dt>
+		<dd class="callseq"><i class="obj">statfile</i>.zero?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">statfile</i> is a zero-length file; <code class="const">false</code>
+      otherwise.
+
+<div><code class="block">File.stat("testfile").zero? <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div></dd>
+</dl>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_c_file__stat.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

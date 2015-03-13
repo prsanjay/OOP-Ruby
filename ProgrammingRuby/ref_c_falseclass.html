@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>FalseClass</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_c_falseclass',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="class" id="FalseClass">class <strong>FalseClass</strong> &lt; Object</h1>
+
+<p>The global value <code class="const">false</code> is the only instance of class <code class="class">FalseClass</code> and represents a logically false value in boolean expressions. The class provides operators allowing <code class="const">false</code> to participate correctly in logical expressions.</p>
+
+<h2 class="refsubsection" id="instancemethods">instance methods</h2>
+<dl class="methodlist">
+	<dt id="FalseClass._et">&amp;</dt>
+		<dd class="callseq"><code class="const">false</code> &amp; <i class="obj">anObject</i>  &rarr; <code class="const">false</code></dd>
+		<dd class="desc">And&mdash;Returns <code class="const">false</code>. <i class="obj">anObject</i> is always
+      evaluated as it is the argument to a method call&mdash;there is no
+      short-circuit evaluation in this case.
+
+		</dd>
+
+	<dt id="FalseClass._up">^</dt>
+		<dd class="callseq"><code class="const">false</code> ^ <i class="obj">anObject</i>  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Exclusive Or&mdash;If <i class="obj">anObject</i> is <code class="const">nil</code> or
+      <code class="const">false</code>, returns <code class="const">false</code>; otherwise, returns <code class="const">true</code>.
+
+		</dd>
+
+	<dt id="FalseClass._ba">|</dt>
+		<dd class="callseq"><code class="const">false</code> | <i class="obj">anObject</i>  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Or&mdash;Returns <code class="const">false</code> if <i class="obj">anObject</i> is
+      <code class="const">nil</code> or <code class="const">false</code>; <code class="const">true</code> otherwise.</dd>
+</dl>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_c_falseclass.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

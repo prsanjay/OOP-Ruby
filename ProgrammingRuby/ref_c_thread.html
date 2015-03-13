@@ -1,0 +1,374 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Thread</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'ref_c_thread',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 class="class" id="Thread">class <strong>Thread</strong> &lt; Object</h1>
+
+<p><code class="class">Thread</code> encapsulates the behavior of a thread of execution, including the main thread of the Ruby script. See the tutorial on &ldquo;<a href="tut_threads.html#threadsandprocesses">Threads and Processes</a>&rdquo;. In the descriptions that follow, the   parameter <i class="obj">aSymbol</i> refers to a symbol, which is either a   quoted string or a <code class="class">Symbol</code> (such as <code>:name</code>).</p>
+
+<h2 class="refsubsection" id="classmethods">class methods</h2>
+<dl class="methodlist">
+	<dt id="Thread.abort_on_exception">abort_on_exception</dt>
+		<dd class="callseq">Thread.abort_on_exception  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns the status of the global &ldquo;abort on exception&rdquo; condition.  The default is <code class="const">false</code>. When set to <code class="const">true</code>, will cause all threads to abort (the process will <code>exit(0)</code>) if an exception is raised in any thread. See also <code class="class_class_method"><a href="ref_c_thread.html#Thread.abort_on_exception_eq"><span class="class">Thread</span>.<span class="method">abort_on_exception=</span></a></code>. </dd>
+
+	<dt id="Thread.abort_on_exception_eq">abort_on_exception=</dt>
+		<dd class="callseq">Thread.abort_on_exception=  <i class="obj">aBoolean</i> &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">When set to <code class="const">true</code>, all threads will abort if an exception is raised. Returns the new state.
+
+<div><code class="block">Thread.abort_on_exception = true
+t1 = Thread.new do
+  puts  "In second thread"
+  raise "Raise exception"
+end
+t1.join
+print "not reached\n"</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">In second thread
+prog.rb:4: Raise exception (RuntimeError)
+	from prog.rb:2:in `initialize'
+	from prog.rb:2:in `new'
+	from prog.rb:2</code></div>
+
+		</dd>
+
+	<dt id="Thread.critical">critical</dt>
+		<dd class="callseq">Thread.critical  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns the status of the global &ldquo;thread critical&rdquo;
+      condition.
+
+		</dd>
+
+	<dt id="Thread.critical_eq">critical=</dt>
+		<dd class="callseq">Thread.critical= <i class="obj">aBoolean</i>  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Sets the status of the global &ldquo;thread critical&rdquo; condition and returns it. When set to <code class="const">true</code>, prohibits scheduling of any existing thread.  Does not block new threads from being created and run. Certain thread operations (such as stopping or killing a thread, sleeping in the current thread, and raising an exception) may cause a thread to be scheduled even when in a critical section.
+
+<div><code class="block">count=0
+Thread.new { while true; sleep(1); print "a "; count+=1; end }
+while count &lt; 3 do end # no-op wait
+Thread.critical = true
+puts "no more a's will come out."</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">a a a no more a's will come out.</code></div>
+
+		</dd>
+
+	<dt id="Thread.current">current</dt>
+		<dd class="callseq">Thread.current  &rarr; <i class="obj">aThread</i></dd>
+		<dd class="desc">Returns the currently executing thread.
+
+<div><code class="block">Thread.current <span class="output"><span class="outputmark">&rarr;</span> #&lt;Thread:0x401be5c8 run&gt;</span></code></div>
+
+		</dd>
+
+	<dt id="Thread.exit">exit</dt>
+		<dd class="callseq">Thread.exit</dd>
+		<dd class="desc">Terminates the currently running thread and schedules another thread to be run.  If this thread is already marked to be killed, <code class="method">exit</code> returns the <code class="class">Thread</code>.  If this is the main thread, or the last thread, exit the process. </dd>
+
+	<dt id="Thread.fork">fork</dt>
+		<dd class="callseq">Thread.fork { block }  &rarr; <i class="obj">aThread</i></dd>
+		<dd class="desc">Synonym for <code class="class_class_method"><a href="ref_c_thread.html#Thread.new"><span class="class">Thread</span>.<span class="method">new</span></a></code>.
+
+		</dd>
+
+	<dt id="Thread.kill">kill</dt>
+		<dd class="callseq">Thread.kill( <i class="obj">aThread</i> )</dd>
+		<dd class="desc">Causes the given thread to exit (see <code class="class_class_method"><a href="ref_c_thread.html#Thread.exit"><span class="class">Thread</span>.<span class="method">exit</span></a></code>).
+
+<div><code class="block">count = 0
+a = Thread.new { while true do  count += 1 end }
+sleep(1) <span class="output"><span class="outputmark">&rarr;</span> 1</span>
+Thread.kill(a) <span class="output"><span class="outputmark">&rarr;</span> #&lt;Thread:0x401b5cac dead&gt;</span>
+count <span class="output"><span class="outputmark">&rarr;</span> 903877</span>
+a.alive? <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+		</dd>
+
+	<dt id="Thread.list">list</dt>
+		<dd class="callseq">Thread.list  &rarr; <i class="obj">anArray</i></dd>
+		<dd class="desc">Returns an array of <code class="class">Thread</code> objects for all threads that are either runnable or stopped.
+
+<div><code class="block">Thread.new { sleep(200) }
+Thread.new { 1000000.times {|i| i*i } }
+Thread.new { Thread.stop }
+l = Thread.list
+l <span class="output"><span class="outputmark">&rarr;</span> [#&lt;Thread:0x401b5644 sleep&gt;, #&lt;Thread:0x401b59f0 run&gt;, #&lt;Thread:0x401b5cac sleep&gt;, #&lt;Thread:0x401be5c8 run&gt;]</span></code></div>
+
+		</dd>
+
+	<dt id="Thread.main">main</dt>
+		<dd class="callseq">Thread.main  &rarr; <i class="obj">aThread</i></dd>
+		<dd class="desc">Returns the main thread for the process.
+
+<div><code class="block">Thread.main <span class="output"><span class="outputmark">&rarr;</span> #&lt;Thread:0x401be5c8 run&gt;</span></code></div>
+
+		</dd>
+
+	<dt id="Thread.new">new</dt>
+		<dd class="callseq">Thread.new( <i>[</i><i class="obj">arg</i><i>]*</i> ) {| args | block }  &rarr; <i class="obj">aThread</i></dd>
+		<dd class="desc">Creates a new thread to execute the instructions given in <i class="obj">block</i>, and begins running it. Any arguments passed to <code class="class_class_method"><a href="ref_c_thread.html#Thread.new"><span class="class">Thread</span>.<span class="method">new</span></a></code> are passed into the block.
+
+<div><code class="block">x = Thread.new { sleep .1; print "x"; print "y"; print "z" }
+a = Thread.new { print "a"; print "b"; sleep .2; print "c" }
+x.join # Let the threads finish before
+a.join # main thread exits...</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">abxyzc</code></div>
+
+		</dd>
+
+	<dt id="Thread.pass">pass</dt>
+		<dd class="callseq">Thread.pass</dd>
+		<dd class="desc">Invokes the thread scheduler to pass execution to another
+      thread.
+
+<div><code class="block">a = Thread.new { print "a"; Thread.pass;
+                 print "b"; Thread.pass;
+                 print "c" }
+b = Thread.new { print "x"; Thread.pass;
+                 print "y"; Thread.pass;
+                 print "z" }
+a.join
+b.join</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">axbycz</code></div>
+
+		</dd>
+
+	<dt id="Thread.start">start</dt>
+		<dd class="callseq">Thread.start( <i>[</i><i class="obj">args</i><i>]*</i> ) {| args | block }  &rarr; <i class="obj">aThread</i></dd>
+		<dd class="desc">Basically the same as <code class="class_class_method"><a href="ref_c_thread.html#Thread.new"><span class="class">Thread</span>.<span class="method">new</span></a></code>. However, if class <code class="class">Thread</code> is subclassed, then calling <code class="method">start</code> in that subclass will not invoke the subclass's <code class="method">initialize</code> method. </dd>
+
+	<dt id="Thread.stop">stop</dt>
+		<dd class="callseq">Thread.stop</dd>
+		<dd class="desc">Stops execution of the current thread, putting it into a &ldquo;sleep&rdquo; state, and schedules execution of another thread. Resets the &ldquo;critical&rdquo; condition to <code class="const">false</code>.
+
+<div><code class="block">a = Thread.new { print "a"; Thread.stop; print "c" }
+Thread.pass
+print "b"
+a.run
+a.join</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">abc</code></div>
+
+		</dd>
+</dl>
+
+<h2 class="refsubsection" id="instancemethods">instance methods</h2>
+<dl class="methodlist">
+	<dt id="Thread._ob_cb">[ ]</dt>
+		<dd class="callseq"><i class="obj">thr</i>[ <i class="obj">aSymbol</i> ]  &rarr; <i class="obj">anObject</i> or <code>nil</code></dd>
+		<dd class="desc">Attribute Reference&mdash;Returns the value of a thread-local variable, using either a symbol or a string name.  If the specified variable does not exist, returns <code>nil</code>.
+
+<div><code class="block">a = Thread.new { Thread.current["name"] = "A"; Thread.stop }
+b = Thread.new { Thread.current[:name]  = "B"; Thread.stop }
+c = Thread.new { Thread.current["name"] = "C"; Thread.stop }
+Thread.list.each {|x| print x.inspect, x[:name], "\n" }</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">#&lt;Thread:0x401b53c4 sleep&gt;C
+#&lt;Thread:0x401b5734 sleep&gt;B
+#&lt;Thread:0x401b5cac sleep&gt;A
+#&lt;Thread:0x401be5c8 run&gt;nil</code></div>
+
+		</dd>
+
+	<dt id="Thread._ob_cb_eq">[ ]=</dt>
+		<dd class="callseq"><i class="obj">thr</i>[ <i class="obj">aSymbol</i> ]  = <i class="obj">anObject</i> &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Attribute Assignment&mdash;Sets or creates the value of a thread-local variable, using either a symbol or a string. See also <code class="class_instance_method"><a href="ref_c_thread.html#Thread._ob_cb"><span class="class">Thread</span>#<span class="method">[]</span></a></code>. </dd>
+
+	<dt id="Thread.abort_on_exception">abort_on_exception</dt>
+		<dd class="callseq"><i class="obj">thr</i>.abort_on_exception  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns the status of the &ldquo;abort on exception&rdquo; condition for <i class="obj">thr</i>.  The default is <code class="const">false</code>. See also <code class="class_class_method"><a href="ref_c_thread.html#Thread.abort_on_exception_eq"><span class="class">Thread</span>.<span class="method">abort_on_exception=</span></a></code>. </dd>
+
+	<dt id="Thread.abort_on_exception_eq">abort_on_exception=</dt>
+		<dd class="callseq"><i class="obj">thr</i>.abort_on_exception=  <code class="const">true</code> or <code class="const">false</code> &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">When set to <code class="const">true</code>, causes all threads (including the main program) to abort if an exception is raised in <i class="obj">thr</i>. The process will effectively <code>exit(0)</code>. </dd>
+
+	<dt id="Thread.alive_qm">alive?</dt>
+		<dd class="callseq"><i class="obj">thr</i>.alive?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">thr</i> is running or sleeping. <div><code class="block">Thread.current.alive? <span class="output"><span class="outputmark">&rarr;</span> true</span></code></div> </dd>
+
+	<dt id="Thread.exit">exit</dt>
+		<dd class="callseq"><i class="obj">thr</i>.exit  &rarr; <i class="obj">thr</i> or <code>nil</code></dd>
+		<dd class="desc">Terminates <i class="obj">thr</i> and schedules another thread to be run.  If this thread is already marked to be killed, <code class="method">exit</code> returns the <code class="class">Thread</code>.  If this is the main thread, or the last thread, exits the process. </dd>
+
+	<dt id="Thread.join">join</dt>
+		<dd class="callseq"><i class="obj">thr</i>.join  &rarr; <i class="obj">thr</i></dd>
+		<dd class="desc">The calling thread will suspend execution and run <i class="obj">thr</i>. Does not return until <i class="obj">thr</i> exits.  Any threads not joined will be killed when the main program exits.
+
+<div><code class="block">a = Thread.new { print "a"; sleep(10); print "b"; print "c" }
+x = Thread.new { print "x"; Thread.pass; print "y"; print "z" }
+x.join # Let x thread finish, a will be killed on exit.</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">axyz</code></div>
+
+		</dd>
+
+	<dt id="Thread.key_qm">key?</dt>
+		<dd class="callseq"><i class="obj">thr</i>.key?( <i class="obj">aSymbol</i> )  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if the given string (or symbol) exists as a thread-local variable.
+
+<div><code class="block">me = Thread.current
+me[:oliver] = "a"
+me.key?(:oliver) <span class="output"><span class="outputmark">&rarr;</span> true</span>
+me.key?(:stanley) <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+		</dd>
+
+	<dt id="Thread.kill">kill</dt>
+		<dd class="callseq"><i class="obj">thr</i>.kill</dd>
+		<dd class="desc">Synonym for <code class="class_instance_method"><a href="ref_c_thread.html#Thread.exit"><span class="class">Thread</span>#<span class="method">exit</span></a></code>. </dd>
+
+	<dt id="Thread.priority">priority</dt>
+		<dd class="callseq"><i class="obj">thr</i>.priority  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Returns the priority of <i class="obj">thr</i>.  Default is zero; higher-priority threads will run before lower-priority threads.
+
+<div><code class="block">Thread.current.priority <span class="output"><span class="outputmark">&rarr;</span> 0</span></code></div>
+
+		</dd>
+
+	<dt id="Thread.priority_eq">priority=</dt>
+		<dd class="callseq"><i class="obj">thr</i>.priority= <i class="obj">anInteger</i>  &rarr; <i class="obj">thr</i></dd>
+		<dd class="desc">Sets the priority of <i class="obj">thr</i> to <i class="obj">anInteger</i>. Higher-priority threads will run before lower-priority threads.
+
+<div><code class="block">count1 = count2 = 0
+a = Thread.new do
+      loop { count1 += 1 }
+    end
+a.priority = -1</code></div>
+
+<div><code class="block">b = Thread.new do
+      loop { count2 += 1 }
+    end
+b.priority = -2
+sleep 1 <span class="output"><span class="outputmark">&rarr;</span> 1</span>
+Thread.critical = 1
+count1 <span class="output"><span class="outputmark">&rarr;</span> 577581</span>
+count2 <span class="output"><span class="outputmark">&rarr;</span> 5751</span></code></div>
+
+		</dd>
+
+	<dt id="Thread.raise">raise</dt>
+		<dd class="callseq"><i class="obj">thr</i>.raise( <i class="obj">anException</i> )</dd>
+		<dd class="desc">Raises an exception (see <code class="module_module_method"><a href="ref_m_kernel.html#Kernel.raise"><span class="module">Kernel</span>::<span class="method">raise</span></a></code> for details) from <i class="obj">thr</i>. The caller does not have to be <i class="obj">thr</i>.
+
+<div><code class="block">Thread.abort_on_exception = true
+a = Thread.new { sleep(200) }
+a.raise("Gotcha")</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">prog.rb:3: Gotcha (RuntimeError)
+	from prog.rb:2:in `initialize'
+	from prog.rb:2:in `new'
+	from prog.rb:2</code></div>
+
+		</dd>
+
+	<dt id="Thread.run">run</dt>
+		<dd class="callseq"><i class="obj">thr</i>.run  &rarr; <i class="obj">thr</i></dd>
+		<dd class="desc">Wakes up <i class="obj">thr</i>, making it eligible for scheduling. If not in a critical section, then invokes the scheduler.
+
+<div><code class="block">a = Thread.new { puts "a"; Thread.stop; puts "c" }
+Thread.pass
+puts "Got here"
+a.run
+a.join</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">a
+Got here
+c</code></div>
+
+		</dd>
+
+	<dt id="Thread.safe_level">safe_level</dt>
+		<dd class="callseq"><i class="obj">thr</i>.safe_level  &rarr; <i class="obj">anInteger</i></dd>
+		<dd class="desc">Returns the safe level in effect for <i class="obj">thr</i>.
+
+<div><code class="block">Thread.current.safe_level <span class="output"><span class="outputmark">&rarr;</span> 0</span></code></div>
+
+		</dd>
+
+	<dt id="Thread.status">status</dt>
+		<dd class="callseq"><i class="obj">thr</i>.status  &rarr; <i class="obj">aString</i>, <code class="const">false</code> or <code>nil</code></dd>
+		<dd class="desc">Returns the status of <i class="obj">thr</i>: &ldquo;<code>sleep</code>&rdquo; if <i class="obj">thr</i> is sleeping or waiting on I/O, &ldquo;<code>run</code>&rdquo; if <i class="obj">thr</i> is executing, <code class="const">false</code> if <i class="obj">thr</i> terminated normally, and <code>nil</code> if <i class="obj">thr</i> terminated with an exception.
+
+<div><code class="block">a = Thread.new { raise("die now") }
+b = Thread.new { Thread.stop }
+c = Thread.new { Thread.exit }
+a.status <span class="output"><span class="outputmark">&rarr;</span> nil</span>
+b.status <span class="output"><span class="outputmark">&rarr;</span> "sleep"</span>
+c.status <span class="output"><span class="outputmark">&rarr;</span> false</span>
+Thread.current.status <span class="output"><span class="outputmark">&rarr;</span> "run"</span></code></div>
+
+		</dd>
+
+	<dt id="Thread.stop_qm">stop?</dt>
+		<dd class="callseq"><i class="obj">thr</i>.stop?  &rarr; <code class="const">true</code> or <code class="const">false</code></dd>
+		<dd class="desc">Returns <code class="const">true</code> if <i class="obj">thr</i> is dead or sleeping.
+
+<div><code class="block">a = Thread.new { Thread.stop }
+b = Thread.current
+a.stop? <span class="output"><span class="outputmark">&rarr;</span> true</span>
+b.stop? <span class="output"><span class="outputmark">&rarr;</span> false</span></code></div>
+
+		</dd>
+
+	<dt id="Thread.value">value</dt>
+		<dd class="callseq"><i class="obj">thr</i>.value  &rarr; <i class="obj">anObject</i></dd>
+		<dd class="desc">Waits for <i class="obj">thr</i> to complete (via <code class="class_instance_method"><a href="ref_c_thread.html#Thread.join"><span class="class">Thread</span>#<span class="method">join</span></a></code>) and returns its value.
+
+<div><code class="block">a = Thread.new { 2+2 }
+a.value <span class="output"><span class="outputmark">&rarr;</span> 4</span></code></div>
+
+		</dd>
+
+	<dt id="Thread.wakeup">wakeup</dt>
+		<dd class="callseq"><i class="obj">thr</i>.wakeup  &rarr; <i class="obj">thr</i></dd>
+		<dd class="desc">Marks <i class="obj">thr</i> as eligible for scheduling (it may still remain blocked on I/O, however). Does not invoke the scheduler (see <code class="class_instance_method"><a href="ref_c_thread.html#Thread.run"><span class="class">Thread</span>#<span class="method">run</span></a></code>).
+
+<div><code class="block">c = Thread.new { Thread.stop; puts "hey!" }
+c.wakeup</code></div>
+<p class="produces"><em>produces:</em></p>
+<div><code class="block">hey!</code></div></dd>
+</dl>
+
+<div id="menubot" class="menu">
+	
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="ref_c_thread.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>

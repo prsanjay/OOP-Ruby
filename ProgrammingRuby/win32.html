@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+	<title>Ruby and Microsoft Windows</title>
+	<link rel="stylesheet" href="includes/styles.css" type="text/css" media="all">
+</head>
+<body>
+<div id="header">
+	<h1>Programming Ruby</h1>
+	<h2>The Pragmatic Programmer's Guide</h2>
+</div><div id="menutop" class="menu">
+	<a href="ext_tk.html" class="prev">&lt; Previous</a><a href="ext_ruby.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div><script type="text/javascript">
+	top.frames.toc && top.frames.toc.SyncChanges && top.frames.toc.SyncChanges(null,'win32',location.hash);
+	top.document.title=document.title+' @ Programming Ruby';
+</script>
+
+
+<h1 id="rubyandmicrosoftwindows">Ruby and Microsoft Windows</h1>
+<p>Ruby is written for POSIX environments, which means that it can take advantage of all of the system calls and libraries that Unix programmers are familiar with.</p>
+<p>But there are a number of features and extensions designed to make Ruby more useful in a Microsoft Windows environment, too.  In this chapter, we'll look at these features and share some secrets to using Ruby effectively under Windows.</p>
+
+<h2 id="rubyports">Ruby Ports</h2>
+<p>Windows does not provide a POSIX environment by itself, so some sort of emulation library is required in order to provide the necessary functions.  There are several ports of Ruby for Windows: the most commonly used one relies on the GNU Win32 environment, and is called the &ldquo;cygwin32&rdquo; port.  The cygwin32 port works well with extension libraries, and is available on the Web as a precompiled binary. Another port, &ldquo;mswin32,&rdquo; does not rely on cygwin.  It is currently available as source code only. The remainder of this chapter will refer to the cygwin32 port.</p>
+
+<h2 id="runningrubyunderwindows">Running Ruby Under Windows</h2>
+<p>There are two executables provided with the cygwin32 Ruby distribution: <code>ruby.exe</code> and <code>rubyw.exe</code>.</p>
+<p><code>ruby.exe</code> is meant to be used at a command prompt (a DOS shell), just as in the Unix version.  For applications that read and write to the standard input and output, this is fine. But that also means that anytime you run <code>ruby.exe</code>, you'll get a DOS shell even if you don't want one&mdash;Windows will create a new command prompt window and display it while Ruby is running.  This might not be appropriate behavior if, for example, you double-click on a Ruby script that uses a graphical interface (such as Tk), or if you are running a Ruby script as a background task, or from inside another program.</p>
+<p>In these cases, you'll want to use <code>rubyw.exe</code>.  It is the same as <code>ruby.exe</code> except that it does not provide standard in, standard out, or standard error, and does not launch a DOS shell when run.</p>
+<p>You can set a file association <span class="footnote">Using   <code>View/Options/Filetypes</code> from Explorer.</span> so that files with the extension &ldquo;<code>.rb</code>&rdquo; will automatically use <code>rubyw.exe</code>.  By doing this, you can double-click on Ruby scripts and they will simply run without popping up a DOS shell.</p>
+
+<h2 id="win32api">Win32API</h2>
+<p>If you plan on doing Ruby programming that needs to access some Windows 32 API functions directly, or to use the entry points in some other DLLs, we've got good news for you&mdash;the <code class="class">Win32API</code> extension.</p>
+<p>The <code class="class">Win32API</code> module is documented in the reference library section &ldquo;<a href="lib_windows.html#Win32API">WIN32API</a>,&rdquo; but here's a quick peek at how it works.</p>
+<p>You create a <code class="class">Win32API</code> object that represents a call to a particular DLL entry point by specifying the name of the function, the name of the DLL that contains the function, and the function signature (argument types and return type).  The resulting object can then be used to make the function call.</p>
+<p>Many of the arguments to DLL functions are binary structures of some form.  <code class="class">Win32API</code> handles this by using Ruby <code class="class">String</code> objects to pass the binary data back and forth.  You will need to pack and unpack these strings as necessary (see <a href="lib_windows.html#Win32API">the example in the reference</a>).</p>
+
+<h2 id="windowsautomation">Windows Automation</h2>
+<p>If groveling around in the low-level Windows API doesn't interest you, Windows automation might&mdash;you can use Ruby as a client for Windows Automation thanks to a Ruby extension called <code class="class">WIN32OLE</code>, written by Masaki Suketa. The examples in this section are taken from those provided in the <code class="class">WIN32OLE</code> distribution.</p>
+<p>Windows automation allows an automation controller (a client) to issue commands and queries against an automation server, such as Microsoft Excel, Word, PowerPoint, and so on.</p>
+<p>You can execute a method of an automation server by calling a method of the same name from a <code>WIN32OLE</code> object.  For instance, you can create a new <code class="class">WIN32OLE</code> client that launches a fresh copy of Internet Explorer and commands it to visit the home page.</p>
+
+<div><code class="block">ie = WIN32OLE.new('InternetExplorer.Application')
+ie.visible = true
+ie.gohome</code></div>
+<p>Methods that aren't known to <code class="class">WIN32OLE</code> (such as <code>visible</code> or <code>gohome</code>) are passed on to the <code class="class_instance_method"><span class="class">WIN32OLE</span>#<span class="method">invoke</span></code> method, which sends the proper commands to the server.  The <a href="lib_windows.html#WIN32OLE"><code class="class">WIN32OLE</code> reference</a> describes the class in detail, but we'll go over a few of its features here.</p>
+
+<h3 id="gettingandsettingproperties">Getting and Setting Properties</h3>
+<p>You can set and get <em>properties</em> from the server using normal Ruby hash notation.  For example, to set the <code>Rotation</code> property in an Excel chart, you might write</p>
+
+<div><code class="block">excel = WIN32OLE.new("excel.application")
+excelchart = excel.Charts.Add()
+...
+excelchart['Rotation'] = 45
+puts excelchart['Rotation']</code></div>
+<p>An OLE object's parameters are automatically set up as attributes of the <code class="class">WIN32OLE</code> object. This means that you can set a parameter by assigning to an object attribute.</p>
+
+<div><code class="block">excelchart.rotation = 45
+r = excelchart.rotation</code></div>
+<p>Because these attributes are conventional Ruby accessor methods, attribute names cannot start with a capital letter. In this example, we have to use <code>rotation</code> instead of <code>Rotation</code>.</p>
+
+<h3 id="namedarguments">Named Arguments</h3>
+<p>Other automation client languages such as Visual Basic have the concept of <em>named arguments</em>.  Suppose you had a Visual Basic routine with the signature:</p>
+
+<div><code class="block">Song(artist, title, length):    rem Visual Basic</code></div>
+<p>Instead of calling it with all three arguments in the order specified, you could use named arguments.</p>
+
+<div><code class="block">Song title := 'Get It On':      rem Visual Basic</code></div>
+<p>This is equivalent to the call <code>Song(nil, 'Get It On', nil)</code>.</p>
+<p>In Ruby, you can use this feature by passing a hash with the named arguments.</p>
+
+<div><code class="block">Song.new( 'title' =&gt; 'Get It On' )</code></div>
+
+<h3 id="foreach">for each</h3>
+<p>Where Visual Basic has a &ldquo;for each&rdquo; statement to iterate over a collection of items in a server, a <code class="class">WIN32OLE</code> object has an <code>each</code> method (which takes a block) to accomplish the same thing.</p>
+
+<h3 id="anexample">An Example</h3>
+<p>The following example, using Microsoft Excel, illustrates most of these concepts.  First, we create a new <code>WIN32OLE</code> object attached to Excel and set some cell values. Next we select a range of cells and create a chart.  We set the <code>Type</code> property in the <code>excelchart</code> object to make it a 3D chart. Next we'll loop through and change the chart rotation, 10&#176; at a time. We'll add a few charts, and we'll use <code>each</code> to step through and print them out. Finally, we'll close down the Excel application and exit.</p>
+
+<div><code class="block">require 'win32ole'
+
+# -4100 is the value for the Excel constant xl3DColumn.
+ChartTypeVal = -4100;
+
+# Creates OLE object to Excel
+excel = WIN32OLE.new("excel.application")
+
+# Create and rotate the chart
+
+excel['Visible'] = TRUE;
+workbook = excel.Workbooks.Add();
+excel.Range("a1")['Value'] = 3;
+excel.Range("a2")['Value'] = 2;
+excel.Range("a3")['Value'] = 1;
+excel.Range("a1:a3").Select();
+excelchart = workbook.Charts.Add();
+excelchart['Type'] = ChartTypeVal;
+
+30.step(180, 10) do |rot|
+    excelchart['Rotation'] = rot
+end
+
+excelchart2 = workbook.Charts.Add();
+excelchart3 = workbook.Charts.Add();
+
+charts = workbook.Charts
+charts.each { |i| puts i }
+
+excel.ActiveWorkbook.Close(0);
+excel.Quit();</code></div>
+
+<h3 id="optimizing">Optimizing</h3>
+<p>As with most (if not all) high-level languages, it can be all too easy to churn out code that is unbearably slow, but that can be easily fixed with a little thought.</p>
+<p>With <code class="class">WIN32OLE</code>, you need to be careful with unnecessary dynamic lookups.  Where possible, it is better to assign a <code class="class">WIN32OLE</code> object to a variable and then reference elements from it, rather than creating a long chain of &ldquo;.&rdquo; expressions.</p>
+<p>For example, instead of writing</p>
+
+<div><code class="block">workbook.Worksheets(1).Range("A1").value = 1
+workbook.Worksheets(1).Range("A2").value = 2
+workbook.Worksheets(1).Range("A3").value = 4
+workbook.Worksheets(1).Range("A4").value = 8</code></div>
+
+<p>we can eliminate the common subexpressions by saving the first part of the expression to a temporary variable and then make calls from that variable:</p>
+
+<div><code class="block">worksheet = workbook.Worksheets(1)
+
+worksheet.Range("A1").value = 1
+worksheet.Range("A2").value = 2
+worksheet.Range("A3").value = 4
+worksheet.Range("A4").value = 8</code></div>
+
+
+<div id="menubot" class="menu">
+	<a href="ext_tk.html" class="prev">&lt; Previous</a><a href="ext_ruby.html" class="next">Next &gt;</a>
+	<a href="frameset.html" class="contents" target="_top">^Contents^</a>
+</div>
+
+<div id="copyright">
+	<p>Extracted from the book "Programming Ruby -  The Pragmatic Programmer's Guide"</p>
+	<p>Copyright &copy; 2001 by Addison Wesley Longman, Inc. This material may be distributed only subject to the terms and conditions set forth in the Open Publication License, v1.0 or later (the latest version is presently available at <a href="http://www.opencontent.org/openpub/">http://www.opencontent.org/openpub/</a>).</p>
+	<p>Distribution of substantively modified versions of this document is prohibited without the explicit permission of the copyright holder.</p>
+	<p>Distribution of the work or derivative of the work in any standard (paper) book form is prohibited unless prior permission is obtained from the copyright holder.</p>
+</div>
+
+<a href="win32.html" target="_top" id="expand" title="Show this content in its own window" onclick="this.href=window.location.href"><img src="includes/expand.png" alt="Show this content in its own window" width="15" height="15"></a>
+<script type="text/javascript">
+	if (top==self && document.getElementById){
+		ex = document.getElementById('expand');
+		img = ex.getElementsByTagName('img')[0];
+		ex.title=img.alt="Show this content alongside the Table of Contents";
+		ex.onclick=function(){ return true }
+		ex.href="frameset.html?content="+escape(self.location.href);
+		img.src="includes/collapse.png";
+	}
+</script>
+</body>
+</html>
